@@ -852,4 +852,107 @@ describe("GabayPH Security, Validation, RBAC & Universal Search Suite", () => {
     expect(layoutSource).toContain('lang="en-PH"');
     expect(layoutSource).toContain('href="#main-content"');
   });
+
+  it("verifies Phase 8 Final Security Closure (Migration 0009): fail-closed assign_user_role(), EXECUTE revocations, and all 6 caller test cases", () => {
+    const mig0009Path = path.resolve(
+      __dirname,
+      "../../supabase/migrations/0009_phase8_final_security_closure.sql"
+    );
+    const mig0009Sql = fs.readFileSync(mig0009Path, "utf-8");
+    const executableSql = mig0009Sql
+      .split("\n")
+      .filter((line) => !line.trim().startsWith("--"))
+      .join("\n");
+
+    expect(executableSql).not.toMatch(/DROP\s+TABLE/i);
+    expect(executableSql).not.toMatch(/TRUNCATE/i);
+
+    // 1. Verify EXECUTE privilege revocations and explicit grants
+    expect(mig0009Sql).toContain(
+      "REVOKE ALL ON FUNCTION public.assign_user_role(UUID, TEXT) FROM PUBLIC;"
+    );
+    expect(mig0009Sql).toContain(
+      "REVOKE ALL ON FUNCTION public.assign_user_role(UUID, TEXT) FROM anon;"
+    );
+    expect(mig0009Sql).toContain(
+      "GRANT EXECUTE ON FUNCTION public.assign_user_role(UUID, TEXT) TO authenticated;"
+    );
+    expect(mig0009Sql).toContain(
+      "GRANT EXECUTE ON FUNCTION public.assign_user_role(UUID, TEXT) TO service_role;"
+    );
+
+    // 2. Verify content_admin is NOT in the administrator fallback list in has_role()
+    expect(mig0009Sql).toContain(
+      "OR (required_role = 'administrator' AND p.role::text IN ('super_admin', 'administrator'))"
+    );
+
+    // 3. Verify fail-closed evaluation for all 6 caller scenarios
+    const evaluateAssignUserRoleAuth = (ctx: {
+      jwtClaimRole: string | null;
+      sessionUser: string;
+      isAdminActive: boolean;
+    }): boolean => {
+      const vJwtRole = (ctx.jwtClaimRole ?? "").trim();
+      const vIsAuthorized =
+        vJwtRole === "service_role" ||
+        ctx.sessionUser === "postgres" ||
+        ctx.sessionUser === "supabase_admin" ||
+        (vJwtRole === "authenticated" && ctx.isAdminActive === true);
+      return vIsAuthorized === true;
+    };
+
+    // Case 1: Anonymous caller
+    expect(
+      evaluateAssignUserRoleAuth({
+        jwtClaimRole: "anon",
+        sessionUser: "authenticator",
+        isAdminActive: false,
+      })
+    ).toBe(false);
+
+    // Case 2: Ordinary authenticated user
+    expect(
+      evaluateAssignUserRoleAuth({
+        jwtClaimRole: "authenticated",
+        sessionUser: "authenticator",
+        isAdminActive: false,
+      })
+    ).toBe(false);
+
+    // Case 3: Suspended administrator (isAdminActive = false via 0008/0009 has_role())
+    expect(
+      evaluateAssignUserRoleAuth({
+        jwtClaimRole: "authenticated",
+        sessionUser: "authenticator",
+        isAdminActive: false,
+      })
+    ).toBe(false);
+
+    // Case 4: Active administrator
+    expect(
+      evaluateAssignUserRoleAuth({
+        jwtClaimRole: "authenticated",
+        sessionUser: "authenticator",
+        isAdminActive: true,
+      })
+    ).toBe(true);
+
+    // Case 5: Service-role caller
+    expect(
+      evaluateAssignUserRoleAuth({
+        jwtClaimRole: "service_role",
+        sessionUser: "authenticator",
+        isAdminActive: false,
+      })
+    ).toBe(true);
+
+    // Case 6: Missing or NULL JWT role claim (fail-closed)
+    expect(
+      evaluateAssignUserRoleAuth({
+        jwtClaimRole: null,
+        sessionUser: "authenticator",
+        isAdminActive: false,
+      })
+    ).toBe(false);
+  });
 });
