@@ -250,6 +250,19 @@ export function CivicHeader() {
         {/* Right Utility Actions: Search, Bookmarks, Theme, Login & Register */}
         <div className="flex items-center gap-1.5">
           <Link
+            href="/assistant"
+            aria-label="GabayAI Grounded Assistant"
+            className={`gabay-interactive inline-flex min-h-[36px] items-center gap-1.5 rounded-md border px-2.5 py-1 text-[12px] font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#087F8C] ${
+              pathname === "/assistant"
+                ? "border-[#087F8C] bg-[#087F8C]/10 text-[#087F8C]"
+                : "border-slate-300 bg-[#F7F9FC] text-[#17365D] hover:border-[#087F8C]"
+            }`}
+          >
+            <Compass className="h-3.5 w-3.5 text-[#087F8C]" aria-hidden="true" />
+            <span className="hidden sm:inline">GabayAI</span>
+          </Link>
+
+          <Link
             href="/search"
             aria-label="Universal Search"
             className={`gabay-interactive inline-flex min-h-[36px] items-center gap-1.5 rounded-md border px-2.5 py-1 text-[12px] font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#087F8C] ${

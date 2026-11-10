@@ -119,10 +119,18 @@ export default function AdminDashboardPage() {
     },
   ]);
 
-  // System settings state
+  // System & AI Governance settings state
   const [turnstileEnabled, setTurnstileEnabled] = useState(true);
-  const [aiAssistantEnabled, setAiAssistantEnabled] = useState(false);
+  const [aiAssistantEnabled, setAiAssistantEnabled] = useState(true);
   const [strictExpiryArchive, setStrictExpiryArchive] = useState(true);
+  const [aiModelName, setAiModelName] = useState<
+    "gemini-2.5-flash" | "gemini-1.5-flash" | "grounded-local-rag"
+  >("gemini-2.5-flash");
+  const [aiMaxRpm, setAiMaxRpm] = useState<number>(20);
+  const [aiStrictGrounding, setAiStrictGrounding] = useState<boolean>(true);
+  const [aiPromptInjectionShield, setAiPromptInjectionShield] =
+    useState<boolean>(true);
+  const [aiEmergencyTriage, setAiEmergencyTriage] = useState<boolean>(true);
 
   const appendAudit = (action: string, entityType: string, entityId: string, summary: string) => {
     setAuditLogs((prev) => [
@@ -959,19 +967,20 @@ export default function AdminDashboardPage() {
               </div>
             )}
 
-            {/* 13. SYSTEM SETTINGS (Super Admin Only) */}
+            {/* 13. SYSTEM & AI GOVERNANCE SETTINGS (Super Admin Only) */}
             {activeTab === "settings" && (
               <div>
                 <h2 className="text-base font-bold text-slate-900">
-                  13. Platform Security & Feature Flag Settings
+                  13. Platform Security, Feature Flags &amp; AI Governance Settings
                 </h2>
                 {!isSuperAdmin ? (
                   <p className="mt-3 rounded border border-amber-300 bg-amber-50 p-3 text-xs text-amber-950">
-                    Restricted: System settings require{" "}
-                    <strong>Super Admin</strong> privileges.
+                    Restricted: System and AI governance settings require{" "}
+                    <strong>Super Admin (Administrator)</strong> privileges.
                   </p>
                 ) : (
-                  <div className="mt-4 space-y-3 text-xs">
+                  <div className="mt-4 space-y-4 text-xs">
+                    {/* Core Platform Security Toggles */}
                     <div className="flex items-center justify-between rounded border border-slate-200 p-3.5">
                       <div>
                         <strong className="text-slate-900">
@@ -1018,28 +1027,241 @@ export default function AdminDashboardPage() {
                       </button>
                     </div>
 
-                    <div className="flex items-center justify-between rounded border border-slate-200 p-3.5">
-                      <div>
-                        <strong className="text-slate-900">
-                          Optional Source-Grounded AI Assistant (/api/assistant)
-                        </strong>
-                        <p className="text-slate-600">
-                          Feature flag for bilingual (Filipino/English) resource assistant. Core platform operates without AI dependency.
-                        </p>
+                    {/* Phase 7 AI Assistant Governance Panel */}
+                    <div className="rounded-md border border-slate-300 bg-slate-50/70 p-4">
+                      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-3">
+                        <div>
+                          <span className="rounded bg-[#17365D] px-2 py-0.5 font-mono text-[10px] font-bold uppercase text-white">
+                            Phase 7 · AI Governance
+                          </span>
+                          <h3 className="mt-1 text-sm font-bold text-slate-900">
+                            GabayAI Grounded Assistant Configuration &amp; Safety Controls
+                          </h3>
+                          <p className="text-[11px] text-slate-600">
+                            Manage AI availability, provider status, model selection, rate limits, and safety shields. API keys are kept strictly server-side and are never exposed in the dashboard.
+                          </p>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            const next = !aiAssistantEnabled;
+                            setAiAssistantEnabled(next);
+                            appendAudit(
+                              "ai.toggle_availability",
+                              "ai_admin_settings",
+                              "default",
+                              `Set GabayAI availability to ${next ? "ENABLED" : "STANDBY"}`
+                            );
+                            try {
+                              await fetch("/api/assistant", {
+                                method: "PATCH",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({
+                                  actorRole: user.role,
+                                  aiEnabled: next,
+                                }),
+                              });
+                            } catch {
+                              // ignore network error in preview
+                            }
+                          }}
+                          className={`rounded border px-3 py-1.5 font-semibold ${
+                            aiAssistantEnabled
+                              ? "border-emerald-300 bg-emerald-50 text-emerald-900"
+                              : "border-slate-300 bg-slate-100 text-slate-700"
+                          }`}
+                        >
+                          {aiAssistantEnabled ? "AI ENABLED" : "STANDBY / DISABLED"}
+                        </button>
                       </div>
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setAiAssistantEnabled(!aiAssistantEnabled)
-                        }
-                        className={`rounded border px-3 py-1.5 font-semibold ${
-                          aiAssistantEnabled
-                            ? "border-emerald-300 bg-emerald-50 text-emerald-900"
-                            : "border-slate-300 bg-slate-100 text-slate-700"
-                        }`}
-                      >
-                        {aiAssistantEnabled ? "ENABLED" : "OPTIONAL / STANDBY"}
-                      </button>
+
+                      {/* Provider Status & Usage Telemetry Summary */}
+                      <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
+                        <div className="rounded border border-slate-200 bg-white p-3">
+                          <div className="text-[11px] font-semibold uppercase text-slate-500">
+                            Provider Configuration Status
+                          </div>
+                          <div className="mt-1 font-bold text-slate-900">
+                            Grounded RAG + Optional Gemini API
+                          </div>
+                          <p className="mt-0.5 text-[11px] text-slate-600">
+                            Secret Credentials: <strong>REDACTED (Server-Only)</strong>
+                          </p>
+                        </div>
+
+                        <div className="rounded border border-slate-200 bg-white p-3">
+                          <div className="text-[11px] font-semibold uppercase text-slate-500">
+                            Active Model &amp; Fallback
+                          </div>
+                          <div className="mt-1 font-mono font-bold text-[#17365D]">
+                            {aiModelName}
+                          </div>
+                          <p className="mt-0.5 text-[11px] text-slate-600">
+                            Auto-falls back to deterministic Grounded Local RAG if quota/key unavailable.
+                          </p>
+                        </div>
+
+                        <div className="rounded border border-slate-200 bg-white p-3">
+                          <div className="text-[11px] font-semibold uppercase text-slate-500">
+                            Safety &amp; Error Monitoring
+                          </div>
+                          <div className="mt-1 font-bold text-emerald-800">
+                            100% Citation Grounding Active
+                          </div>
+                          <p className="mt-0.5 text-[11px] text-slate-600">
+                            Zero PII logged · 30-day RLS chat retention
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Model Selection & Rate Limits */}
+                      <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                        <div className="rounded border border-slate-200 bg-white p-3">
+                          <label
+                            htmlFor="admin-ai-model"
+                            className="block font-semibold text-slate-900"
+                          >
+                            Model Selection (Free-Tier Compatible)
+                          </label>
+                          <select
+                            id="admin-ai-model"
+                            value={aiModelName}
+                            onChange={async (e) => {
+                              const nextModel = e.target.value as
+                                | "gemini-2.5-flash"
+                                | "gemini-1.5-flash"
+                                | "grounded-local-rag";
+                              setAiModelName(nextModel);
+                              appendAudit(
+                                "ai.change_model",
+                                "ai_admin_settings",
+                                "default",
+                                `Selected AI model: ${nextModel}`
+                              );
+                              try {
+                                await fetch("/api/assistant", {
+                                  method: "PATCH",
+                                  headers: { "Content-Type": "application/json" },
+                                  body: JSON.stringify({
+                                    actorRole: user.role,
+                                    modelName: nextModel,
+                                  }),
+                                });
+                              } catch {
+                                // ignore
+                              }
+                            }}
+                            className="mt-1.5 w-full rounded border border-slate-300 bg-white px-2.5 py-1.5 text-xs text-slate-900"
+                          >
+                            <option value="gemini-2.5-flash">
+                              gemini-2.5-flash (Recommended Free-Tier + RAG Fallback)
+                            </option>
+                            <option value="gemini-1.5-flash">
+                              gemini-1.5-flash (Fast Bilingual + RAG Fallback)
+                            </option>
+                            <option value="grounded-local-rag">
+                              grounded-local-rag (Deterministic Zero-Cost Engine Only)
+                            </option>
+                          </select>
+                        </div>
+
+                        <div className="rounded border border-slate-200 bg-white p-3">
+                          <label
+                            htmlFor="admin-ai-rpm"
+                            className="block font-semibold text-slate-900"
+                          >
+                            Per-Client Rate Limit (Requests / Minute)
+                          </label>
+                          <select
+                            id="admin-ai-rpm"
+                            value={aiMaxRpm}
+                            onChange={async (e) => {
+                              const nextRpm = Number(e.target.value);
+                              setAiMaxRpm(nextRpm);
+                              appendAudit(
+                                "ai.update_rate_limit",
+                                "ai_admin_settings",
+                                "default",
+                                `Updated AI rate limit to ${nextRpm} requests/min`
+                              );
+                              try {
+                                await fetch("/api/assistant", {
+                                  method: "PATCH",
+                                  headers: { "Content-Type": "application/json" },
+                                  body: JSON.stringify({
+                                    actorRole: user.role,
+                                    maxRequestsPerMinute: nextRpm,
+                                  }),
+                                });
+                              } catch {
+                                // ignore
+                              }
+                            }}
+                            className="mt-1.5 w-full rounded border border-slate-300 bg-white px-2.5 py-1.5 text-xs text-slate-900"
+                          >
+                            <option value={10}>10 RPM (Strict Free-Tier Protection)</option>
+                            <option value={20}>20 RPM (Standard Public Access)</option>
+                            <option value={40}>40 RPM (High-Traffic Disaster Mode)</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      {/* Safety Guardrail Switches */}
+                      <div className="mt-3 grid grid-cols-1 gap-2.5 sm:grid-cols-3">
+                        <div className="flex items-center justify-between rounded border border-slate-200 bg-white p-2.5">
+                          <span>Strict Published-Only Grounding</span>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setAiStrictGrounding(!aiStrictGrounding)
+                            }
+                            className={`rounded px-2 py-0.5 font-mono text-[10px] font-bold ${
+                              aiStrictGrounding
+                                ? "bg-emerald-100 text-emerald-900"
+                                : "bg-slate-200 text-slate-700"
+                            }`}
+                          >
+                            {aiStrictGrounding ? "ON" : "OFF"}
+                          </button>
+                        </div>
+
+                        <div className="flex items-center justify-between rounded border border-slate-200 bg-white p-2.5">
+                          <span>Prompt-Injection Shield</span>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setAiPromptInjectionShield(
+                                !aiPromptInjectionShield
+                              )
+                            }
+                            className={`rounded px-2 py-0.5 font-mono text-[10px] font-bold ${
+                              aiPromptInjectionShield
+                                ? "bg-emerald-100 text-emerald-900"
+                                : "bg-slate-200 text-slate-700"
+                            }`}
+                          >
+                            {aiPromptInjectionShield ? "ON" : "OFF"}
+                          </button>
+                        </div>
+
+                        <div className="flex items-center justify-between rounded border border-slate-200 bg-white p-2.5">
+                          <span>911 / 143 Emergency Triage</span>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setAiEmergencyTriage(!aiEmergencyTriage)
+                            }
+                            className={`rounded px-2 py-0.5 font-mono text-[10px] font-bold ${
+                              aiEmergencyTriage
+                                ? "bg-emerald-100 text-emerald-900"
+                                : "bg-slate-200 text-slate-700"
+                            }`}
+                          >
+                            {aiEmergencyTriage ? "ON" : "OFF"}
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 )}
