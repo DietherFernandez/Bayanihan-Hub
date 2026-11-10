@@ -14,7 +14,7 @@ export default function SearchHistoryPage() {
     <div className="mx-auto max-w-4xl px-4 py-8">
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-4">
         <div>
-          <div className="inline-flex items-center gap-1.5 rounded bg-blue-50 px-2.5 py-0.5 text-xs font-bold uppercase text-[#0B3D91]">
+          <div className="inline-flex items-center gap-1.5 rounded bg-blue-50 px-2.5 py-0.5 text-xs font-bold uppercase text-[#17365D]">
             <History className="h-3.5 w-3.5" />
             <span>Search History & Privacy Controls</span>
           </div>
@@ -75,7 +75,7 @@ export default function SearchHistoryPage() {
       {user && (
         <div className="mb-6 flex items-center justify-between rounded-md border border-slate-200 bg-white p-4 text-xs">
           <div className="flex items-start gap-2.5">
-            <Shield className="mt-0.5 h-4 w-4 shrink-0 text-[#0B3D91]" />
+            <Shield className="mt-0.5 h-4 w-4 shrink-0 text-[#17365D]" />
             <div>
               <strong className="text-slate-900">
                 Search History Recording Preference
@@ -129,7 +129,7 @@ export default function SearchHistoryPage() {
                 <span className="text-slate-400">{item.timestamp}</span>
                 <Link
                   href={`/search?q=${encodeURIComponent(item.query)}&module=${item.moduleFilter}&region=${item.regionFilter}`}
-                  className="font-semibold text-[#0B3D91] hover:underline"
+                  className="font-semibold text-[#17365D] hover:underline"
                 >
                   Run Search Again →
                 </Link>

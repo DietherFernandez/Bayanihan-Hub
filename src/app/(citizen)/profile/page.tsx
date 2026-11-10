@@ -37,7 +37,7 @@ export default function ProfilePage() {
           <div className="mt-4 flex justify-center gap-3">
             <Link
               href="/login"
-              className="rounded bg-[#0B3D91] px-4 py-2 text-xs font-semibold text-white hover:bg-[#082d6b]"
+              className="rounded bg-[#17365D] px-4 py-2 text-xs font-semibold text-white hover:bg-[#102847]"
             >
               Sign In
             </Link>
@@ -63,7 +63,7 @@ export default function ProfilePage() {
     <div className="mx-auto max-w-3xl px-4 py-8">
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-4">
         <div>
-          <div className="inline-flex items-center gap-1.5 rounded bg-blue-50 px-2.5 py-0.5 text-xs font-bold uppercase text-[#0B3D91]">
+          <div className="inline-flex items-center gap-1.5 rounded bg-blue-50 px-2.5 py-0.5 text-xs font-bold uppercase text-[#17365D]">
             <User className="h-3.5 w-3.5" />
             <span>Citizen Profile & Privacy Settings</span>
           </div>
@@ -80,7 +80,7 @@ export default function ProfilePage() {
           {canAccessAdminDashboard(user.role) && (
             <Link
               href="/admin"
-              className="inline-flex items-center gap-1.5 rounded bg-[#0B3D91] px-3 py-2 text-xs font-semibold text-white hover:bg-[#082d6b]"
+              className="inline-flex items-center gap-1.5 rounded bg-[#17365D] px-3 py-2 text-xs font-semibold text-white hover:bg-[#102847]"
             >
               <LayoutDashboard className="h-3.5 w-3.5" />
               <span>Open Admin Dashboard</span>
@@ -184,7 +184,7 @@ export default function ProfilePage() {
           />
           <label htmlFor="prof-history" className="text-slate-700">
             <strong>Save My Search History:</strong> Keep a private list of my search queries on this account. You can view or clear your history at any time in{" "}
-            <Link href="/history" className="text-[#0B3D91] underline">
+            <Link href="/history" className="text-[#17365D] underline">
               Search History Controls
             </Link>
             .
@@ -194,7 +194,7 @@ export default function ProfilePage() {
         <div className="flex justify-end">
           <button
             type="submit"
-            className="rounded bg-[#0B3D91] px-4 py-2 text-xs font-semibold text-white hover:bg-[#082d6b]"
+            className="rounded bg-[#17365D] px-4 py-2 text-xs font-semibold text-white hover:bg-[#102847]"
           >
             Save Preferences
           </button>

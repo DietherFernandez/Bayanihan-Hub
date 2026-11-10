@@ -11,7 +11,7 @@ export default function BookmarksPage() {
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
       <div className="mb-6 border-b border-slate-200 pb-4">
-        <div className="inline-flex items-center gap-1.5 rounded bg-blue-50 px-2.5 py-0.5 text-xs font-bold uppercase text-[#0B3D91]">
+        <div className="inline-flex items-center gap-1.5 rounded bg-blue-50 px-2.5 py-0.5 text-xs font-bold uppercase text-[#17365D]">
           <Bookmark className="h-3.5 w-3.5" />
           <span>Saved Resources & Checklists</span>
         </div>
@@ -34,7 +34,7 @@ export default function BookmarksPage() {
           <div className="mt-4 flex justify-center gap-3">
             <Link
               href="/serbisyo"
-              className="rounded bg-[#0B3D91] px-4 py-2 text-xs font-semibold text-white hover:bg-[#082d6b]"
+              className="rounded bg-[#17365D] px-4 py-2 text-xs font-semibold text-white hover:bg-[#102847]"
             >
               Browse Serbisyo Guides
             </Link>
@@ -55,14 +55,14 @@ export default function BookmarksPage() {
             >
               <div>
                 <div className="flex items-center gap-2 text-xs">
-                  <span className="rounded bg-blue-50 px-2 py-0.5 font-mono text-[10px] font-bold uppercase text-[#0B3D91]">
+                  <span className="rounded bg-blue-50 px-2 py-0.5 font-mono text-[10px] font-bold uppercase text-[#17365D]">
                     {bm.targetModule}
                   </span>
                   <span className="text-slate-500">Saved on {bm.createdAt}</span>
                 </div>
                 <Link
                   href={bm.href}
-                  className="mt-1 block text-sm font-bold text-[#0B3D91] hover:underline"
+                  className="mt-1 block text-sm font-bold text-[#17365D] hover:underline"
                 >
                   {bm.targetTitle}
                 </Link>

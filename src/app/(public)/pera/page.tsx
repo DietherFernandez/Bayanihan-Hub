@@ -132,7 +132,7 @@ function PeraContent() {
                 onClick={() => setProgramTypeFilter(tab.id)}
                 className={`rounded border px-2.5 py-1 font-medium ${
                   programTypeFilter === tab.id
-                    ? "border-[#0B3D91] bg-[#0B3D91] text-white"
+                    ? "border-[#17365D] bg-[#17365D] text-white"
                     : "border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
                 }`}
               >
@@ -153,7 +153,7 @@ function PeraContent() {
                   onClick={() => setSelectedSlug(prog.slug)}
                   className={`w-full p-3.5 text-left ${
                     isSelected
-                      ? "border-l-4 border-l-[#0B3D91] bg-blue-50/80"
+                      ? "border-l-4 border-l-[#17365D] bg-blue-50/80"
                       : "hover:bg-slate-50"
                   }`}
                 >
@@ -243,7 +243,7 @@ function PeraContent() {
                     <ul className="mt-2 space-y-1.5 text-slate-700">
                       {activeProgram.requiredDocuments.map((doc, i) => (
                         <li key={i} className="flex items-start gap-1.5">
-                          <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#0B3D91]" />
+                          <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#17365D]" />
                           <span>{doc}</span>
                         </li>
                       ))}
@@ -305,7 +305,7 @@ function PeraContent() {
               onClick={() => setActiveCalcTab("budget")}
               className={`inline-flex items-center gap-1.5 rounded border px-3 py-1.5 font-semibold ${
                 activeCalcTab === "budget"
-                  ? "border-[#0B3D91] bg-[#0B3D91] text-white"
+                  ? "border-[#17365D] bg-[#17365D] text-white"
                   : "border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
               }`}
             >
@@ -320,7 +320,7 @@ function PeraContent() {
               onClick={() => setActiveCalcTab("savings")}
               className={`inline-flex items-center gap-1.5 rounded border px-3 py-1.5 font-semibold ${
                 activeCalcTab === "savings"
-                  ? "border-[#0B3D91] bg-[#0B3D91] text-white"
+                  ? "border-[#17365D] bg-[#17365D] text-white"
                   : "border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
               }`}
             >
@@ -335,7 +335,7 @@ function PeraContent() {
               onClick={() => setActiveCalcTab("debt")}
               className={`inline-flex items-center gap-1.5 rounded border px-3 py-1.5 font-semibold ${
                 activeCalcTab === "debt"
-                  ? "border-[#0B3D91] bg-[#0B3D91] text-white"
+                  ? "border-[#17365D] bg-[#17365D] text-white"
                   : "border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
               }`}
             >
@@ -593,7 +593,7 @@ function PeraContent() {
               <dl className="mt-3 space-y-2.5">
                 <div className="flex justify-between border-b border-slate-200 pb-2">
                   <dt className="text-slate-600">Time to Reach Target Goal:</dt>
-                  <dd className="font-mono font-bold text-[#0B3D91]">
+                  <dd className="font-mono font-bold text-[#17365D]">
                     {monthsToGoalSimple} months (~
                     {(monthsToGoalSimple / 12).toFixed(1)} years)
                   </dd>
@@ -696,7 +696,7 @@ function PeraContent() {
                 <dl className="mt-3 space-y-2.5">
                   <div className="flex justify-between border-b border-slate-200 pb-2">
                     <dt className="text-slate-600">Estimated Months to Debt-Free:</dt>
-                    <dd className="font-mono font-bold text-[#0B3D91]">
+                    <dd className="font-mono font-bold text-[#17365D]">
                       {estimatedMonthsToPayoff} months
                     </dd>
                   </div>

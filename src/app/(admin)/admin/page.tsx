@@ -173,7 +173,7 @@ export default function AdminDashboardPage() {
                     regionCode: "NATIONAL",
                   })
                 }
-                className="rounded bg-[#0B3D91] px-3 py-1.5 font-semibold text-white hover:bg-[#082d6b]"
+                className="rounded bg-[#17365D] px-3 py-1.5 font-semibold text-white hover:bg-[#102847]"
               >
                 Sign In as Super Admin
               </button>
@@ -211,7 +211,7 @@ export default function AdminDashboardPage() {
           <div className="mt-4">
             <Link
               href="/"
-              className="text-xs font-semibold text-[#0B3D91] hover:underline"
+              className="text-xs font-semibold text-[#17365D] hover:underline"
             >
               ← Return to Public Homepage
             </Link>
@@ -281,7 +281,7 @@ export default function AdminDashboardPage() {
               }
               className={`rounded border px-2.5 py-1 font-medium ${
                 user.role === r
-                  ? "border-[#0B3D91] bg-[#0B3D91] text-white"
+                  ? "border-[#17365D] bg-[#17365D] text-white"
                   : "border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
               }`}
             >
@@ -309,7 +309,7 @@ export default function AdminDashboardPage() {
                   onClick={() => setActiveTab(mod.id)}
                   className={`flex w-full items-center justify-between px-3.5 py-2.5 text-left font-medium transition-colors ${
                     isSelected
-                      ? "bg-[#0B3D91] text-white"
+                      ? "bg-[#17365D] text-white"
                       : "text-slate-700 hover:bg-slate-50"
                   }`}
                 >
@@ -341,13 +341,13 @@ export default function AdminDashboardPage() {
                 <dl className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
                   <div className="rounded border border-slate-200 bg-slate-50 p-3">
                     <dt className="text-xs text-slate-600">Verified Resources</dt>
-                    <dd className="mt-1 font-mono text-xl font-bold text-[#0B3D91]">
+                    <dd className="mt-1 font-mono text-xl font-bold text-[#17365D]">
                       {resourcesState.length}
                     </dd>
                   </div>
                   <div className="rounded border border-slate-200 bg-slate-50 p-3">
                     <dt className="text-xs text-slate-600">Jobs & Scholarships</dt>
-                    <dd className="mt-1 font-mono text-xl font-bold text-[#0B3D91]">
+                    <dd className="mt-1 font-mono text-xl font-bold text-[#17365D]">
                       {VERIFIED_OPPORTUNITIES.length}
                     </dd>
                   </div>
@@ -417,7 +417,7 @@ export default function AdminDashboardPage() {
                               href={res.sourceUrl}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="inline-flex items-center gap-0.5 text-[#0B3D91] underline"
+                              className="inline-flex items-center gap-0.5 text-[#17365D] underline"
                             >
                               <span>Inspect Source</span>
                               <ExternalLink className="h-3 w-3" />
@@ -495,7 +495,7 @@ export default function AdminDashboardPage() {
                     <tbody className="divide-y divide-slate-200">
                       {resourcesState.map((r) => (
                         <tr key={r.id}>
-                          <td className="px-3 py-2.5 font-mono uppercase text-[#0B3D91]">
+                          <td className="px-3 py-2.5 font-mono uppercase text-[#17365D]">
                             {r.module}
                           </td>
                           <td className="px-3 py-2.5 font-semibold text-slate-900">

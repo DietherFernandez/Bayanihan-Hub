@@ -1,21 +1,220 @@
 @import "tailwindcss";
 
+/* ============================================================================
+   GabayPH Unified Civic Design System Tokens
+   - Apple HIG-inspired simplicity
+   - Professional government portal clarity
+   - Modern fintech precision & WCAG AA contrast
+   - Full Light & Dark mode semantic variables
+   ============================================================================ */
+
 :root {
-  --civic-blue: #0b3d91;
-  --civic-blue-dark: #082d6b;
-  --surface-paper: #f8fafc;
+  /* Core Brand Identity */
+  --brand-navy: #17365d;
+  --brand-navy-hover: #102847;
+  --brand-navy-subtle: #eaf0f8;
+
+  --brand-teal: #087f8c;
+  --brand-teal-hover: #06636d;
+  --brand-teal-subtle: #e6f5f7;
+
+  /* Surfaces & Backgrounds */
+  --bg-canvas: #f7f9fc;
+  --bg-surface: #ffffff;
+  --bg-surface-muted: #f1f5f9;
+  --bg-surface-elevated: #ffffff;
+
+  /* Typography & Neutral Ink */
+  --text-primary: #0f172a;
+  --text-secondary: #334155;
+  --text-muted: #64748b;
+  --text-on-brand: #ffffff;
+
+  /* Borders & Dividers */
+  --border-subtle: #e2e8f0;
+  --border-strong: #cbd5e1;
+  --focus-ring: #087f8c;
+
+  /* Semantic Status Colors */
+  --status-success: #16a36a;
+  --status-success-bg: #ecfdf5;
+  --status-success-border: #a7f3d0;
+  --status-success-text: #065f46;
+
+  --status-warning: #d99a28;
+  --status-warning-bg: #fffbeb;
+  --status-warning-border: #fde68a;
+  --status-warning-text: #92400e;
+
+  --status-danger: #d94b4b;
+  --status-danger-bg: #fef2f2;
+  --status-danger-border: #fecaca;
+  --status-danger-text: #991b1b;
+
+  --status-neutral: #64748b;
+  --status-neutral-bg: #f1f5f9;
+  --status-neutral-border: #cbd5e1;
+
+  /* Elevation */
+  --shadow-subtle: 0 1px 2px 0 rgba(15, 23, 42, 0.04);
+  --shadow-modal: 0 12px 32px -4px rgba(15, 23, 42, 0.16);
+}
+
+html.dark {
+  --brand-navy: #2b5b94;
+  --brand-navy-hover: #386fa8;
+  --brand-navy-subtle: #16263b;
+
+  --brand-teal: #12a4b4;
+  --brand-teal-hover: #1cb8c9;
+  --brand-teal-subtle: #0f2d33;
+
+  --bg-canvas: #0b111e;
+  --bg-surface: #111a2e;
+  --bg-surface-muted: #17233b;
+  --bg-surface-elevated: #1a2742;
+
+  --text-primary: #f8fafc;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
+  --text-on-brand: #ffffff;
+
+  --border-subtle: #1e293b;
+  --border-strong: #334155;
+  --focus-ring: #12a4b4;
+
+  --status-success: #22c55e;
+  --status-success-bg: #07291c;
+  --status-success-border: #14532d;
+  --status-success-text: #86efac;
+
+  --status-warning: #eab308;
+  --status-warning-bg: #2b1f06;
+  --status-warning-border: #713f12;
+  --status-warning-text: #fde047;
+
+  --status-danger: #ef4444;
+  --status-danger-bg: #2c0f12;
+  --status-danger-border: #7f1d1d;
+  --status-danger-text: #fca5a5;
+
+  --status-neutral: #94a3b8;
+  --status-neutral-bg: #1e293b;
+  --status-neutral-border: #334155;
 }
 
 html {
   scroll-behavior: smooth;
+  color-scheme: light;
+}
+
+html.dark {
+  color-scheme: dark;
 }
 
 body {
-  background-color: #f8fafc;
-  color: #0f172a;
-  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
-    "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background-color: var(--bg-canvas);
+  color: var(--text-primary);
+  font-family: "Inter", "Geist", ui-sans-serif, system-ui, -apple-system,
+    BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 0.9375rem; /* 15px optimal civic body */
+  line-height: 1.55;
   -webkit-font-smoothing: antialiased;
+  transition: background-color 180ms ease, color 180ms ease;
+}
+
+/* Dark mode automatic surface adaptation for existing utility classes */
+html.dark .bg-white {
+  background-color: var(--bg-surface) !important;
+}
+
+html.dark .bg-slate-50,
+html.dark .bg-slate-50\/60,
+html.dark .bg-slate-50\/70,
+html.dark .bg-slate-50\/80,
+html.dark .bg-\[\#F7F9FC\],
+html.dark .bg-\[\#F8FAFC\] {
+  background-color: var(--bg-surface-muted) !important;
+}
+
+html.dark .bg-slate-100 {
+  background-color: #1e293b !important;
+}
+
+html.dark .text-slate-900,
+html.dark .text-slate-800 {
+  color: var(--text-primary) !important;
+}
+
+html.dark .text-slate-700,
+html.dark .text-slate-600 {
+  color: var(--text-secondary) !important;
+}
+
+html.dark .text-slate-500,
+html.dark .text-slate-400 {
+  color: var(--text-muted) !important;
+}
+
+html.dark .border-slate-200,
+html.dark .border-slate-100,
+html.dark .divide-slate-200 > :not([hidden]) ~ :not([hidden]),
+html.dark .divide-slate-100 > :not([hidden]) ~ :not([hidden]) {
+  border-color: var(--border-subtle) !important;
+}
+
+html.dark .border-slate-300 {
+  border-color: var(--border-strong) !important;
+}
+
+html.dark input,
+html.dark select,
+html.dark textarea {
+  background-color: var(--bg-surface) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-strong) !important;
+}
+
+/* Restrained Typography Scale Utility Classes */
+.gabay-page-title {
+  font-size: clamp(1.375rem, 2.2vw, 1.875rem); /* 22px - 30px */
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  color: var(--text-primary);
+}
+
+.gabay-section-title {
+  font-size: clamp(1rem, 1.5vw, 1.25rem); /* 16px - 20px */
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.35;
+  color: var(--text-primary);
+}
+
+.gabay-body {
+  font-size: 0.9375rem; /* 15px (within 14-16px range) */
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
+
+.gabay-label {
+  font-size: 0.78125rem; /* 12.5px (within 12-13px range) */
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--text-secondary);
+}
+
+/* Smooth 180ms interactive transitions */
+.gabay-interactive {
+  transition-property: background-color, border-color, color, box-shadow,
+    transform, opacity;
+  transition-duration: 180ms;
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.gabay-interactive:active {
+  transform: scale(0.99);
 }
 
 @media print {
@@ -26,5 +225,6 @@ body {
   }
   body {
     background: #ffffff !important;
+    color: #000000 !important;
   }
 }

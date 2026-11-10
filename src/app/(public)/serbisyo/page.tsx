@@ -59,7 +59,7 @@ function SerbisyoContent() {
       {/* Module Header */}
       <div className="mb-6 flex flex-col justify-between gap-3 border-b border-slate-200 pb-4 sm:flex-row sm:items-end">
         <div>
-          <div className="inline-flex items-center gap-1.5 rounded bg-blue-50 px-2.5 py-0.5 text-xs font-bold uppercase text-[#0B3D91]">
+          <div className="inline-flex items-center gap-1.5 rounded bg-blue-50 px-2.5 py-0.5 text-xs font-bold uppercase text-[#17365D]">
             <FileCheck2 className="h-3.5 w-3.5" aria-hidden="true" />
             <span>Module B · Serbisyo</span>
           </div>
@@ -97,7 +97,7 @@ function SerbisyoContent() {
             onClick={() => setSelectedCategory(cat.slug)}
             className={`rounded border px-3 py-1.5 text-xs font-medium ${
               selectedCategory === cat.slug
-                ? "border-[#0B3D91] bg-[#0B3D91] text-white"
+                ? "border-[#17365D] bg-[#17365D] text-white"
                 : "border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
             }`}
           >
@@ -125,7 +125,7 @@ function SerbisyoContent() {
                   onClick={() => setActiveSlug(guide.slug)}
                   className={`w-full p-3.5 text-left transition-colors ${
                     isSelected
-                      ? "bg-blue-50/90 border-l-4 border-l-[#0B3D91]"
+                      ? "bg-blue-50/90 border-l-4 border-l-[#17365D]"
                       : "hover:bg-slate-50"
                   }`}
                 >
@@ -156,7 +156,7 @@ function SerbisyoContent() {
               <div className="flex flex-wrap items-start justify-between gap-3 border-b border-slate-200 pb-4">
                 <div>
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="rounded bg-[#0B3D91] px-2 py-0.5 font-mono text-xs font-bold text-white">
+                    <span className="rounded bg-[#17365D] px-2 py-0.5 font-mono text-xs font-bold text-white">
                       {selectedGuide.organizationAcronym}
                     </span>
                     <span className="text-xs font-medium text-slate-600">
@@ -206,7 +206,7 @@ function SerbisyoContent() {
               <dl className="mt-4 grid grid-cols-1 gap-3 rounded border border-slate-200 bg-slate-50 p-3.5 text-xs sm:grid-cols-3">
                 <div>
                   <dt className="flex items-center gap-1 font-semibold text-slate-700">
-                    <Banknote className="h-3.5 w-3.5 text-[#0B3D91]" />
+                    <Banknote className="h-3.5 w-3.5 text-[#17365D]" />
                     <span>Official Fee</span>
                   </dt>
                   <dd className="mt-1 text-slate-900">
@@ -215,7 +215,7 @@ function SerbisyoContent() {
                 </div>
                 <div>
                   <dt className="flex items-center gap-1 font-semibold text-slate-700">
-                    <Clock className="h-3.5 w-3.5 text-[#0B3D91]" />
+                    <Clock className="h-3.5 w-3.5 text-[#17365D]" />
                     <span>Processing Time</span>
                   </dt>
                   <dd className="mt-1 text-slate-900">
@@ -224,7 +224,7 @@ function SerbisyoContent() {
                 </div>
                 <div>
                   <dt className="flex items-center gap-1 font-semibold text-slate-700">
-                    <Phone className="h-3.5 w-3.5 text-[#0B3D91]" />
+                    <Phone className="h-3.5 w-3.5 text-[#17365D]" />
                     <span>Official Hotline & Hours</span>
                   </dt>
                   <dd className="mt-1 font-mono text-slate-900">
@@ -277,7 +277,7 @@ function SerbisyoContent() {
                             toggleChecklistStep(selectedGuide.slug, req.id)
                           }
                           aria-pressed={checked}
-                          className="mt-0.5 text-[#0B3D91] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0B3D91]"
+                          className="mt-0.5 text-[#17365D] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#17365D]"
                         >
                           {checked ? (
                             <CheckSquare className="h-4 w-4 text-emerald-700" />
@@ -297,7 +297,7 @@ function SerbisyoContent() {
                               {req.label}
                             </span>
                             {req.isMandatory ? (
-                              <span className="rounded bg-blue-50 px-1.5 py-0.5 text-[10px] font-semibold text-[#0B3D91]">
+                              <span className="rounded bg-blue-50 px-1.5 py-0.5 text-[10px] font-semibold text-[#17365D]">
                                 Required
                               </span>
                             ) : (
@@ -336,7 +336,7 @@ function SerbisyoContent() {
                             href={step.officialPortalLink}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex shrink-0 items-center gap-1 font-semibold text-[#0B3D91] hover:underline"
+                            className="inline-flex shrink-0 items-center gap-1 font-semibold text-[#17365D] hover:underline"
                           >
                             <span>Official Portal</span>
                             <ExternalLink className="h-3 w-3" />
@@ -372,7 +372,7 @@ function SerbisyoContent() {
         className="no-print mt-10"
       >
         <div className="mb-3 flex items-center gap-2">
-          <Building2 className="h-4 w-4 text-[#0B3D91]" aria-hidden="true" />
+          <Building2 className="h-4 w-4 text-[#17365D]" aria-hidden="true" />
           <h2
             id="agency-directory-heading"
             className="text-base font-bold text-slate-900"
@@ -417,7 +417,7 @@ function SerbisyoContent() {
                       href={org.officialWebsite}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 font-semibold text-[#0B3D91] hover:underline"
+                      className="inline-flex items-center gap-1 font-semibold text-[#17365D] hover:underline"
                     >
                       <span>{org.officialWebsite.replace("https://", "")}</span>
                       <ExternalLink className="h-3 w-3" />

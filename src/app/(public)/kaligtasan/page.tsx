@@ -151,7 +151,7 @@ export default function KaligtasanPage() {
                 onClick={() => setHotlineCategory(cat.id)}
                 className={`rounded border px-2.5 py-1 font-medium ${
                   hotlineCategory === cat.id
-                    ? "border-[#0B3D91] bg-[#0B3D91] text-white"
+                    ? "border-[#17365D] bg-[#17365D] text-white"
                     : "border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
                 }`}
               >
@@ -181,7 +181,7 @@ export default function KaligtasanPage() {
                       href={hot.sourceUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="ml-2 inline-flex items-center gap-0.5 text-[11px] font-normal text-[#0B3D91] hover:underline"
+                      className="ml-2 inline-flex items-center gap-0.5 text-[11px] font-normal text-[#17365D] hover:underline"
                     >
                       <span>Source</span>
                       <ExternalLink className="h-2.5 w-2.5" />
@@ -222,7 +222,7 @@ export default function KaligtasanPage() {
       <section aria-labelledby="evac-heading" className="mb-8">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <MapPin className="h-4 w-4 text-[#0B3D91]" aria-hidden="true" />
+            <MapPin className="h-4 w-4 text-[#17365D]" aria-hidden="true" />
             <h2 id="evac-heading" className="text-base font-bold text-slate-900">
               2. Verified Regional & LGU Evacuation Center Directory
             </h2>
@@ -255,7 +255,7 @@ export default function KaligtasanPage() {
               className="rounded-md border border-slate-200 bg-white p-4"
             >
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <span className="rounded bg-blue-50 px-2 py-0.5 font-mono text-[11px] font-bold text-[#0B3D91]">
+                <span className="rounded bg-blue-50 px-2 py-0.5 font-mono text-[11px] font-bold text-[#17365D]">
                   {evac.regionCode} · {evac.cityMunicipality}
                 </span>
                 <VerificationBadge
@@ -293,7 +293,7 @@ export default function KaligtasanPage() {
                   href={evac.sourceUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 font-semibold text-[#0B3D91] hover:underline"
+                  className="inline-flex items-center gap-1 font-semibold text-[#17365D] hover:underline"
                 >
                   <span>LGU DRRMO Link</span>
                   <ExternalLink className="h-3 w-3" />
@@ -334,7 +334,7 @@ export default function KaligtasanPage() {
                         toggleChecklistStep(goBagGuide.slug, item.id)
                       }
                       aria-pressed={checked}
-                      className="mt-0.5 text-[#0B3D91]"
+                      className="mt-0.5 text-[#17365D]"
                     >
                       {checked ? (
                         <CheckSquare className="h-4 w-4 text-emerald-700" />
@@ -395,7 +395,7 @@ export default function KaligtasanPage() {
                     href={guide.sourceUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 font-medium text-[#0B3D91] hover:underline"
+                    className="inline-flex items-center gap-1 font-medium text-[#17365D] hover:underline"
                   >
                     <span>{guide.sourceName}</span>
                     <ExternalLink className="h-3 w-3" />

@@ -118,7 +118,7 @@ function TrabahoContent() {
     <div className="mx-auto max-w-7xl px-3 py-6 sm:px-6">
       {/* Header */}
       <div className="no-print mb-6 border-b border-slate-200 pb-4">
-        <div className="inline-flex items-center gap-1.5 rounded bg-blue-50 px-2.5 py-0.5 text-xs font-bold uppercase text-[#0B3D91]">
+        <div className="inline-flex items-center gap-1.5 rounded bg-blue-50 px-2.5 py-0.5 text-xs font-bold uppercase text-[#17365D]">
           <Briefcase className="h-3.5 w-3.5" aria-hidden="true" />
           <span>Module A · Trabaho</span>
         </div>
@@ -190,14 +190,14 @@ function TrabahoContent() {
                 key={opp.id}
                 className={`rounded-md border bg-white p-4 sm:p-5 ${
                   isHighlighted
-                    ? "border-[#0B3D91] ring-2 ring-[#0B3D91]/20"
+                    ? "border-[#17365D] ring-2 ring-[#17365D]/20"
                     : "border-slate-200"
                 }`}
               >
                 <div className="flex flex-wrap items-start justify-between gap-2">
                   <div>
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="rounded bg-blue-50 px-2 py-0.5 font-mono text-[11px] font-bold uppercase text-[#0B3D91]">
+                      <span className="rounded bg-blue-50 px-2 py-0.5 font-mono text-[11px] font-bold uppercase text-[#17365D]">
                         {opp.type}
                       </span>
                       <span className="text-xs font-semibold text-slate-700">
@@ -244,7 +244,7 @@ function TrabahoContent() {
                       href={opp.applicationUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 rounded bg-[#0B3D91] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#082d6b]"
+                      className="inline-flex items-center gap-1 rounded bg-[#17365D] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#102847]"
                     >
                       <span>Official Portal</span>
                       <ExternalLink className="h-3.5 w-3.5" />
@@ -269,7 +269,7 @@ function TrabahoContent() {
                   <ul className="mt-1 grid grid-cols-1 gap-1 sm:grid-cols-2">
                     {opp.requirements.map((req, idx) => (
                       <li key={idx} className="flex items-start gap-1.5 text-slate-600">
-                        <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#0B3D91]" />
+                        <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#17365D]" />
                         <span>{req}</span>
                       </li>
                     ))}
@@ -300,7 +300,7 @@ function TrabahoContent() {
       >
         <div className="no-print flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-4">
           <div className="flex items-center gap-2">
-            <FileText className="h-4 w-4 text-[#0B3D91]" aria-hidden="true" />
+            <FileText className="h-4 w-4 text-[#17365D]" aria-hidden="true" />
             <div>
               <h2
                 id="resume-builder-heading"
@@ -317,7 +317,7 @@ function TrabahoContent() {
           <button
             type="button"
             onClick={() => typeof window !== "undefined" && window.print()}
-            className="inline-flex items-center gap-1.5 rounded bg-[#0B3D91] px-3.5 py-2 text-xs font-semibold text-white hover:bg-[#082d6b]"
+            className="inline-flex items-center gap-1.5 rounded bg-[#17365D] px-3.5 py-2 text-xs font-semibold text-white hover:bg-[#102847]"
           >
             <Printer className="h-3.5 w-3.5" />
             <span>Print / Save Resume as PDF</span>
@@ -452,7 +452,7 @@ function TrabahoContent() {
               <h3 className="text-lg font-bold uppercase tracking-tight text-slate-900">
                 {resumeFullName}
               </h3>
-              <p className="text-xs font-semibold text-[#0B3D91]">
+              <p className="text-xs font-semibold text-[#17365D]">
                 {resumeTitle}
               </p>
               <p className="mt-1 text-[11px] text-slate-600">
@@ -533,7 +533,7 @@ function TrabahoContent() {
             <button
               type="button"
               onClick={() => setScamSubmittedRef(null)}
-              className="mt-3 rounded bg-[#0B3D91] px-3 py-1.5 font-semibold text-white"
+              className="mt-3 rounded bg-[#17365D] px-3 py-1.5 font-semibold text-white"
             >
               Submit Another Report
             </button>

@@ -10,7 +10,7 @@ export default function CitizenReportsPage() {
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
       <div className="mb-6 border-b border-slate-200 pb-4">
-        <div className="inline-flex items-center gap-1.5 rounded bg-blue-50 px-2.5 py-0.5 text-xs font-bold uppercase text-[#0B3D91]">
+        <div className="inline-flex items-center gap-1.5 rounded bg-blue-50 px-2.5 py-0.5 text-xs font-bold uppercase text-[#17365D]">
           <Flag className="h-3.5 w-3.5" />
           <span>Public Verification & Scam Reports</span>
         </div>
