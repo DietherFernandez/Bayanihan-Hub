@@ -36,6 +36,7 @@ import {
   VERIFIED_RESOURCES,
 } from "@/lib/constants/philippine-data";
 import { VerificationBadge } from "@/components/trust/verification-badge";
+import { isSupabaseConfigured } from "@/env";
 import type { UserRole, VerificationStatus } from "@/types/database";
 
 type AdminModuleId =
@@ -166,55 +167,59 @@ export default function AdminDashboardPage() {
             <strong>Regional Moderator</strong> roles, enforced via server RBAC and Supabase Row Level Security.
           </p>
 
-          <div className="mt-4 rounded border border-slate-200 bg-slate-50 p-3.5 text-xs">
-            <p className="font-semibold text-slate-900">
-              Quick Role Elevation for QA & Review:
-            </p>
-            <div className="mt-2.5 flex flex-wrap gap-2">
-              <button
-                type="button"
-                onClick={() =>
-                  loginDemoUser({
-                    email: "superadmin@gabayph.org",
-                    fullName: "GabayPH Super Admin",
-                    role: "super_admin",
-                    regionCode: "NATIONAL",
-                  })
-                }
-                className="rounded bg-[#17365D] px-3 py-1.5 font-semibold text-white hover:bg-[#102847]"
-              >
-                Sign In as Super Admin
-              </button>
-              <button
-                type="button"
-                onClick={() =>
-                  loginDemoUser({
-                    email: "contentadmin@gabayph.org",
-                    fullName: "Content Verification Admin",
-                    role: "content_admin",
-                    regionCode: "NATIONAL",
-                  })
-                }
-                className="rounded border border-slate-300 bg-white px-3 py-1.5 font-semibold text-slate-800 hover:bg-slate-100"
-              >
-                Sign In as Content Admin
-              </button>
-              <button
-                type="button"
-                onClick={() =>
-                  loginDemoUser({
-                    email: "moderator.ncr@gabayph.org",
-                    fullName: "NCR Regional Moderator",
-                    role: "regional_moderator",
-                    regionCode: "NCR",
-                  })
-                }
-                className="rounded border border-slate-300 bg-white px-3 py-1.5 font-semibold text-slate-800 hover:bg-slate-100"
-              >
-                Sign In as Regional Moderator
-              </button>
+          {!(
+            process.env.NODE_ENV === "production" && isSupabaseConfigured()
+          ) && (
+            <div className="mt-4 rounded border border-slate-200 bg-slate-50 p-3.5 text-xs">
+              <p className="font-semibold text-slate-900">
+                Quick Role Elevation for QA & Review (Demo Mode Only):
+              </p>
+              <div className="mt-2.5 flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() =>
+                    loginDemoUser({
+                      email: "superadmin@gabayph.org",
+                      fullName: "GabayPH Super Admin",
+                      role: "super_admin",
+                      regionCode: "NATIONAL",
+                    })
+                  }
+                  className="rounded bg-[#17365D] px-3 py-1.5 font-semibold text-white hover:bg-[#102847]"
+                >
+                  Sign In as Super Admin
+                </button>
+                <button
+                  type="button"
+                  onClick={() =>
+                    loginDemoUser({
+                      email: "contentadmin@gabayph.org",
+                      fullName: "Content Verification Admin",
+                      role: "content_admin",
+                      regionCode: "NATIONAL",
+                    })
+                  }
+                  className="rounded border border-slate-300 bg-white px-3 py-1.5 font-semibold text-slate-800 hover:bg-slate-100"
+                >
+                  Sign In as Content Admin
+                </button>
+                <button
+                  type="button"
+                  onClick={() =>
+                    loginDemoUser({
+                      email: "moderator.ncr@gabayph.org",
+                      fullName: "NCR Regional Moderator",
+                      role: "regional_moderator",
+                      regionCode: "NCR",
+                    })
+                  }
+                  className="rounded border border-slate-300 bg-white px-3 py-1.5 font-semibold text-slate-800 hover:bg-slate-100"
+                >
+                  Sign In as Regional Moderator
+                </button>
+              </div>
             </div>
-          </div>
+          )}
 
           <div className="mt-4">
             <Link

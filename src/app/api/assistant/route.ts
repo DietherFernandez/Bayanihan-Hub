@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 import { checkRateLimit } from "@/lib/security/rate-limit";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 import {
   SUGGESTED_STARTING_QUESTIONS,
 } from "@/lib/ai/retrieval";
@@ -222,8 +223,71 @@ export async function PATCH(request: NextRequest) {
     );
   }
 
-  const { actorRole, ...updates } = parsed.data;
-  const updated = updateAiAdminSettings(updates, actorRole);
+  const { actorRole: clientRoleFallback, ...updates } = parsed.data;
+  let verifiedRole: string | undefined;
+
+  const supabase = await createSupabaseServerClient();
+  if (supabase) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error:
+            "Authentication required: Please sign in as an Administrator to modify AI governance settings.",
+        },
+        { status: 401 }
+      );
+    }
+
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role, is_suspended, account_status")
+      .eq("id", user.id)
+      .single();
+
+    if (
+      !profile ||
+      profile.is_suspended === true ||
+      (profile.account_status && profile.account_status !== "active")
+    ) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error:
+            "Forbidden: Suspended or inactive accounts cannot modify AI governance settings.",
+        },
+        { status: 403 }
+      );
+    }
+
+    const { data: roleRows } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", user.id);
+
+    const assignedRoles = new Set<string>([
+      ...(roleRows?.map((r) => String(r.role)) ?? []),
+      ...(profile.role ? [String(profile.role)] : []),
+    ]);
+
+    if (
+      assignedRoles.has("administrator") ||
+      assignedRoles.has("super_admin") ||
+      assignedRoles.has("content_admin")
+    ) {
+      verifiedRole = "administrator";
+    } else {
+      verifiedRole = profile.role ? String(profile.role) : "citizen";
+    }
+  } else if (process.env.NODE_ENV !== "production") {
+    verifiedRole = clientRoleFallback;
+  }
+
+  const updated = updateAiAdminSettings(updates, verifiedRole);
 
   if (!updated.ok) {
     return NextResponse.json(

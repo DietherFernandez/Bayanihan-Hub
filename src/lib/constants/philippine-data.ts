@@ -1676,7 +1676,11 @@ export function queryUniversalSearch(params: {
       .join(" ")
       .toLowerCase();
 
-    const terms = normalizedQ.split(/\s+/).filter(Boolean);
+    const terms = normalizedQ
+      .replace(/[?,!.;:()[\]"']/g, " ")
+      .split(/\s+/)
+      .filter(Boolean);
+    if (terms.length === 0) return false;
     return terms.every((term) => haystack.includes(term));
   });
 }

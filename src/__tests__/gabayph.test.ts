@@ -799,4 +799,57 @@ describe("GabayPH Security, Validation, RBAC & Universal Search Suite", () => {
     expect(mig0007Sql).toContain("CREATE TABLE IF NOT EXISTS public.ai_admin_settings");
     expect(mig0007Sql).toContain("ENABLE ROW LEVEL SECURITY");
   });
+
+  it("verifies Phase 8 security hardening (SEC-01 to SEC-07), Storage RLS migration 0008, search punctuation handling (QA-01), and accessibility lang tag (A11Y-01)", async () => {
+    // 1. Verify Migration 0008 is strictly additive, enforces is_suspended = FALSE in has_role(), and configures Storage RLS
+    const mig0008Path = path.resolve(
+      __dirname,
+      "../../supabase/migrations/0008_phase8_security_hardening_and_storage_rls.sql"
+    );
+    const mig0008Sql = fs.readFileSync(mig0008Path, "utf-8");
+    const executableSql = mig0008Sql
+      .split("\n")
+      .filter((line) => !line.trim().startsWith("--"))
+      .join("\n");
+
+    expect(executableSql).not.toMatch(/DROP\s+TABLE/i);
+    expect(executableSql).not.toMatch(/TRUNCATE/i);
+    expect(mig0008Sql).toContain("CREATE OR REPLACE FUNCTION public.has_role");
+    expect(mig0008Sql).toContain("p.is_suspended = FALSE");
+    expect(mig0008Sql).toContain("p.account_status = 'active'");
+    expect(mig0008Sql).toContain("storage.buckets");
+    expect(mig0008Sql).toContain("'avatars'");
+    expect(mig0008Sql).toContain("'verification-documents'");
+    expect(mig0008Sql).toContain("avatars_owner_insert");
+    expect(mig0008Sql).toContain("verification_docs_select");
+
+    // 2. Verify Universal Search strips trailing punctuation (QA-01) while keeping honest empty results
+    const punctuatedResults = queryUniversalSearch({
+      q: "NBI Clearance?",
+    });
+    expect(punctuatedResults.length).toBeGreaterThan(0);
+    expect(
+      punctuatedResults.some((r) => r.title.toLowerCase().includes("nbi"))
+    ).toBe(true);
+
+    // 3. Verify Rate Limiter enforces limits and prunes expired keys safely (SEC-07)
+    const { checkRateLimit } = await import("../lib/security/rate-limit");
+    const rlKey = `phase8-test-${Date.now()}`;
+    expect(checkRateLimit(rlKey, 2, 60_000).allowed).toBe(true);
+    expect(checkRateLimit(rlKey, 2, 60_000).allowed).toBe(true);
+    expect(checkRateLimit(rlKey, 2, 60_000).allowed).toBe(false);
+
+    // 4. Verify next.config.ts includes HSTS, X-Permitted-Cross-Domain-Policies, and conditional unsafe-eval (SEC-06)
+    const nextConfigPath = path.resolve(__dirname, "../../next.config.ts");
+    const nextConfigSource = fs.readFileSync(nextConfigPath, "utf-8");
+    expect(nextConfigSource).toContain("Strict-Transport-Security");
+    expect(nextConfigSource).toContain("X-Permitted-Cross-Domain-Policies");
+    expect(nextConfigSource).toContain("isDev ? \" 'unsafe-eval'\" : \"\"");
+
+    // 5. Verify Root Layout sets lang="en-PH" and includes skip-to-main-content link (A11Y-01)
+    const layoutPath = path.resolve(__dirname, "../app/layout.tsx");
+    const layoutSource = fs.readFileSync(layoutPath, "utf-8");
+    expect(layoutSource).toContain('lang="en-PH"');
+    expect(layoutSource).toContain('href="#main-content"');
+  });
 });

@@ -1,6 +1,7 @@
 "use server";
 
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { checkRateLimit } from "@/lib/security/rate-limit";
 import {
   bayanihanSubmissionSchema,
   containsSensitivePersonalData,
@@ -84,7 +85,7 @@ export async function saveBookmarkServerAction(
 }
 
 /**
- * 2. Bayanihan Community Submission Server Action (With Privacy & Moderation Safeguards)
+ * 2. Bayanihan Community Submission Server Action (With Privacy, Rate Limit & Moderation Safeguards)
  */
 export async function submitBayanihanCommunityPostAction(
   rawInput: unknown
@@ -104,6 +105,19 @@ export async function submitBayanihanCommunityPostAction(
   }
 
   const data = parsed.data;
+  const rate = checkRateLimit(
+    `bayanihan-post:${data.regionCode}:${data.cityMunicipality}`,
+    8,
+    60_000
+  );
+  if (!rate.allowed) {
+    return {
+      ok: false,
+      message:
+        "Too many community submissions in a short period. Please wait a minute before submitting again.",
+    };
+  }
+
   const combinedText = `${data.title} ${data.summary} ${data.dropOffOrMeetingPoint}`;
   const piiCheck = containsSensitivePersonalData(combinedText);
   if (piiCheck.flagged) {
@@ -135,6 +149,22 @@ export async function submitBayanihanCommunityPostAction(
     };
   }
 
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("is_suspended, account_status")
+    .eq("id", user.id)
+    .single();
+
+  if (
+    profile?.is_suspended === true ||
+    (profile?.account_status && profile.account_status !== "active")
+  ) {
+    return {
+      ok: false,
+      message: "Suspended or inactive accounts cannot submit community posts.",
+    };
+  }
+
   return {
     ok: true,
     moderationStatus: "under_review",
@@ -144,7 +174,7 @@ export async function submitBayanihanCommunityPostAction(
 }
 
 /**
- * 3. Public / Citizen Content Report Server Action
+ * 3. Public / Citizen Content Report Server Action (With Rate Limit)
  */
 export async function submitModuleReportServerAction(
   rawInput: unknown
@@ -155,6 +185,19 @@ export async function submitModuleReportServerAction(
       ok: false,
       message:
         parsed.error.issues[0]?.message || "Please check your report details.",
+    };
+  }
+
+  const rate = checkRateLimit(
+    `module-report:${parsed.data.targetType}:${parsed.data.targetId}`,
+    10,
+    60_000
+  );
+  if (!rate.allowed) {
+    return {
+      ok: false,
+      message:
+        "Too many reports submitted in a short period. Please wait a moment and try again.",
     };
   }
 
@@ -184,8 +227,8 @@ export async function submitModuleReportServerAction(
 }
 
 /**
- * 4. Phase 6 Foundation: Authorized Server-Side Content Verification Action
- * Only content_manager and administrator roles can approve verified content.
+ * 4. Authorized Server-Side Content Verification Action (SEC-02 Hardened)
+ * Resolves caller identity, active status, and role on the server when Supabase is configured.
  */
 export async function verifyModuleResourceServerAction(
   params: {
@@ -203,9 +246,76 @@ export async function verifyModuleResourceServerAction(
   },
   actorRoleFallback?: UserRole | null
 ): Promise<{ ok: boolean; message: string }> {
+  let effectiveRole: UserRole | null | undefined = undefined;
+  let verifierUserId: string | null = null;
+
+  const supabase = await createSupabaseServerClient();
+  if (supabase) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return {
+        ok: false,
+        message:
+          "Authentication required: Please sign in as a Content Manager or Administrator.",
+      };
+    }
+
+    verifierUserId = user.id;
+
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role, is_suspended, account_status")
+      .eq("id", user.id)
+      .single();
+
+    if (
+      !profile ||
+      profile.is_suspended === true ||
+      (profile.account_status && profile.account_status !== "active")
+    ) {
+      return {
+        ok: false,
+        message:
+          "Forbidden: Suspended or inactive accounts cannot verify official content.",
+      };
+    }
+
+    const { data: roleRows } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", user.id);
+
+    const assignedRoles = new Set<string>([
+      ...(roleRows?.map((r) => String(r.role)) ?? []),
+      ...(profile.role ? [String(profile.role)] : []),
+    ]);
+
+    if (
+      assignedRoles.has("administrator") ||
+      assignedRoles.has("super_admin")
+    ) {
+      effectiveRole = "administrator";
+    } else if (
+      assignedRoles.has("content_manager") ||
+      assignedRoles.has("content_admin") ||
+      assignedRoles.has("agency_editor")
+    ) {
+      effectiveRole = "content_manager";
+    } else if (assignedRoles.has("moderator")) {
+      effectiveRole = "moderator";
+    } else {
+      effectiveRole = (profile.role as UserRole) || "citizen";
+    }
+  } else if (process.env.NODE_ENV !== "production") {
+    effectiveRole = actorRoleFallback;
+  }
+
   if (
-    !canVerifyOfficialResources(actorRoleFallback) ||
-    !hasPermission(actorRoleFallback, "manage_authorized_content")
+    !canVerifyOfficialResources(effectiveRole) ||
+    !hasPermission(effectiveRole, "manage_authorized_content")
   ) {
     return {
       ok: false,
@@ -223,6 +333,37 @@ export async function verifyModuleResourceServerAction(
       message:
         "Verification requires an https:// official reference URL and at least 10 characters of verification notes.",
     };
+  }
+
+  if (supabase && verifierUserId) {
+    const tableMap: Record<typeof params.targetType, string> = {
+      resource: "resources",
+      opportunity: "opportunities",
+      assistance_program: "assistance_programs",
+      organization: "organizations",
+      bayanihan_post: "bayanihan_posts",
+      announcement: "announcements",
+    };
+
+    const targetTable = tableMap[params.targetType];
+    await supabase
+      .from(targetTable)
+      .update({
+        verification_status: params.newStatus,
+        verified_at: new Date().toISOString(),
+        verified_by: verifierUserId,
+      })
+      .eq("id", params.targetId);
+
+    await supabase.from("verification_logs").insert({
+      target_type: params.targetType,
+      target_id: params.targetId,
+      target_title: `${params.targetType}:${params.targetId}`,
+      new_status: params.newStatus,
+      verified_by: verifierUserId,
+      verification_notes: params.verificationNotes.trim(),
+      official_reference_url: params.officialReferenceUrl.trim(),
+    });
   }
 
   return {

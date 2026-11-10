@@ -61,10 +61,53 @@ export async function middleware(request: NextRequest) {
     } = await supabase.auth.getUser();
 
     // Server-side guard for /admin when Supabase Auth is active
-    if (pathname.startsWith("/admin") && !user) {
-      const loginUrl = new URL("/login", request.url);
-      loginUrl.searchParams.set("next", pathname);
-      return NextResponse.redirect(loginUrl);
+    if (pathname.startsWith("/admin")) {
+      if (!user) {
+        const loginUrl = new URL("/login", request.url);
+        loginUrl.searchParams.set("next", pathname);
+        return NextResponse.redirect(loginUrl);
+      }
+
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("role, is_suspended, account_status")
+        .eq("id", user.id)
+        .single();
+
+      if (
+        !profile ||
+        profile.is_suspended === true ||
+        (profile.account_status && profile.account_status !== "active")
+      ) {
+        const homeUrl = new URL("/", request.url);
+        homeUrl.searchParams.set("error", "account_suspended");
+        return NextResponse.redirect(homeUrl);
+      }
+
+      const { data: roleRows } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", user.id);
+
+      const allowedAdminRoles = new Set([
+        "administrator",
+        "super_admin",
+        "content_manager",
+        "content_admin",
+        "agency_editor",
+        "moderator",
+        "regional_moderator",
+      ]);
+
+      const hasAdminAccess =
+        (profile.role && allowedAdminRoles.has(String(profile.role))) ||
+        (roleRows ?? []).some((row) => allowedAdminRoles.has(String(row.role)));
+
+      if (!hasAdminAccess) {
+        const homeUrl = new URL("/", request.url);
+        homeUrl.searchParams.set("error", "unauthorized_admin");
+        return NextResponse.redirect(homeUrl);
+      }
     }
   }
 
