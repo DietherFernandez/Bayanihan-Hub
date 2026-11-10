@@ -853,7 +853,7 @@ describe("GabayPH Security, Validation, RBAC & Universal Search Suite", () => {
     expect(layoutSource).toContain('href="#main-content"');
   });
 
-  it("verifies Phase 8 Final Security Closure (Migration 0009): fail-closed assign_user_role(), EXECUTE revocations, and all 6 caller test cases", () => {
+  it("verifies Phase 8 Final Security Closure (Migration 0009): fail-closed assign_user_role(), EXECUTE revocations, positive EXISTS storage checks, and all caller test cases", () => {
     const mig0009Path = path.resolve(
       __dirname,
       "../../supabase/migrations/0009_phase8_final_security_closure.sql"
@@ -881,24 +881,41 @@ describe("GabayPH Security, Validation, RBAC & Universal Search Suite", () => {
       "GRANT EXECUTE ON FUNCTION public.assign_user_role(UUID, TEXT) TO service_role;"
     );
 
-    // 2. Verify content_admin is NOT in the administrator fallback list in has_role()
+    // 2. Verify content_admin is NOT in the administrator fallback list in has_role(), and required_role = 'user' is restored
     expect(mig0009Sql).toContain(
-      "OR (required_role = 'administrator' AND p.role::text IN ('super_admin', 'administrator'))"
+      "AND p.role::text IN ('super_admin', 'administrator')"
     );
+    expect(mig0009Sql).toContain("required_role = 'user'");
+    expect(mig0009Sql).toContain("'service_role'");
+    expect(mig0009Sql).toContain("'db_bootstrap'");
 
-    // 3. Verify fail-closed evaluation for all 6 caller scenarios
+    // 3. Verify positive EXISTS profile checks in storage policies (zero NOT EXISTS in storage.objects policies)
+    const storageSection = mig0009Sql.slice(
+      mig0009Sql.indexOf("4. FAIL-CLOSED POSITIVE PROFILE VALIDATION")
+    );
+    expect(storageSection).not.toMatch(/NOT\s+EXISTS/i);
+    expect(storageSection).toContain("AND p.is_suspended IS FALSE");
+    expect(storageSection).toContain("AND p.account_status = 'active'");
+
+    // 4. Verify fail-closed evaluation for all caller scenarios
     const evaluateAssignUserRoleAuth = (ctx: {
       jwtClaimRole: string | null;
       sessionUser: string;
       isAdminActive: boolean;
     }): boolean => {
       const vJwtRole = (ctx.jwtClaimRole ?? "").trim();
-      const vIsAuthorized =
-        vJwtRole === "service_role" ||
-        ctx.sessionUser === "postgres" ||
-        ctx.sessionUser === "supabase_admin" ||
-        (vJwtRole === "authenticated" && ctx.isAdminActive === true);
-      return vIsAuthorized === true;
+      const vIsServiceRole = vJwtRole === "service_role";
+      const vIsDbBootstrap =
+        vJwtRole === "" &&
+        (ctx.sessionUser === "postgres" ||
+          ctx.sessionUser === "supabase_admin");
+      const vIsActiveAdmin =
+        vJwtRole === "authenticated" && ctx.isAdminActive === true;
+      return (
+        vIsServiceRole === true ||
+        vIsDbBootstrap === true ||
+        vIsActiveAdmin === true
+      );
     };
 
     // Case 1: Anonymous caller
@@ -919,7 +936,7 @@ describe("GabayPH Security, Validation, RBAC & Universal Search Suite", () => {
       })
     ).toBe(false);
 
-    // Case 3: Suspended administrator (isAdminActive = false via 0008/0009 has_role())
+    // Case 3: Suspended administrator (isAdminActive = false via 0009 has_role())
     expect(
       evaluateAssignUserRoleAuth({
         jwtClaimRole: "authenticated",
@@ -946,7 +963,7 @@ describe("GabayPH Security, Validation, RBAC & Universal Search Suite", () => {
       })
     ).toBe(true);
 
-    // Case 6: Missing or NULL JWT role claim (fail-closed)
+    // Case 6: Missing or NULL JWT role claim under authenticator (fail-closed)
     expect(
       evaluateAssignUserRoleAuth({
         jwtClaimRole: null,
