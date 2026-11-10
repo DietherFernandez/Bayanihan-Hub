@@ -1,9 +1,22 @@
+export type CanonicalUserRole =
+  | "user"
+  | "content_manager"
+  | "moderator"
+  | "administrator";
+
 export type UserRole =
+  | CanonicalUserRole
   | "super_admin"
   | "content_admin"
   | "regional_moderator"
   | "organization"
   | "citizen";
+
+export type AccountStatus =
+  | "active"
+  | "pending_verification"
+  | "suspended"
+  | "deactivated";
 
 export type VerificationStatus =
   | "officially_verified"
@@ -250,10 +263,27 @@ export interface UserProfile {
   id: string;
   email: string;
   fullName: string;
+  username?: string;
+  avatarUrl?: string;
+  phoneNumber?: string;
   role: UserRole;
   regionCode: string;
+  province?: string;
+  cityMunicipality?: string;
+  barangay?: string;
+  accountStatus?: AccountStatus;
   saveSearchHistory: boolean;
   preferredLanguage: "en" | "fil";
+  emailVerified?: boolean;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface UserRoleRecord {
+  id: string;
+  userId: string;
+  role: CanonicalUserRole;
+  assignedBy?: string | null;
   createdAt: string;
 }
 

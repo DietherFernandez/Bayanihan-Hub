@@ -2,12 +2,15 @@
 
 import React, { createContext, useContext, useEffect, useState } from "react";
 import type {
+  AccountStatus,
   BookmarkItem,
   ReportSubmission,
   UserProfile,
   UserRole,
 } from "@/types/database";
 import { INITIAL_REPORTS } from "@/lib/constants/philippine-data";
+import { createSupabaseBrowserClient } from "@/lib/supabase/client";
+import { normalizeToCanonicalRole } from "@/lib/auth/rbac";
 
 export interface SearchHistoryEntry {
   id: string;
@@ -23,12 +26,21 @@ interface CitizenStateContextValue {
   searchHistory: SearchHistoryEntry[];
   reports: ReportSubmission[];
   completedChecklistIds: Record<string, string[]>;
+  setAuthenticatedUser: (profile: UserProfile | null) => void;
   loginDemoUser: (params: {
+    id?: string;
     email: string;
     fullName?: string;
+    username?: string;
+    phoneNumber?: string;
     role?: UserRole;
     regionCode?: string;
+    province?: string;
+    cityMunicipality?: string;
+    barangay?: string;
+    accountStatus?: AccountStatus;
     saveSearchHistory?: boolean;
+    emailVerified?: boolean;
   }) => void;
   logoutUser: () => void;
   updateProfile: (updates: Partial<UserProfile>) => void;
@@ -96,46 +108,164 @@ export function CitizenStateProvider({
     } catch {
       // Ignore storage access errors in restricted modes
     }
+
+    // Synchronize with Supabase Auth session when configured
+    const supabase = createSupabaseBrowserClient();
+    if (!supabase) return;
+
+    const syncSession = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (!session?.user) return;
+
+      const [{ data: profileRow }, { data: roleRows }] = await Promise.all([
+        supabase
+          .from("profiles")
+          .select(
+            "id, full_name, username, avatar_url, phone_number, role, region, province, city_municipality, barangay, account_status, save_search_history, preferred_language, created_at"
+          )
+          .eq("id", session.user.id)
+          .maybeSingle(),
+        supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", session.user.id),
+      ]);
+
+      const roles = Array.isArray(roleRows)
+        ? roleRows.map((r: { role: string }) => normalizeToCanonicalRole(r.role))
+        : [];
+      const primaryRole: UserRole = roles.includes("administrator")
+        ? "administrator"
+        : roles.includes("content_manager")
+          ? "content_manager"
+          : roles.includes("moderator")
+            ? "moderator"
+            : profileRow?.role || "user";
+
+      const syncedUser: UserProfile = {
+        id: session.user.id,
+        email: session.user.email || "",
+        fullName:
+          profileRow?.full_name ||
+          session.user.user_metadata?.full_name ||
+          session.user.email?.split("@")[0] ||
+          "Citizen",
+        username: profileRow?.username || undefined,
+        avatarUrl: profileRow?.avatar_url || undefined,
+        phoneNumber: profileRow?.phone_number || undefined,
+        role: primaryRole,
+        regionCode: profileRow?.region || "NCR",
+        province: profileRow?.province || undefined,
+        cityMunicipality: profileRow?.city_municipality || undefined,
+        barangay: profileRow?.barangay || undefined,
+        accountStatus: profileRow?.account_status || "active",
+        saveSearchHistory: Boolean(profileRow?.save_search_history),
+        preferredLanguage:
+          profileRow?.preferred_language === "fil" ? "fil" : "en",
+        emailVerified: Boolean(session.user.email_confirmed_at),
+        createdAt:
+          profileRow?.created_at?.split("T")[0] ||
+          new Date().toISOString().split("T")[0],
+      };
+
+      setUser(syncedUser);
+      try {
+        localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(syncedUser));
+      } catch {
+        // no-op
+      }
+    };
+
+    void syncSession();
+
+    const { data: listener } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "SIGNED_OUT") {
+        setUser(null);
+        try {
+          localStorage.removeItem(STORAGE_KEYS.USER);
+        } catch {
+          // no-op
+        }
+      } else if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
+        void syncSession();
+      }
+    });
+
+    return () => {
+      listener.subscription.unsubscribe();
+    };
   }, []);
 
-  const loginDemoUser: CitizenStateContextValue["loginDemoUser"] = ({
-    email,
-    fullName,
-    role = "citizen",
-    regionCode = "NCR",
-    saveSearchHistory = false,
-  }) => {
-    const nextUser: UserProfile = {
-      id: `usr-${Date.now()}`,
-      email: email.trim().toLowerCase(),
-      fullName: fullName?.trim() || email.split("@")[0] || "Juan Dela Cruz",
-      role,
-      regionCode,
-      saveSearchHistory,
-      preferredLanguage: "en",
-      createdAt: new Date().toISOString().split("T")[0],
-    };
-    setUser(nextUser);
+  const setAuthenticatedUser = (profile: UserProfile | null) => {
+    setUser(profile);
     try {
-      localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(nextUser));
+      if (profile) {
+        localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(profile));
+      } else {
+        localStorage.removeItem(STORAGE_KEYS.USER);
+      }
     } catch {
       // no-op
     }
   };
 
+  const loginDemoUser: CitizenStateContextValue["loginDemoUser"] = ({
+    id,
+    email,
+    fullName,
+    username,
+    phoneNumber,
+    role = "user",
+    regionCode = "NCR",
+    province,
+    cityMunicipality,
+    barangay,
+    accountStatus = "active",
+    saveSearchHistory = false,
+    emailVerified = true,
+  }) => {
+    const nextUser: UserProfile = {
+      id: id || `usr-${Date.now()}`,
+      email: email.trim().toLowerCase(),
+      fullName: fullName?.trim() || email.split("@")[0] || "Juan Dela Cruz",
+      username: username?.trim() || undefined,
+      phoneNumber: phoneNumber?.trim() || undefined,
+      role,
+      regionCode,
+      province: province?.trim() || undefined,
+      cityMunicipality: cityMunicipality?.trim() || undefined,
+      barangay: barangay?.trim() || undefined,
+      accountStatus,
+      saveSearchHistory,
+      preferredLanguage: "en",
+      emailVerified,
+      createdAt: new Date().toISOString().split("T")[0],
+    };
+    setAuthenticatedUser(nextUser);
+  };
+
   const logoutUser = () => {
-    setUser(null);
-    try {
-      localStorage.removeItem(STORAGE_KEYS.USER);
-    } catch {
-      // no-op
+    const supabase = createSupabaseBrowserClient();
+    if (supabase) {
+      void supabase.auth.signOut();
     }
+    setAuthenticatedUser(null);
   };
 
   const updateProfile = (updates: Partial<UserProfile>) => {
     setUser((prev) => {
       if (!prev) return null;
-      const updated = { ...prev, ...updates };
+      // Never allow client-side updateProfile to mutate role or accountStatus
+      const safeUpdates = { ...updates };
+      delete safeUpdates.role;
+      delete safeUpdates.accountStatus;
+      const updated = {
+        ...prev,
+        ...safeUpdates,
+        updatedAt: new Date().toISOString().split("T")[0],
+      };
       try {
         localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(updated));
       } catch {
@@ -146,6 +276,10 @@ export function CitizenStateProvider({
   };
 
   const deleteAccount = () => {
+    const supabase = createSupabaseBrowserClient();
+    if (supabase) {
+      void supabase.auth.signOut();
+    }
     setUser(null);
     setBookmarks([]);
     setSearchHistory([]);
@@ -295,6 +429,7 @@ export function CitizenStateProvider({
         searchHistory,
         reports,
         completedChecklistIds,
+        setAuthenticatedUser,
         loginDemoUser,
         logoutUser,
         updateProfile,

@@ -148,11 +148,33 @@ export const authRegisterSchema = z
       .trim()
       .min(2, "Full name must be at least 2 characters.")
       .max(100),
+    username: z
+      .string()
+      .trim()
+      .regex(
+        /^[a-zA-Z0-9_.-]{3,30}$/,
+        "Username must be 3–30 alphanumeric characters, dots, underscores, or hyphens."
+      )
+      .optional()
+      .or(z.literal("")),
     email: z.string().trim().email("Enter a valid email address."),
+    phoneNumber: z
+      .string()
+      .trim()
+      .regex(
+        /^(\+63|0)?9\d{9}$/,
+        "Enter a valid Philippine mobile number (e.g., 09171234567 or +639171234567)."
+      )
+      .optional()
+      .or(z.literal("")),
     regionCode: z.string().min(2, "Please select your region."),
+    province: z.string().trim().max(80).optional().default(""),
+    cityMunicipality: z.string().trim().max(80).optional().default(""),
+    barangay: z.string().trim().max(80).optional().default(""),
     password: z
       .string()
       .min(8, "Password must be at least 8 characters.")
+      .max(128, "Password must not exceed 128 characters.")
       .regex(/[A-Z]/, "Must include at least one uppercase letter.")
       .regex(/[0-9]/, "Must include at least one number."),
     confirmPassword: z.string(),
@@ -162,6 +184,66 @@ export const authRegisterSchema = z
     message: "Passwords do not match.",
     path: ["confirmPassword"],
   });
+
+export const passwordRecoveryRequestSchema = z.object({
+  email: z.string().trim().email("Enter a valid email address."),
+});
+
+export const passwordResetSchema = z
+  .object({
+    password: z
+      .string()
+      .min(8, "New password must be at least 8 characters.")
+      .max(128, "Password must not exceed 128 characters.")
+      .regex(/[A-Z]/, "Must include at least one uppercase letter.")
+      .regex(/[0-9]/, "Must include at least one number."),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match.",
+    path: ["confirmPassword"],
+  });
+
+/**
+ * Profile update schema: strictly whitelists user-editable profile fields.
+ * Never accepts `role`, `accountStatus`, or `isSuspended` from client requests.
+ */
+export const profileUpdateSchema = z.object({
+  fullName: z
+    .string()
+    .trim()
+    .min(2, "Full name must be at least 2 characters.")
+    .max(100),
+  username: z
+    .string()
+    .trim()
+    .regex(
+      /^[a-zA-Z0-9_.-]{3,30}$/,
+      "Username must be 3–30 alphanumeric characters, dots, underscores, or hyphens."
+    )
+    .optional()
+    .or(z.literal("")),
+  phoneNumber: z
+    .string()
+    .trim()
+    .regex(
+      /^(\+63|0)?9\d{9}$/,
+      "Enter a valid Philippine mobile number (e.g., 09171234567)."
+    )
+    .optional()
+    .or(z.literal("")),
+  regionCode: z.string().min(2, "Select a valid Philippine region."),
+  province: z.string().trim().max(80).optional().default(""),
+  cityMunicipality: z.string().trim().max(80).optional().default(""),
+  barangay: z.string().trim().max(80).optional().default(""),
+  preferredLanguage: z.enum(["en", "fil"]).default("en"),
+  saveSearchHistory: z.boolean().default(false),
+});
+
+export const roleAssignmentSchema = z.object({
+  targetUserId: z.string().uuid("Target user ID must be a valid UUID."),
+  newRole: z.enum(["user", "content_manager", "moderator", "administrator"]),
+});
 
 export const budgetCalculatorSchema = z.object({
   monthlyNetIncome: z.number().min(0).max(10000000),
