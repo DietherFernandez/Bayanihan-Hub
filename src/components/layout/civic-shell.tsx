@@ -20,6 +20,9 @@ import {
   Sun,
   Moon,
   Menu,
+  UserPlus,
+  Compass,
+  Info,
 } from "lucide-react";
 import { useCitizenState } from "@/components/providers/citizen-state-provider";
 import { useThemeAndToast } from "@/components/providers/theme-provider";
@@ -28,16 +31,16 @@ import { CompactDrawer } from "@/components/ui/design-system";
 
 export const PLATFORM_MODULE_LINKS = [
   {
+    href: "/trabaho",
+    label: "Trabaho",
+    sublabel: "Jobs, Resume & Training",
+    icon: Briefcase,
+  },
+  {
     href: "/serbisyo",
     label: "Serbisyo",
     sublabel: "Gov Guides & IDs",
     icon: FileCheck2,
-  },
-  {
-    href: "/trabaho",
-    label: "Trabaho",
-    sublabel: "Jobs & Resume",
-    icon: Briefcase,
   },
   {
     href: "/pera",
@@ -48,7 +51,7 @@ export const PLATFORM_MODULE_LINKS = [
   {
     href: "/bayanihan",
     label: "Bayanihan",
-    sublabel: "Community & Relief",
+    sublabel: "Donations & Volunteering",
     icon: HeartHandshake,
   },
   {
@@ -68,9 +71,21 @@ export const PLATFORM_MODULE_LINKS = [
 export function DesktopNavigation({ pathname }: { pathname: string }) {
   return (
     <nav
-      aria-label="Primary Platform Modules"
+      aria-label="Primary Platform Navigation"
       className="hidden lg:flex lg:items-center lg:gap-1"
     >
+      <Link
+        href="/#explore-modules"
+        className={`gabay-interactive inline-flex min-h-[36px] items-center gap-1.5 rounded-md px-2.5 py-1 text-[13px] font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#087F8C] ${
+          pathname === "/"
+            ? "bg-[#17365D]/10 text-[#17365D]"
+            : "text-slate-700 hover:bg-slate-100 hover:text-[#17365D]"
+        }`}
+      >
+        <Compass className="h-3.5 w-3.5 text-[#087F8C]" aria-hidden="true" />
+        <span>Explore</span>
+      </Link>
+
       {PLATFORM_MODULE_LINKS.map((item) => {
         const Icon = item.icon;
         const isActive =
@@ -79,17 +94,29 @@ export function DesktopNavigation({ pathname }: { pathname: string }) {
           <Link
             key={item.href}
             href={item.href}
-            className={`gabay-interactive inline-flex min-h-[38px] items-center gap-1.5 rounded-md px-3 py-1.5 text-[13px] font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#087F8C] ${
+            className={`gabay-interactive inline-flex min-h-[36px] items-center gap-1.5 rounded-md px-2.5 py-1 text-[13px] font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#087F8C] ${
               isActive
                 ? "bg-[#17365D] text-white"
                 : "text-slate-700 hover:bg-slate-100 hover:text-[#17365D]"
             }`}
           >
-            <Icon className="h-4 w-4" aria-hidden="true" />
+            <Icon className="h-3.5 w-3.5" aria-hidden="true" />
             <span>{item.label}</span>
           </Link>
         );
       })}
+
+      <Link
+        href="/about"
+        className={`gabay-interactive inline-flex min-h-[36px] items-center gap-1.5 rounded-md px-2.5 py-1 text-[13px] font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#087F8C] ${
+          pathname === "/about"
+            ? "bg-[#17365D] text-white"
+            : "text-slate-700 hover:bg-slate-100 hover:text-[#17365D]"
+        }`}
+      >
+        <Info className="h-3.5 w-3.5" aria-hidden="true" />
+        <span>About</span>
+      </Link>
     </nav>
   );
 }
@@ -98,7 +125,7 @@ export function MobileBottomNavigation({ pathname }: { pathname: string }) {
   return (
     <nav
       aria-label="Quick Mobile Bottom Navigation"
-      className="no-print fixed bottom-0 left-0 right-0 z-40 flex items-center justify-around border-t border-slate-200 bg-white py-1.5 md:hidden"
+      className="no-print fixed bottom-0 left-0 right-0 z-40 flex items-center justify-around border-t border-slate-200 bg-white py-1 md:hidden"
     >
       <Link
         href="/"
@@ -165,24 +192,24 @@ export function CivicHeader() {
   return (
     <header className="sticky top-0 z-40 border-b border-slate-200 bg-white">
       {/* Top Civic Trust & Emergency Strip */}
-      <div className="border-b border-slate-200/20 bg-[#17365D] px-3 py-1.5 text-[12px] text-white">
+      <div className="border-b border-slate-200/20 bg-[#17365D] px-3 py-1 text-[11.5px] text-white">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
             <ShieldCheck
               className="h-3.5 w-3.5 text-[#16A36A]"
               aria-hidden="true"
             />
             <span>
-              <strong>GabayPH</strong> · Official Public Information & Community Guide
+              <strong>GabayPH</strong> · Independent Public-Service &amp; Community Guide
             </span>
           </div>
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2">
             <Link
               href="/kaligtasan#hotlines"
               className="gabay-interactive inline-flex items-center gap-1 rounded bg-[#D94B4B] px-2 py-0.5 text-[11px] font-semibold text-white hover:bg-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
             >
               <PhoneCall className="h-3 w-3" aria-hidden="true" />
-              <span>Emergency: 911 / Red Cross 143</span>
+              <span>Emergency: 911 / 143</span>
             </Link>
             {isStaff && (
               <Link
@@ -190,29 +217,29 @@ export function CivicHeader() {
                 className="gabay-interactive inline-flex items-center gap-1 rounded border border-white/25 bg-white/10 px-2 py-0.5 text-[11px] font-medium text-white hover:bg-white/20"
               >
                 <LayoutDashboard className="h-3 w-3" aria-hidden="true" />
-                <span>Admin Console</span>
+                <span>Admin</span>
               </Link>
             )}
           </div>
         </div>
       </div>
 
-      {/* Main Navigation Row */}
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-3 py-2.5 sm:px-6">
-        <div className="flex items-center gap-6">
+      {/* Compact Main Navigation Row */}
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-2 px-3 py-2 sm:px-6">
+        <div className="flex items-center gap-5">
           <Link
             href="/"
-            className="flex items-center gap-2.5 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#087F8C]"
+            className="flex items-center gap-2 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#087F8C]"
           >
-            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-[#17365D] text-sm font-bold tracking-tight text-white">
+            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-[#17365D] text-xs font-bold tracking-tight text-white">
               PH
             </div>
             <div>
-              <span className="block text-[16px] font-bold leading-none tracking-tight text-slate-900">
+              <span className="block text-[15px] font-bold leading-none tracking-tight text-slate-900">
                 GabayPH
               </span>
-              <span className="block text-[11.5px] text-[#64748B]">
-                Your Everyday Guide to a Better Life
+              <span className="hidden text-[11px] text-[#64748B] sm:block">
+                Your Everyday Guide to a Better Life.
               </span>
             </div>
           </Link>
@@ -220,31 +247,31 @@ export function CivicHeader() {
           <DesktopNavigation pathname={pathname} />
         </div>
 
-        {/* Right Utility Actions */}
-        <div className="flex items-center gap-1.5 sm:gap-2">
+        {/* Right Utility Actions: Search, Bookmarks, Theme, Login & Register */}
+        <div className="flex items-center gap-1.5">
           <Link
             href="/search"
-            className={`gabay-interactive inline-flex min-h-[38px] items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-[12.5px] font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#087F8C] ${
+            aria-label="Universal Search"
+            className={`gabay-interactive inline-flex min-h-[36px] items-center gap-1.5 rounded-md border px-2.5 py-1 text-[12px] font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#087F8C] ${
               pathname === "/search"
                 ? "border-[#087F8C] bg-[#087F8C]/10 text-[#087F8C]"
                 : "border-slate-300 bg-[#F7F9FC] text-slate-700 hover:border-[#087F8C]"
             }`}
           >
             <Search className="h-3.5 w-3.5" aria-hidden="true" />
-            <span className="hidden sm:inline">Search</span>
+            <span className="hidden xl:inline">Search</span>
           </Link>
 
           <Link
             href="/bookmarks"
             aria-label={`Saved Bookmarks (${bookmarks.length})`}
-            className={`gabay-interactive inline-flex min-h-[38px] items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-[12.5px] font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#087F8C] ${
+            className={`gabay-interactive inline-flex min-h-[36px] items-center gap-1 rounded-md border px-2 py-1 text-[12px] font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#087F8C] ${
               pathname === "/bookmarks"
                 ? "border-[#087F8C] bg-[#087F8C]/10 text-[#087F8C]"
                 : "border-slate-300 bg-white text-slate-700 hover:border-[#087F8C]"
             }`}
           >
             <Bookmark className="h-3.5 w-3.5" aria-hidden="true" />
-            <span className="hidden md:inline">Saved</span>
             {bookmarks.length > 0 && (
               <span className="rounded-full bg-[#087F8C] px-1.5 py-0.2 text-[10px] font-bold text-white">
                 {bookmarks.length}
@@ -258,7 +285,7 @@ export function CivicHeader() {
             aria-label={
               theme === "dark" ? "Switch to light mode" : "Switch to dark mode"
             }
-            className="gabay-interactive inline-flex min-h-[38px] min-w-[38px] items-center justify-center rounded-md border border-slate-300 bg-white text-slate-700 hover:border-[#087F8C] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#087F8C]"
+            className="gabay-interactive inline-flex min-h-[36px] min-w-[36px] items-center justify-center rounded-md border border-slate-300 bg-white text-slate-700 hover:border-[#087F8C] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#087F8C]"
           >
             {theme === "dark" ? (
               <Sun className="h-4 w-4 text-[#D99A28]" aria-hidden="true" />
@@ -270,89 +297,113 @@ export function CivicHeader() {
           {user ? (
             <Link
               href="/profile"
-              className="gabay-interactive inline-flex min-h-[38px] items-center gap-1.5 rounded-md border border-slate-300 bg-white px-2.5 py-1.5 text-[12.5px] font-semibold text-slate-800 hover:border-[#087F8C] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#087F8C]"
+              className="gabay-interactive inline-flex min-h-[36px] items-center gap-1.5 rounded-md border border-slate-300 bg-white px-2.5 py-1 text-[12px] font-semibold text-slate-800 hover:border-[#087F8C] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#087F8C]"
             >
               <User className="h-3.5 w-3.5 text-[#087F8C]" aria-hidden="true" />
-              <span className="max-w-[96px] truncate">{user.fullName}</span>
+              <span className="max-w-[90px] truncate">{user.fullName}</span>
             </Link>
           ) : (
-            <Link
-              href="/login"
-              className="gabay-interactive inline-flex min-h-[38px] items-center gap-1.5 rounded-md bg-[#17365D] px-3 py-1.5 text-[12.5px] font-semibold text-white hover:bg-[#102847] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#087F8C]"
-            >
-              <User className="h-3.5 w-3.5" aria-hidden="true" />
-              <span>Sign In</span>
-            </Link>
+            <div className="flex items-center gap-1.5">
+              <Link
+                href="/login"
+                className="gabay-interactive inline-flex min-h-[36px] items-center gap-1 rounded-md border border-slate-300 bg-white px-2.5 py-1 text-[12px] font-semibold text-slate-800 hover:border-[#087F8C] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#087F8C]"
+              >
+                <User className="h-3.5 w-3.5 text-[#17365D]" aria-hidden="true" />
+                <span>Login</span>
+              </Link>
+              <Link
+                href="/register"
+                className="gabay-interactive hidden min-h-[36px] items-center gap-1 rounded-md bg-[#17365D] px-2.5 py-1 text-[12px] font-semibold text-white hover:bg-[#102847] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#087F8C] sm:inline-flex"
+              >
+                <UserPlus className="h-3.5 w-3.5" aria-hidden="true" />
+                <span>Register</span>
+              </Link>
+            </div>
           )}
 
           <button
             type="button"
             onClick={() => setDrawerOpen(true)}
-            aria-label="Open quick modules drawer"
-            className="gabay-interactive inline-flex min-h-[38px] min-w-[38px] items-center justify-center rounded-md border border-slate-300 bg-white text-slate-700 lg:hidden"
+            aria-label="Open navigation menu"
+            className="gabay-interactive inline-flex min-h-[36px] min-w-[36px] items-center justify-center rounded-md border border-slate-300 bg-white text-slate-700 lg:hidden"
           >
             <Menu className="h-4 w-4" aria-hidden="true" />
           </button>
         </div>
       </div>
 
-      {/* Tablet / Compact Horizontal Module Strip */}
-      <div className="border-t border-slate-200 bg-[#F7F9FC] px-3 py-1.5 lg:hidden">
-        <nav
-          aria-label="Mobile Module Bar"
-          className="mx-auto flex max-w-7xl items-center gap-1.5 overflow-x-auto pb-0.5"
-        >
-          {PLATFORM_MODULE_LINKS.map((item) => {
-            const Icon = item.icon;
-            const isActive =
-              pathname === item.href || pathname.startsWith(`${item.href}/`);
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`gabay-interactive inline-flex shrink-0 items-center gap-1.5 rounded-md px-2.5 py-1.5 text-[12px] font-semibold ${
-                  isActive
-                    ? "bg-[#17365D] text-white"
-                    : "border border-slate-200 bg-white text-slate-700 hover:border-[#087F8C]"
-                }`}
-              >
-                <Icon className="h-3.5 w-3.5" aria-hidden="true" />
-                <span>{item.label}</span>
-              </Link>
-            );
-          })}
-        </nav>
-      </div>
-
-      {/* Compact Slide-over Drawer (Not a full-screen modal) */}
+      {/* Compact Slide-over Mobile Drawer */}
       <CompactDrawer
         open={drawerOpen}
-        title="GabayPH Modules & Tools"
+        title="GabayPH Navigation"
         onClose={() => setDrawerOpen(false)}
       >
-        <div className="space-y-1.5">
-          {PLATFORM_MODULE_LINKS.map((mod) => {
-            const Icon = mod.icon;
-            return (
-              <Link
-                key={mod.href}
-                href={mod.href}
-                onClick={() => setDrawerOpen(false)}
-                className="flex items-center gap-3 rounded-md border border-slate-200 bg-[#F7F9FC] p-2.5 text-xs hover:border-[#087F8C]"
-              >
-                <Icon
-                  className="h-4 w-4 shrink-0 text-[#17365D]"
-                  aria-hidden="true"
-                />
-                <div>
-                  <div className="font-bold text-slate-900">{mod.label}</div>
-                  <div className="text-[11px] text-[#64748B]">
-                    {mod.sublabel}
+        <div className="space-y-4">
+          <div className="space-y-1.5">
+            <p className="gabay-label uppercase tracking-wider text-[#64748B]">
+              Explore Modules
+            </p>
+            {PLATFORM_MODULE_LINKS.map((mod) => {
+              const Icon = mod.icon;
+              return (
+                <Link
+                  key={mod.href}
+                  href={mod.href}
+                  onClick={() => setDrawerOpen(false)}
+                  className="flex items-center gap-3 rounded-md border border-slate-200 bg-[#F7F9FC] p-2.5 text-xs hover:border-[#087F8C]"
+                >
+                  <Icon
+                    className="h-4 w-4 shrink-0 text-[#17365D]"
+                    aria-hidden="true"
+                  />
+                  <div>
+                    <div className="font-bold text-slate-900">{mod.label}</div>
+                    <div className="text-[11px] text-[#64748B]">
+                      {mod.sublabel}
+                    </div>
                   </div>
-                </div>
-              </Link>
-            );
-          })}
+                </Link>
+              );
+            })}
+          </div>
+
+          <div className="space-y-1.5 border-t border-slate-200 pt-3">
+            <p className="gabay-label uppercase tracking-wider text-[#64748B]">
+              Platform &amp; Account
+            </p>
+            <Link
+              href="/about"
+              onClick={() => setDrawerOpen(false)}
+              className="block rounded-md px-2.5 py-2 text-xs font-semibold text-slate-800 hover:bg-slate-100"
+            >
+              About GabayPH
+            </Link>
+            <Link
+              href="/reports"
+              onClick={() => setDrawerOpen(false)}
+              className="block rounded-md px-2.5 py-2 text-xs font-semibold text-slate-800 hover:bg-slate-100"
+            >
+              Report Incorrect Information
+            </Link>
+            {!user && (
+              <div className="grid grid-cols-2 gap-2 pt-2">
+                <Link
+                  href="/login"
+                  onClick={() => setDrawerOpen(false)}
+                  className="rounded-md border border-slate-300 bg-white py-2 text-center text-xs font-semibold text-slate-800"
+                >
+                  Login
+                </Link>
+                <Link
+                  href="/register"
+                  onClick={() => setDrawerOpen(false)}
+                  className="rounded-md bg-[#17365D] py-2 text-center text-xs font-semibold text-white"
+                >
+                  Register
+                </Link>
+              </div>
+            )}
+          </div>
         </div>
       </CompactDrawer>
     </header>
@@ -372,33 +423,36 @@ export function CivicFooter() {
               </span>
               <span>GabayPH</span>
             </div>
+            <p className="mt-1 text-[12px] font-semibold text-slate-700">
+              Your Everyday Guide to a Better Life.
+            </p>
             <p className="mt-2 leading-relaxed">
-              Your Everyday Guide to a Better Life. Free, mobile-first public service directory, employment guide, financial calculators, and emergency resource platform for every Filipino.
+              Free, mobile-first public service directory, employment guide, financial calculators, and emergency resource platform for every Filipino.
             </p>
             <p className="mt-2 text-[11px]">
-              Disclaimer: GabayPH links directly to verified `.gov.ph` agencies and humanitarian institutions. We never charge fees or process government applications on your behalf.
+              Independent Platform Notice: GabayPH is not a government agency. We link directly to official <code>.gov.ph</code> portals and never charge fees or approve applications.
             </p>
           </div>
 
           <div>
             <h3 className="gabay-label uppercase tracking-wider text-slate-900">
-              Platform Modules
+              Explore Categories
             </h3>
             <ul className="mt-2.5 space-y-1.5">
-              <li>
-                <Link
-                  href="/serbisyo"
-                  className="hover:text-[#087F8C] hover:underline"
-                >
-                  Serbisyo (Government Guides & Checklists)
-                </Link>
-              </li>
               <li>
                 <Link
                   href="/trabaho"
                   className="hover:text-[#087F8C] hover:underline"
                 >
-                  Trabaho (Jobs, Resume Builder & Scam Report)
+                  Trabaho (Jobs, Resume &amp; Training)
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/serbisyo"
+                  className="hover:text-[#087F8C] hover:underline"
+                >
+                  Serbisyo (Government Guides &amp; Checklists)
                 </Link>
               </li>
               <li>
@@ -406,7 +460,7 @@ export function CivicFooter() {
                   href="/pera"
                   className="hover:text-[#087F8C] hover:underline"
                 >
-                  Pera (Financial Aid & Budget Calculators)
+                  Pera (Financial Aid &amp; Calculators)
                 </Link>
               </li>
               <li>
@@ -414,7 +468,7 @@ export function CivicFooter() {
                   href="/bayanihan"
                   className="hover:text-[#087F8C] hover:underline"
                 >
-                  Bayanihan (Donations, Volunteering & Orgs)
+                  Bayanihan (Donations &amp; Volunteering)
                 </Link>
               </li>
               <li>
@@ -422,7 +476,7 @@ export function CivicFooter() {
                   href="/aral"
                   className="hover:text-[#087F8C] hover:underline"
                 >
-                  Aral (Free Courses & Scholarships)
+                  Aral (Free Courses &amp; Scholarships)
                 </Link>
               </li>
               <li>
@@ -430,7 +484,7 @@ export function CivicFooter() {
                   href="/kaligtasan"
                   className="hover:text-[#087F8C] hover:underline"
                 >
-                  Kaligtasan (911 Hotlines & Evacuation Directory)
+                  Kaligtasan (Hotlines &amp; Evacuation Directory)
                 </Link>
               </li>
             </ul>
@@ -438,31 +492,39 @@ export function CivicFooter() {
 
           <div>
             <h3 className="gabay-label uppercase tracking-wider text-slate-900">
-              Citizen Tools & Privacy
+              Information &amp; Governance
             </h3>
             <ul className="mt-2.5 space-y-1.5">
               <li>
                 <Link
-                  href="/search"
+                  href="/about"
                   className="hover:text-[#087F8C] hover:underline"
                 >
-                  Universal Search Directory
+                  About GabayPH
                 </Link>
               </li>
               <li>
                 <Link
-                  href="/bookmarks"
+                  href="/privacy"
                   className="hover:text-[#087F8C] hover:underline"
                 >
-                  Saved Resources & Checklists
+                  Privacy Policy
                 </Link>
               </li>
               <li>
                 <Link
-                  href="/history"
+                  href="/terms"
                   className="hover:text-[#087F8C] hover:underline"
                 >
-                  Search History & Privacy Controls
+                  Terms of Service
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/contact"
+                  className="hover:text-[#087F8C] hover:underline"
+                >
+                  Contact
                 </Link>
               </li>
               <li>
@@ -470,15 +532,7 @@ export function CivicFooter() {
                   href="/reports"
                   className="hover:text-[#087F8C] hover:underline"
                 >
-                  Submitted Correction & Scam Reports
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/admin"
-                  className="hover:text-[#087F8C] hover:underline"
-                >
-                  Admin & Content Verification Console
+                  Report Incorrect Information
                 </Link>
               </li>
             </ul>
@@ -515,7 +569,7 @@ export function CivicFooter() {
 
         <div className="mt-8 flex flex-wrap items-center justify-between gap-2 border-t border-slate-200 pt-4 text-[11.5px]">
           <span>
-            © {new Date().getFullYear()} GabayPH Public Service Platform. Unified Civic Design System.
+            © {new Date().getFullYear()} GabayPH — Your Everyday Guide to a Better Life. All rights reserved.
           </span>
           <span>
             No browsing account required · Data Privacy Act of 2012 (RA 10173) aligned

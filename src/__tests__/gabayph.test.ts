@@ -1,4 +1,6 @@
 import { describe, expect, it } from "vitest";
+import fs from "node:fs";
+import path from "node:path";
 import {
   authRegisterSchema,
   bayanihanSubmissionSchema,
@@ -11,7 +13,15 @@ import {
   canManageUsersAndAuditLogs,
   canModerateBayanihan,
 } from "../lib/auth/rbac";
-import { queryUniversalSearch } from "../lib/constants/philippine-data";
+import {
+  ACTIVE_ANNOUNCEMENTS,
+  VERIFIED_ASSISTANCE_PROGRAMS,
+  VERIFIED_BAYANIHAN_POSTS,
+  VERIFIED_OPPORTUNITIES,
+  VERIFIED_RESOURCES,
+  queryUniversalSearch,
+} from "../lib/constants/philippine-data";
+import { PLATFORM_MODULE_LINKS } from "../components/layout/civic-shell";
 
 describe("GabayPH Security, Validation, RBAC & Universal Search Suite", () => {
   it("validates universal search filters and strips whitespace", () => {
@@ -35,6 +45,13 @@ describe("GabayPH Security, Validation, RBAC & Universal Search Suite", () => {
     expect(psaResults[0].sourceUrl).toContain("gov.ph");
   });
 
+  it("returns an honest empty array when a search query has no verified match", () => {
+    const noMatch = queryUniversalSearch({
+      q: "nonexistent-fictional-agency-99999",
+    });
+    expect(noMatch).toEqual([]);
+  });
+
   it("enforces minimum detail length on public inaccuracy reports", () => {
     const invalid = reportSubmissionSchema.safeParse({
       targetType: "resource",
@@ -50,7 +67,8 @@ describe("GabayPH Security, Validation, RBAC & Universal Search Suite", () => {
       targetId: "res-psa-birth-cert",
       targetTitle: "PSA Birth Certificate",
       reason: "outdated_info",
-      details: "Updated appointment link verified on official psa.gov.ph portal.",
+      details:
+        "Updated appointment link verified on official psa.gov.ph portal.",
       officialReferenceUrl: "https://psa.gov.ph",
     });
     expect(valid.success).toBe(true);
@@ -129,5 +147,52 @@ describe("GabayPH Security, Validation, RBAC & Universal Search Suite", () => {
         "Region VII"
       )
     ).toBe(false);
+  });
+
+  it("verifies Phase 3 Homepage structure, Filipino hero copy, 6 ordered categories, and non-government disclosure", () => {
+    const homepagePath = path.resolve(__dirname, "../app/page.tsx");
+    const homepageSource = fs.readFileSync(homepagePath, "utf-8");
+
+    expect(homepageSource).toContain("Ano ang kailangan mong tulong ngayon?");
+    expect(homepageSource).toContain(
+      "Hanapin ang trabaho, serbisyo, tulong pinansyal, edukasyon, at mahahalagang impormasyon para sa iyong pang-araw-araw na pangangailangan."
+    );
+    expect(homepageSource).toContain("Popular Government Services");
+    expect(homepageSource).toContain(
+      "Opportunities: Jobs, Scholarships &amp; Free Training"
+    );
+    expect(homepageSource).toContain(
+      "Financial &amp; Medical Assistance Programs"
+    );
+    expect(homepageSource).toContain("How GabayPH Verifies Public Information");
+    expect(homepageSource).toContain("not a government agency");
+
+    // Verify navigation order matches: Trabaho, Serbisyo, Pera, Bayanihan, Aral, Kaligtasan
+    expect(PLATFORM_MODULE_LINKS.map((m) => m.label)).toEqual([
+      "Trabaho",
+      "Serbisyo",
+      "Pera",
+      "Bayanihan",
+      "Aral",
+      "Kaligtasan",
+    ]);
+
+    // Verify every public record on homepage has official source URL and verification date
+    for (const res of VERIFIED_RESOURCES) {
+      expect(res.sourceUrl).toMatch(/^https:\/\//);
+      expect(res.lastVerifiedAt.length).toBeGreaterThanOrEqual(8);
+    }
+    for (const opp of VERIFIED_OPPORTUNITIES) {
+      expect(opp.sourceUrl).toMatch(/^https:\/\//);
+    }
+    for (const aid of VERIFIED_ASSISTANCE_PROGRAMS) {
+      expect(aid.sourceUrl).toMatch(/^https:\/\//);
+    }
+    for (const post of VERIFIED_BAYANIHAN_POSTS) {
+      expect(post.sourceUrl).toMatch(/^https:\/\//);
+    }
+    for (const ann of ACTIVE_ANNOUNCEMENTS) {
+      expect(ann.sourceUrl).toMatch(/^https:\/\//);
+    }
   });
 });
