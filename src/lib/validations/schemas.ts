@@ -255,3 +255,35 @@ export const budgetCalculatorSchema = z.object({
   debtPayments: z.number().min(0).max(10000000),
   personalAndOther: z.number().min(0).max(10000000),
 });
+
+/**
+ * Checks whether a public submission accidentally includes sensitive personal
+ * identifiers (such as 12-digit PhilSys/SSS/TIN/bank numbers or street/house numbers)
+ * so we do not expose sensitive PII of people requesting community help.
+ */
+export function containsSensitivePersonalData(text: string): {
+  flagged: boolean;
+  reason?: string;
+} {
+  if (/\b(?:\d[-\s]?){12,16}\b/.test(text)) {
+    return {
+      flagged: true,
+      reason:
+        "For your privacy and security, do not include government ID numbers, bank account numbers, or 12+ digit personal identifiers in public posts.",
+    };
+  }
+
+  if (
+    /\b(blk\s*\d+\s*lot\s*\d+|house\s*(no\.?|#)\s*\d+|apt\.?\s*\d+)\b/i.test(
+      text
+    )
+  ) {
+    return {
+      flagged: true,
+      reason:
+        "For safety, do not post exact residential house/block/lot numbers publicly. Specify only the Barangay Hall, LGU desk, or public coordination point.",
+    };
+  }
+
+  return { flagged: false };
+}

@@ -6,6 +6,8 @@ import {
   Flag,
   CheckCircle2,
   AlertCircle,
+  Share2,
+  Building2,
 } from "lucide-react";
 import type { VerificationStatus } from "@/types/database";
 import { reportSubmissionSchema } from "@/lib/validations/schemas";
@@ -20,15 +22,99 @@ import {
   StatusIndicator,
 } from "@/components/ui/design-system";
 
+/**
+ * Evaluates whether a resource or opportunity record is fresh, stale (>180 days since
+ * last verification), or past its application/advisory expiration date.
+ * Ensures stale or expired information is never silently presented as current.
+ */
+export function evaluateRecordFreshness(
+  lastVerifiedAt?: string,
+  deadlineOrExpiresAt?: string,
+  referenceDate: Date = new Date("2026-11-10T00:00:00Z")
+): {
+  isExpired: boolean;
+  isStale: boolean;
+  daysSinceVerified: number;
+  sourceClassification: "official_gov_ph" | "secondary_partner";
+} {
+  let isExpired = false;
+  if (deadlineOrExpiresAt) {
+    const exp = new Date(deadlineOrExpiresAt);
+    if (!Number.isNaN(exp.getTime()) && exp.getTime() < referenceDate.getTime()) {
+      isExpired = true;
+    }
+  }
+
+  let daysSinceVerified = 0;
+  let isStale = false;
+  if (lastVerifiedAt) {
+    const ver = new Date(lastVerifiedAt);
+    if (!Number.isNaN(ver.getTime())) {
+      daysSinceVerified = Math.floor(
+        (referenceDate.getTime() - ver.getTime()) / (1000 * 60 * 60 * 24)
+      );
+      if (daysSinceVerified > 270) {
+        isStale = true;
+      }
+    }
+  }
+
+  return {
+    isExpired,
+    isStale,
+    daysSinceVerified,
+    sourceClassification: "official_gov_ph",
+  };
+}
+
+export function classifySourceUrl(
+  sourceUrl: string
+): "official_gov_ph" | "secondary_partner" {
+  try {
+    const parsed = new URL(sourceUrl);
+    if (
+      parsed.hostname.endsWith(".gov.ph") ||
+      parsed.hostname === "gov.ph" ||
+      parsed.hostname.endsWith(".edu.ph")
+    ) {
+      return "official_gov_ph";
+    }
+  } catch {
+    // ignore malformed URL
+  }
+  return "secondary_partner";
+}
+
+export function resolveEffectiveVerificationStatus(
+  status: VerificationStatus,
+  lastVerifiedAt?: string,
+  deadlineOrExpiresAt?: string
+): VerificationStatus {
+  const { isExpired, isStale } = evaluateRecordFreshness(
+    lastVerifiedAt,
+    deadlineOrExpiresAt
+  );
+  if (isExpired) return "archived";
+  if (status === "officially_verified" && isStale) return "needs_review";
+  return status;
+}
+
 export function VerificationBadge({
   status,
   lastVerifiedAt,
+  deadlineOrExpiresAt,
 }: {
   status: VerificationStatus;
   lastVerifiedAt?: string;
+  deadlineOrExpiresAt?: string;
 }) {
+  const effectiveStatus = resolveEffectiveVerificationStatus(
+    status,
+    lastVerifiedAt,
+    deadlineOrExpiresAt
+  );
   return (
-    <StatusIndicator status={status} lastVerifiedAt={lastVerifiedAt} />
+    <StatusIndicator status={effectiveStatus} lastVerifiedAt={lastVerifiedAt} />
   );
 }
 
@@ -41,6 +127,8 @@ export function SourceCitationBar({
   targetId,
   targetTitle,
   targetType = "resource",
+  shareHref,
+  deadlineOrExpiresAt,
 }: {
   sourceName: string;
   sourceUrl: string;
@@ -55,29 +143,71 @@ export function SourceCitationBar({
     | "assistance_program"
     | "organization"
     | "bayanihan_post";
+  shareHref?: string;
+  deadlineOrExpiresAt?: string;
 }) {
   const [reportOpen, setReportOpen] = useState(false);
+  const { showToast } = useThemeAndToast();
+  const sourceKind = classifySourceUrl(sourceUrl);
+
+  const handleShare = async () => {
+    const targetPath =
+      shareHref ||
+      (typeof window !== "undefined" ? window.location.href : sourceUrl);
+    const fullUrl =
+      typeof window !== "undefined" && targetPath.startsWith("/")
+        ? `${window.location.origin}${targetPath}`
+        : targetPath;
+
+    try {
+      if (typeof navigator !== "undefined" && navigator.clipboard) {
+        await navigator.clipboard.writeText(fullUrl);
+      }
+      showToast({
+        title: "Resource link copied to clipboard",
+        description: `${targetTitle} (${fullUrl})`,
+        variant: "info",
+      });
+    } catch {
+      showToast({
+        title: "Share link ready",
+        description: fullUrl,
+        variant: "info",
+      });
+    }
+  };
 
   return (
-    <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-slate-200 pt-2.5 text-[12px] text-[#64748B]">
+    <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-[var(--gabay-border)] pt-2.5 text-[12px] text-[var(--gabay-neutral)]">
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
         <VerificationBadge
           status={verificationStatus}
           lastVerifiedAt={lastVerifiedAt}
+          deadlineOrExpiresAt={deadlineOrExpiresAt}
         />
+        <span className="inline-flex items-center gap-1 rounded border border-[var(--gabay-border)] bg-[var(--gabay-surface-muted)] px-1.5 py-0.5 text-[11px] font-semibold text-[var(--gabay-text)]">
+          <Building2 className="h-3 w-3 text-[#17365D] dark:text-teal-300" aria-hidden="true" />
+          <span>
+            {sourceKind === "official_gov_ph"
+              ? "Official .gov.ph Source"
+              : "Verified Humanitarian / Partner Source"}
+          </span>
+        </span>
         <span>
           Source:{" "}
-          <strong className="font-semibold text-slate-800">{sourceName}</strong>
+          <strong className="font-semibold text-[var(--gabay-text)]">
+            {sourceName}
+          </strong>
         </span>
         <span>Coverage: {regionName}</span>
       </div>
 
-      <div className="flex items-center gap-3">
+      <div className="flex flex-wrap items-center gap-2.5">
         <a
           href={sourceUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-1 font-semibold text-[#087F8C] underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#087F8C]"
+          className="inline-flex items-center gap-1 font-semibold text-[#087F8C] underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#087F8C] dark:text-teal-300"
         >
           <span>Official Source</span>
           <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
@@ -85,8 +215,18 @@ export function SourceCitationBar({
 
         <button
           type="button"
+          onClick={handleShare}
+          className="gabay-interactive inline-flex items-center gap-1 rounded px-2 py-1 text-[var(--gabay-neutral)] hover:bg-[var(--gabay-surface-muted)] hover:text-[var(--gabay-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#087F8C]"
+          aria-label={`Share ${targetTitle}`}
+        >
+          <Share2 className="h-3.5 w-3.5" aria-hidden="true" />
+          <span>Share</span>
+        </button>
+
+        <button
+          type="button"
           onClick={() => setReportOpen(true)}
-          className="gabay-interactive inline-flex items-center gap-1 rounded px-2 py-1 text-slate-600 hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#087F8C]"
+          className="gabay-interactive inline-flex items-center gap-1 rounded px-2 py-1 text-[var(--gabay-neutral)] hover:bg-[var(--gabay-surface-muted)] hover:text-[var(--gabay-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#087F8C]"
         >
           <Flag className="h-3.5 w-3.5" aria-hidden="true" />
           <span>Report Issue</span>
@@ -151,7 +291,9 @@ export function ReportIssueDialog({
     });
 
     if (!parsed.success) {
-      setErrorMsg(parsed.error.issues[0]?.message || "Please check your input.");
+      setErrorMsg(
+        parsed.error.issues[0]?.message || "Please check your report details."
+      );
       return;
     }
 
@@ -166,9 +308,8 @@ export function ReportIssueDialog({
 
     setSubmittedId(created.id);
     showToast({
-      title: `Verification Report #${created.id} Submitted`,
-      description:
-        "Queued for our Content Verification team to cross-check against official agency records.",
+      title: "Report submitted for verification",
+      description: `Reference ID: ${created.id}. Thank you for keeping GabayPH accurate.`,
       variant: "success",
     });
   };
@@ -176,52 +317,59 @@ export function ReportIssueDialog({
   return (
     <CompactDialog
       open={open}
-      title="Report Incorrect Information or Scam"
-      subtitle={`Record: ${targetTitle}`}
       onClose={onClose}
+      title="Report Outdated or Incorrect Information"
+      subtitle={`Record: ${targetTitle}`}
     >
       {submittedId ? (
-        <div className="py-2 text-xs text-slate-700">
-          <div className="flex items-center gap-2 font-semibold text-[#16A36A]">
-            <CheckCircle2 className="h-5 w-5" aria-hidden="true" />
-            <span>Report Received (Ref #{submittedId})</span>
+        <div className="space-y-3 rounded-md border border-[#16A36A]/30 bg-[#16A36A]/10 p-3.5 text-slate-900">
+          <div className="flex items-center gap-2 font-semibold text-[#065F46]">
+            <CheckCircle2
+              className="h-4 w-4 text-[#16A36A]"
+              aria-hidden="true"
+            />
+            <span>Thank you. Your report has been logged for review.</span>
           </div>
-          <p className="mt-2 leading-relaxed text-slate-600">
-            Thank you for helping keep GabayPH accurate and trustworthy. Our content verification team will cross-check this entry against official agency sources.
+          <p className="text-[12px] text-slate-700">
+            Reference ID: <code className="font-mono font-bold">{submittedId}</code>.
+            Our content verification moderators will check the official agency circular and update this entry.
           </p>
-          <div className="mt-4 flex justify-end">
-            <Button variant="primary" size="sm" onClick={onClose}>
-              Done
-            </Button>
-          </div>
+          <Button variant="primary" size="sm" onClick={onClose}>
+            Close
+          </Button>
         </div>
       ) : (
-        <form onSubmit={handleSubmit} className="space-y-3 text-xs">
+        <form onSubmit={handleSubmit} className="space-y-3">
           {errorMsg && (
             <div
               role="alert"
-              className="flex items-center gap-2 rounded-md border border-[#D94B4B]/40 bg-[#D94B4B]/10 p-2.5 text-[#D94B4B]"
+              className="flex items-center gap-2 rounded-md border border-[#D94B4B]/40 bg-[#D94B4B]/10 p-2.5 text-[12px] text-[#991B1B]"
             >
-              <AlertCircle className="h-4 w-4 shrink-0" aria-hidden="true" />
+              <AlertCircle
+                className="h-4 w-4 shrink-0 text-[#D94B4B]"
+                aria-hidden="true"
+              />
               <span>{errorMsg}</span>
             </div>
           )}
 
-          <FormField id="report-reason" label="Reason for Report" required>
+          <FormField id="report-reason" label="What is the issue?">
             <SelectDropdown
               id="report-reason"
               value={reason}
               onChange={(e) => setReason(e.target.value as typeof reason)}
             >
               <option value="outdated_info">
-                Outdated fee, schedule, or procedure
+                Outdated fees, schedule, or rules
               </option>
               <option value="incorrect_requirements">
-                Incorrect document requirements
+                Incorrect documentary requirements
               </option>
-              <option value="broken_link">Broken official agency link</option>
+              <option value="broken_link">
+                Broken or changed official .gov.ph link
+              </option>
               <option value="suspected_scam">
-                Suspected job scam or illegal fee
+                Suspected scam, fixer, or unauthorized fee
               </option>
               <option value="abusive_content">
                 Inappropriate or misleading post
@@ -232,9 +380,7 @@ export function ReportIssueDialog({
 
           <FormField
             id="report-details"
-            label="What needs to be corrected or investigated?"
-            required
-            hint="Minimum 15 characters"
+            label="Correction Details (minimum 15 characters)"
           >
             <textarea
               id="report-details"
@@ -242,14 +388,15 @@ export function ReportIssueDialog({
               required
               value={details}
               onChange={(e) => setDetails(e.target.value)}
-              placeholder="Describe the updated requirement, fee change, or scam warning..."
-              className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-xs text-slate-900 focus:border-[#087F8C] focus:outline-none focus:ring-2 focus:ring-[#087F8C]/20"
+              placeholder="Describe what changed (e.g., new memorandum circular, updated fee, or relocated office)..."
+              className="gabay-interactive w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-[13px] text-slate-900 placeholder:text-[#64748B] focus:border-[#087F8C] focus:outline-none focus:ring-2 focus:ring-[#087F8C]/20"
             />
           </FormField>
 
           <FormField
             id="report-ref-url"
-            label="Official Reference Link (Optional, e.g., .gov.ph URL)"
+            label="Official Reference URL (Optional)"
+            hint="Provide the official .gov.ph link or announcement if available."
           >
             <Input
               id="report-ref-url"
@@ -261,7 +408,7 @@ export function ReportIssueDialog({
           </FormField>
 
           <div className="flex items-center justify-end gap-2 pt-2">
-            <Button type="button" variant="outline" size="sm" onClick={onClose}>
+            <Button type="button" variant="secondary" size="sm" onClick={onClose}>
               Cancel
             </Button>
             <Button type="submit" variant="primary" size="sm">

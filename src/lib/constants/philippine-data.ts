@@ -786,6 +786,147 @@ export const VERIFIED_RESOURCES: ResourceRecord[] = [
     status: "published",
     lastVerifiedAt: "2026-11-01",
   },
+  {
+    id: "res-serbisyo-pagibig-housing",
+    module: "serbisyo",
+    categorySlug: "housing-pagibig",
+    categoryName: "Housing & Pag-IBIG Services",
+    organizationSlug: "pag-ibig",
+    organizationName: "Home Development Mutual Fund",
+    organizationAcronym: "Pag-IBIG",
+    regionCode: "NATIONAL",
+    regionName: "Nationwide (All Regions)",
+    slug: "pag-ibig-affordable-housing-loan-guide",
+    title: "Pag-IBIG Fund Regular & Affordable Housing Loan Application Guide",
+    summary:
+      "Official documentary requirements, eligibility rules (at least 24 monthly savings), and Virtual Pag-IBIG application steps for home purchase, construction, or improvement.",
+    requirementsChecklist: [
+      {
+        id: "chk-hsg-1",
+        label: "Duly accomplished Housing Loan Application (HLA) Form with 1x1 ID photo",
+        isMandatory: true,
+      },
+      {
+        id: "chk-hsg-2",
+        label: "Proof of Income (Notarized Certificate of Employment & Compensation, latest ITR / BIR Form 2316, or 1-month payslip)",
+        isMandatory: true,
+      },
+      {
+        id: "chk-hsg-3",
+        label: "One (1) valid Government-issued Primary ID of principal borrower, spouse, and seller",
+        isMandatory: true,
+      },
+      {
+        id: "chk-hsg-4",
+        label: "Certified True Copy of Transfer Certificate of Title (TCT) / Condominium Certificate of Title (CCT) & Updated Tax Declaration",
+        isMandatory: true,
+      },
+    ],
+    steps: [
+      {
+        stepNumber: 1,
+        title: "Verify 24 Monthly Membership Savings on Virtual Pag-IBIG",
+        description:
+          "Ensure you have at least 24 monthly Pag-IBIG Regular Savings remittances (lump-sum completion is permitted for first-time housing borrowers).",
+        officialPortalLink: "https://www.pagibigfundservices.com/virtualpagibig/",
+      },
+      {
+        stepNumber: 2,
+        title: "Submit Housing Loan Application Online or at a Pag-IBIG Housing Business Center",
+        description:
+          "Upload complete documentary requirements via Virtual Pag-IBIG or file directly at the nearest Pag-IBIG Housing Business Center.",
+      },
+      {
+        stepNumber: 3,
+        title: "Receive Notice of Approval (NOA) & Complete Title Annotation",
+        description:
+          "Upon credit and collateral evaluation approval, sign the loan and mortgage documents and complete Registry of Deeds annotation within 90 days.",
+      },
+    ],
+    eligibilitySummary:
+      "Active Pag-IBIG members with at least 24 monthly contributions, not more than 65 years old at the date of application (and not more than 70 at loan maturity), with legal capacity to acquire property and no foreclosed/defaulted Pag-IBIG housing loan.",
+    processingTime: "Approximately 17–20 working days upon submission of complete requirements",
+    feesSummary:
+      "Processing Fee: PHP 1,000 upon filing + PHP 2,000 upon loan takeout (per official Pag-IBIG Housing Loan guidelines).",
+    sourceName: "Home Development Mutual Fund (Pag-IBIG Fund)",
+    sourceUrl: "https://www.pagibigfund.gov.ph/Availmentofnewloan.html",
+    contactInfo: {
+      hotline: "(02) 8724-4244",
+      email: "contactus@pagibigfund.gov.ph",
+      hours: "24/7 Contact Center",
+    },
+    verificationStatus: "officially_verified",
+    status: "published",
+    lastVerifiedAt: "2026-11-01",
+  },
+  {
+    id: "res-serbisyo-dti-bnrs-lgu-permit",
+    module: "serbisyo",
+    categorySlug: "lgu-business-registration",
+    categoryName: "Local Government & Business Registration",
+    organizationSlug: "dti",
+    organizationName: "Department of Trade and Industry / Local Government BPLO",
+    organizationAcronym: "DTI / LGU",
+    regionCode: "NATIONAL",
+    regionName: "Nationwide (All Regions)",
+    slug: "dti-business-name-and-lgu-barangay-clearance-guide",
+    title: "DTI Sole Proprietorship Business Name (BNRS) & Barangay / LGU Business Permit Guide",
+    summary:
+      "Step-by-step requirements for registering a Sole Proprietorship Business Name on DTI BNRS, securing a Barangay Business Clearance, and applying for BMBE (RA 9178) registration.",
+    requirementsChecklist: [
+      {
+        id: "chk-dti-1",
+        label: "One (1) valid Government-issued ID of the Sole Proprietor (Filipino citizen, 18+ years old)",
+        isMandatory: true,
+      },
+      {
+        id: "chk-dti-2",
+        label: "Three (3) proposed Business Name options and territorial scope selection (Barangay, City/Municipality, Regional, or National)",
+        isMandatory: true,
+      },
+      {
+        id: "chk-dti-3",
+        label: "DTI Certificate of Business Name Registration + Proof of Business Address (Lease Contract or Land Title/Tax Declaration) for LGU BPLO",
+        isMandatory: true,
+      },
+    ],
+    steps: [
+      {
+        stepNumber: 1,
+        title: "Register Business Name Online at DTI BNRS (bnrs.dti.gov.ph)",
+        description:
+          "Search name availability, select your territorial scope, and pay the statutory registration fee within 5 calendar days to download your Certificate of Business Name Registration.",
+        officialPortalLink: "https://bnrs.dti.gov.ph",
+      },
+      {
+        stepNumber: 2,
+        title: "Secure Barangay Business Clearance & Mayor's Permit (eBOSS)",
+        description:
+          "Submit your DTI Certificate to your Barangay Hall or city/municipal Electronic Business One-Stop Shop (eBOSS per RA 11032 Ease of Doing Business Act).",
+      },
+      {
+        stepNumber: 3,
+        title: "Register with BIR (Form 1901) & Optional BMBE Certificate at DTI Negosyo Center",
+        description:
+          "Micro enterprises with total assets not exceeding PHP 3,000,000 (excluding land) may apply for a free Barangay Micro Business Enterprise (BMBE) Certificate of Authority under RA 9178.",
+      },
+    ],
+    eligibilitySummary:
+      "Filipino citizens at least 18 years of age establishing a Sole Proprietorship or micro/small enterprise.",
+    processingTime: "DTI BNRS Online: 15–30 minutes | LGU eBOSS: 1–3 working days per RA 11032",
+    feesSummary:
+      "DTI BNRS Fee by Scope: Barangay PHP 200 | City/Municipality PHP 500 | Regional PHP 1,000 | National PHP 2,000 (+ PHP 30 Documentary Stamp Tax).",
+    sourceName: "Department of Trade and Industry (DTI BNRS)",
+    sourceUrl: "https://bnrs.dti.gov.ph",
+    contactInfo: {
+      hotline: "1-384 (1-DTI)",
+      email: "bnrshelpdesk@dti.gov.ph",
+      hours: "Monday to Friday, 8:00 AM – 5:00 PM",
+    },
+    verificationStatus: "officially_verified",
+    status: "published",
+    lastVerifiedAt: "2026-11-01",
+  },
 ];
 
 export const VERIFIED_OPPORTUNITIES: OpportunityRecord[] = [

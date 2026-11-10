@@ -24,6 +24,7 @@ function PeraContent() {
   const initialSlug = searchParams.get("item") || "";
 
   const [programTypeFilter, setProgramTypeFilter] = useState<string>("all");
+  const [keyword, setKeyword] = useState<string>("");
   const [selectedSlug, setSelectedSlug] = useState<string>(
     initialSlug || VERIFIED_ASSISTANCE_PROGRAMS[0]?.slug || ""
   );
@@ -83,12 +84,17 @@ function PeraContent() {
     ? Math.max(0, estimatedMonthsToPayoff * monthlyDebtPayment - totalDebtBalance)
     : 0;
 
-  const filteredPrograms = VERIFIED_ASSISTANCE_PROGRAMS.filter((p) =>
-    programTypeFilter === "all" ? true : p.programType === programTypeFilter
-  );
+  const filteredPrograms = VERIFIED_ASSISTANCE_PROGRAMS.filter((p) => {
+    if (programTypeFilter !== "all" && p.programType !== programTypeFilter) {
+      return false;
+    }
+    if (!keyword.trim()) return true;
+    const hay = `${p.programName} ${p.organizationName} ${p.description} ${p.benefitSummary}`.toLowerCase();
+    return hay.includes(keyword.trim().toLowerCase());
+  });
 
   const activeProgram =
-    VERIFIED_ASSISTANCE_PROGRAMS.find((p) => p.slug === selectedSlug) ||
+    filteredPrograms.find((p) => p.slug === selectedSlug) ||
     filteredPrograms[0];
 
   const peraGuides = VERIFIED_RESOURCES.filter((r) => r.module === "pera");
@@ -107,6 +113,9 @@ function PeraContent() {
         <p className="mt-1 text-xs text-slate-600">
           Verified eligibility guides for DSWD AICS, Malasakit Centers, DOLE TUPAD, and SSS/Pag-IBIG calamity loans, paired with practical budget, savings, and debt repayment calculators.
         </p>
+        <div className="mt-3 rounded border border-amber-200 bg-amber-50/80 px-3 py-2 text-[11px] text-amber-950">
+          <strong>Financial & Eligibility Disclosure:</strong> Information and calculators on GabayPH are for educational reference only and do <strong>not</strong> constitute licensed financial advice. GabayPH does not process applications, disburse funds, or guarantee assistance approval. Assessment and benefit release are determined solely by DSWD, DOH Malasakit Centers, DOLE, SSS, or Pag-IBIG Fund.
+        </div>
       </div>
 
       {/* Part 1: Financial Assistance Directory */}
@@ -119,7 +128,15 @@ function PeraContent() {
             1. Verified Government Financial & Medical Assistance Directory
           </h2>
 
-          <div className="flex flex-wrap gap-1.5 text-xs">
+          <div className="flex flex-wrap items-center gap-1.5 text-xs">
+            <input
+              type="search"
+              value={keyword}
+              onChange={(e) => setKeyword(e.target.value)}
+              placeholder="Search AICS, Malasakit, TUPAD..."
+              aria-label="Search financial assistance programs"
+              className="rounded border border-slate-300 bg-white px-2.5 py-1 text-xs"
+            />
             {[
               { id: "all", label: "All Aid Programs" },
               { id: "medical", label: "Medical & Hospital (AICS / Malasakit)" },
@@ -144,31 +161,37 @@ function PeraContent() {
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
           <div className="divide-y divide-slate-200 rounded-md border border-slate-200 bg-white lg:col-span-4">
-            {filteredPrograms.map((prog) => {
-              const isSelected = activeProgram?.slug === prog.slug;
-              return (
-                <button
-                  key={prog.id}
-                  type="button"
-                  onClick={() => setSelectedSlug(prog.slug)}
-                  className={`w-full p-3.5 text-left ${
-                    isSelected
-                      ? "border-l-4 border-l-[#17365D] bg-blue-50/80"
-                      : "hover:bg-slate-50"
-                  }`}
-                >
-                  <span className="rounded bg-emerald-100 px-2 py-0.5 text-[10px] font-bold uppercase text-emerald-900">
-                    {prog.programType}
-                  </span>
-                  <h3 className="mt-1.5 text-xs font-bold text-slate-900">
-                    {prog.programName}
-                  </h3>
-                  <p className="mt-1 line-clamp-2 text-[11px] text-slate-600">
-                    {prog.benefitSummary}
-                  </p>
-                </button>
-              );
-            })}
+            {filteredPrograms.length === 0 ? (
+              <div className="p-4 text-center text-xs text-slate-600">
+                No verified assistance program matches your search.
+              </div>
+            ) : (
+              filteredPrograms.map((prog) => {
+                const isSelected = activeProgram?.slug === prog.slug;
+                return (
+                  <button
+                    key={prog.id}
+                    type="button"
+                    onClick={() => setSelectedSlug(prog.slug)}
+                    className={`w-full p-3.5 text-left ${
+                      isSelected
+                        ? "border-l-4 border-l-[#17365D] bg-blue-50/80"
+                        : "hover:bg-slate-50"
+                    }`}
+                  >
+                    <span className="rounded bg-emerald-100 px-2 py-0.5 text-[10px] font-bold uppercase text-emerald-900">
+                      {prog.programType}
+                    </span>
+                    <h3 className="mt-1.5 text-xs font-bold text-slate-900">
+                      {prog.programName}
+                    </h3>
+                    <p className="mt-1 line-clamp-2 text-[11px] text-slate-600">
+                      {prog.benefitSummary}
+                    </p>
+                  </button>
+                );
+              })
+            )}
           </div>
 
           <div className="lg:col-span-8">
@@ -184,32 +207,40 @@ function PeraContent() {
                     </h3>
                   </div>
 
-                  <button
-                    type="button"
-                    onClick={() =>
-                      toggleBookmark({
-                        targetType: "assistance_program",
-                        targetId: activeProgram.id,
-                        targetSlug: activeProgram.slug,
-                        targetTitle: activeProgram.programName,
-                        targetModule: "pera",
-                        href: `/pera?item=${activeProgram.slug}`,
-                      })
-                    }
-                    className="inline-flex items-center gap-1.5 rounded border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-800 hover:bg-slate-50"
-                  >
-                    {isBookmarked(activeProgram.id) ? (
-                      <>
-                        <BookmarkCheck className="h-3.5 w-3.5 text-emerald-700" />
-                        <span>Saved</span>
-                      </>
-                    ) : (
-                      <>
-                        <Bookmark className="h-3.5 w-3.5" />
-                        <span>Save Program</span>
-                      </>
-                    )}
-                  </button>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <a
+                      href={`/pera/${activeProgram.slug}`}
+                      className="inline-flex items-center gap-1 rounded border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-[#17365D] hover:bg-slate-50"
+                    >
+                      <span>Standalone Program Page →</span>
+                    </a>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        toggleBookmark({
+                          targetType: "assistance_program",
+                          targetId: activeProgram.id,
+                          targetSlug: activeProgram.slug,
+                          targetTitle: activeProgram.programName,
+                          targetModule: "pera",
+                          href: `/pera/${activeProgram.slug}`,
+                        })
+                      }
+                      className="inline-flex items-center gap-1.5 rounded border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-800 hover:bg-slate-50"
+                    >
+                      {isBookmarked(activeProgram.id) ? (
+                        <>
+                          <BookmarkCheck className="h-3.5 w-3.5 text-emerald-700" />
+                          <span>Saved</span>
+                        </>
+                      ) : (
+                        <>
+                          <Bookmark className="h-3.5 w-3.5" />
+                          <span>Save Program</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
                 </div>
 
                 <div className="mt-3 rounded border border-emerald-200 bg-emerald-50/70 p-3 text-xs text-emerald-950">

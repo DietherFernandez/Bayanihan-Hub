@@ -9,12 +9,17 @@ import {
   PlusCircle,
 } from "lucide-react";
 import {
+  ACTIVE_ANNOUNCEMENTS,
   PH_LOCATIONS,
   VERIFIED_BAYANIHAN_POSTS,
+  VERIFIED_ORGANIZATIONS,
 } from "@/lib/constants/philippine-data";
 import type { BayanihanPostRecord } from "@/types/database";
 import { SourceCitationBar } from "@/components/trust/verification-badge";
-import { bayanihanSubmissionSchema } from "@/lib/validations/schemas";
+import {
+  bayanihanSubmissionSchema,
+  containsSensitivePersonalData,
+} from "@/lib/validations/schemas";
 
 function BayanihanContent() {
   const [posts, setPosts] = useState<BayanihanPostRecord[]>(
@@ -77,6 +82,17 @@ function BayanihanContent() {
       return;
     }
 
+    const piiGuard = containsSensitivePersonalData(
+      `${parsed.data.title} ${parsed.data.summary} ${parsed.data.dropOffOrMeetingPoint}`
+    );
+    if (piiGuard.flagged) {
+      setFormError(
+        piiGuard.reason ||
+          "Do not include sensitive personal identifiers or residential house numbers."
+      );
+      return;
+    }
+
     const newRecord: BayanihanPostRecord = {
       id: `bay-${Date.now()}`,
       postType: parsed.data.postType,
@@ -97,7 +113,7 @@ function BayanihanContent() {
       sourceName: parsed.data.organizationName,
       sourceUrl: parsed.data.sourceUrl || "https://ndrrmc.gov.ph",
       verificationStatus: "verification_pending",
-      status: "published",
+      status: "under_review",
       lastVerifiedAt: new Date().toISOString().split("T")[0],
     };
 
@@ -122,6 +138,9 @@ function BayanihanContent() {
         <p className="mt-1 text-xs text-slate-600">
           Connect with verified DSWD NROC, Philippine Red Cross 143, LGU relief operations, and community assistance drives. All community submissions undergo verification labeling.
         </p>
+        <div className="mt-3 rounded border border-amber-200 bg-amber-50/80 px-3 py-2 text-[11px] text-amber-950">
+          <strong>Safety, Privacy & Donation Policy:</strong> GabayPH does <strong>not</strong> collect monetary donations or process payments. Coordinate in-kind relief and volunteering only at official LGU/Barangay halls, DSWD NROC, or Philippine Red Cross chapters. Never expose private residential street addresses or government ID numbers of individuals requesting help.
+        </div>
       </div>
 
       {/* Filters */}
@@ -190,9 +209,22 @@ function BayanihanContent() {
                 </span>
               </div>
 
-              <h2 className="mt-2 text-base font-bold text-slate-900">
-                {post.title}
-              </h2>
+              <div className="mt-2 flex items-start justify-between gap-2">
+                <h2 className="text-base font-bold text-slate-900">
+                  <a
+                    href={`/bayanihan/${post.slug}`}
+                    className="hover:text-[#17365D] hover:underline"
+                  >
+                    {post.title}
+                  </a>
+                </h2>
+                <a
+                  href={`/bayanihan/${post.slug}`}
+                  className="shrink-0 rounded border border-slate-300 bg-white px-2.5 py-1 text-[11px] font-semibold text-[#17365D] hover:bg-slate-50"
+                >
+                  Details →
+                </a>
+              </div>
               <p className="mt-0.5 text-xs font-medium text-slate-600">
                 Lead Organization: {post.organizationName}
               </p>
@@ -232,6 +264,7 @@ function BayanihanContent() {
                 targetId={post.id}
                 targetTitle={post.title}
                 targetType="bayanihan_post"
+                shareHref={`/bayanihan/${post.slug}`}
               />
             </article>
           ))}
@@ -459,6 +492,85 @@ function BayanihanContent() {
           </div>
         </aside>
       </div>
+
+      {/* Section 2: Verified Humanitarian & Local Government Organizations */}
+      <section aria-labelledby="bayanihan-orgs-heading" className="mt-10">
+        <h2
+          id="bayanihan-orgs-heading"
+          className="mb-3 text-base font-bold text-slate-900"
+        >
+          2. Verified Humanitarian, Relief & Public Service Organizations
+        </h2>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {VERIFIED_ORGANIZATIONS.slice(0, 6).map((org) => (
+            <div
+              key={org.id}
+              className="rounded-md border border-slate-200 bg-white p-3.5 text-xs"
+            >
+              <div className="flex items-center justify-between gap-2">
+                <span className="rounded bg-[#17365D] px-2 py-0.5 font-mono text-[10px] font-bold uppercase text-white">
+                  {org.acronym}
+                </span>
+                <span className="text-[11px] text-slate-500">
+                  Verified {org.lastVerifiedAt}
+                </span>
+              </div>
+              <h3 className="mt-1.5 font-bold text-slate-900">{org.name}</h3>
+              <p className="mt-1 line-clamp-2 text-[11px] text-slate-600">
+                {org.description}
+              </p>
+              <div className="mt-2.5 flex items-center justify-between border-t border-slate-100 pt-2 text-[11px]">
+                <span className="font-mono text-slate-600">
+                  Hotline: {org.hotline || "See portal"}
+                </span>
+                <a
+                  href={org.officialWebsite}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-semibold text-[#087F8C] hover:underline"
+                >
+                  Official Portal ↗
+                </a>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Section 3: Active Community Announcements & Public Advisories */}
+      <section aria-labelledby="bayanihan-announcements-heading" className="mt-8">
+        <h2
+          id="bayanihan-announcements-heading"
+          className="mb-3 text-base font-bold text-slate-900"
+        >
+          3. Active Community & Public Advisories
+        </h2>
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+          {ACTIVE_ANNOUNCEMENTS.map((ann) => (
+            <div
+              key={ann.id}
+              className="rounded-md border border-slate-200 bg-white p-3.5 text-xs"
+            >
+              <span className="rounded bg-amber-100 px-2 py-0.5 font-mono text-[10px] font-bold uppercase text-amber-900">
+                {ann.severity} · {ann.regionCode}
+              </span>
+              <h3 className="mt-1.5 font-bold text-slate-900">{ann.title}</h3>
+              <p className="mt-1 text-[11px] text-slate-600">{ann.summary}</p>
+              <div className="mt-2.5 flex items-center justify-between border-t border-slate-100 pt-2 text-[11px]">
+                <span className="text-slate-500">Source: {ann.sourceName}</span>
+                <a
+                  href={ann.sourceUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-semibold text-[#087F8C] hover:underline"
+                >
+                  Verify ↗
+                </a>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }

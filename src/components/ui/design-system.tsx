@@ -192,7 +192,21 @@ export function StatusIndicator({
     return (
       <span className="inline-flex items-center gap-1.5 rounded-md border border-[#D99A28]/40 bg-[#D99A28]/10 px-2 py-0.5 text-[12px] font-semibold text-[#92400E]">
         <Clock className="h-3.5 w-3.5 text-[#D99A28]" aria-hidden="true" />
-        <span>Source available, verification pending</span>
+        <span>Pending verification</span>
+      </span>
+    );
+  }
+
+  if (status === "needs_review") {
+    return (
+      <span className="inline-flex items-center gap-1.5 rounded-md border border-amber-400/50 bg-amber-50 px-2 py-0.5 text-[12px] font-semibold text-amber-900">
+        <Clock className="h-3.5 w-3.5 text-amber-700" aria-hidden="true" />
+        <span>Needs review (Re-verification due)</span>
+        {lastVerifiedAt && (
+          <span className="font-normal opacity-85">
+            · Last checked {formatVerifiedDate(lastVerifiedAt)}
+          </span>
+        )}
       </span>
     );
   }

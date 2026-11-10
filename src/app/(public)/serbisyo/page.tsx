@@ -30,6 +30,7 @@ function SerbisyoContent() {
   );
 
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [keyword, setKeyword] = useState<string>("");
   const [activeSlug, setActiveSlug] = useState<string>(
     initialSlug || serbisyoGuides[0]?.slug || ""
   );
@@ -41,12 +42,17 @@ function SerbisyoContent() {
     isBookmarked,
   } = useCitizenState();
 
-  const filteredGuides = serbisyoGuides.filter((g) =>
-    selectedCategory === "all" ? true : g.categorySlug === selectedCategory
-  );
+  const filteredGuides = serbisyoGuides.filter((g) => {
+    if (selectedCategory !== "all" && g.categorySlug !== selectedCategory) {
+      return false;
+    }
+    if (!keyword.trim()) return true;
+    const hay = `${g.title} ${g.organizationAcronym} ${g.organizationName} ${g.summary}`.toLowerCase();
+    return hay.includes(keyword.trim().toLowerCase());
+  });
 
   const selectedGuide =
-    serbisyoGuides.find((g) => g.slug === activeSlug) || filteredGuides[0];
+    filteredGuides.find((g) => g.slug === activeSlug) || filteredGuides[0];
 
   const handlePrintChecklist = () => {
     if (typeof window !== "undefined") {
@@ -67,7 +73,7 @@ function SerbisyoContent() {
             Government Service Directory & Interactive Document Checklists
           </h1>
           <p className="mt-1 text-xs text-slate-600">
-            Verified requirements, step-by-step application procedures, statutory fees, and official agency links. Check off items as you prepare your documents.
+            Verified requirements, step-by-step application procedures, statutory fees, processing times, and official <code>.gov.ph</code> agency links.
           </p>
         </div>
 
@@ -83,27 +89,52 @@ function SerbisyoContent() {
         </div>
       </div>
 
-      {/* Category Filter Strip */}
-      <div className="no-print mb-5 flex flex-wrap items-center gap-2">
-        <span className="text-xs font-semibold text-slate-700">Filter:</span>
-        {[
-          { slug: "all", label: "All Government Guides" },
-          { slug: "civil-registry-ids", label: "Civil Registry & National IDs (PSA, NBI, PhilSys)" },
-          { slug: "social-security-health", label: "Health & Social Security (PhilHealth, SSS)" },
-        ].map((cat) => (
-          <button
-            key={cat.slug}
-            type="button"
-            onClick={() => setSelectedCategory(cat.slug)}
-            className={`rounded border px-3 py-1.5 text-xs font-medium ${
-              selectedCategory === cat.slug
-                ? "border-[#17365D] bg-[#17365D] text-white"
-                : "border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
-            }`}
-          >
-            {cat.label}
-          </button>
-        ))}
+      {/* Category & Keyword Filter Strip */}
+      <div className="no-print mb-5 flex flex-wrap items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-xs font-semibold text-slate-700">Category:</span>
+          {[
+            { slug: "all", label: "All Services" },
+            {
+              slug: "civil-registry-ids",
+              label: "Civil Registration & IDs (PSA, NBI, PhilSys)",
+            },
+            {
+              slug: "social-security-health",
+              label: "Health & Social Insurance (PhilHealth, SSS)",
+            },
+            {
+              slug: "housing-pagibig",
+              label: "Housing (Pag-IBIG)",
+            },
+            {
+              slug: "lgu-business-registration",
+              label: "LGU & Business Registration (DTI, BMBE)",
+            },
+          ].map((cat) => (
+            <button
+              key={cat.slug}
+              type="button"
+              onClick={() => setSelectedCategory(cat.slug)}
+              className={`rounded border px-3 py-1.5 text-xs font-medium ${
+                selectedCategory === cat.slug
+                  ? "border-[#17365D] bg-[#17365D] text-white"
+                  : "border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
+              }`}
+            >
+              {cat.label}
+            </button>
+          ))}
+        </div>
+
+        <input
+          type="search"
+          value={keyword}
+          onChange={(e) => setKeyword(e.target.value)}
+          placeholder="Search agency or document (e.g., PSA, NBI, DTI)..."
+          aria-label="Search government services"
+          className="w-full rounded border border-slate-300 bg-white px-3 py-1.5 text-xs sm:w-64"
+        />
       </div>
 
       {/* Master-Detail Split Layout */}
@@ -114,38 +145,44 @@ function SerbisyoContent() {
           className="no-print lg:col-span-4"
         >
           <div className="divide-y divide-slate-200 rounded-md border border-slate-200 bg-white">
-            {filteredGuides.map((guide) => {
-              const isSelected = selectedGuide?.slug === guide.slug;
-              const checkedCount =
-                (completedChecklistIds[guide.slug] || []).length;
-              return (
-                <button
-                  key={guide.id}
-                  type="button"
-                  onClick={() => setActiveSlug(guide.slug)}
-                  className={`w-full p-3.5 text-left transition-colors ${
-                    isSelected
-                      ? "bg-blue-50/90 border-l-4 border-l-[#17365D]"
-                      : "hover:bg-slate-50"
-                  }`}
-                >
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[11px] font-bold text-slate-800">
-                      {guide.organizationAcronym}
-                    </span>
-                    <span className="text-[11px] font-medium text-emerald-800">
-                      {checkedCount}/{guide.requirementsChecklist.length} checked
-                    </span>
-                  </div>
-                  <h2 className="mt-1.5 text-xs font-bold text-slate-900">
-                    {guide.title}
-                  </h2>
-                  <p className="mt-1 line-clamp-2 text-[11px] text-slate-600">
-                    {guide.summary}
-                  </p>
-                </button>
-              );
-            })}
+            {filteredGuides.length === 0 ? (
+              <div className="p-4 text-center text-xs text-slate-600">
+                No government service guide matches your search.
+              </div>
+            ) : (
+              filteredGuides.map((guide) => {
+                const isSelected = selectedGuide?.slug === guide.slug;
+                const checkedCount =
+                  (completedChecklistIds[guide.slug] || []).length;
+                return (
+                  <button
+                    key={guide.id}
+                    type="button"
+                    onClick={() => setActiveSlug(guide.slug)}
+                    className={`w-full p-3.5 text-left transition-colors ${
+                      isSelected
+                        ? "border-l-4 border-l-[#17365D] bg-blue-50/90"
+                        : "hover:bg-slate-50"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[11px] font-bold text-slate-800">
+                        {guide.organizationAcronym}
+                      </span>
+                      <span className="text-[11px] font-medium text-emerald-800">
+                        {checkedCount}/{guide.requirementsChecklist.length} checked
+                      </span>
+                    </div>
+                    <h2 className="mt-1.5 text-xs font-bold text-slate-900">
+                      {guide.title}
+                    </h2>
+                    <p className="mt-1 line-clamp-2 text-[11px] text-slate-600">
+                      {guide.summary}
+                    </p>
+                  </button>
+                );
+              })
+            )}
           </div>
         </aside>
 
@@ -168,7 +205,13 @@ function SerbisyoContent() {
                   </h2>
                 </div>
 
-                <div className="no-print flex items-center gap-2">
+                <div className="no-print flex flex-wrap items-center gap-2">
+                  <a
+                    href={`/serbisyo/${selectedGuide.slug}`}
+                    className="inline-flex items-center gap-1 rounded border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-[#17365D] hover:bg-slate-50"
+                  >
+                    <span>Standalone Guide Page →</span>
+                  </a>
                   <button
                     type="button"
                     onClick={() =>
@@ -178,7 +221,7 @@ function SerbisyoContent() {
                         targetSlug: selectedGuide.slug,
                         targetTitle: selectedGuide.title,
                         targetModule: "serbisyo",
-                        href: `/serbisyo?item=${selectedGuide.slug}`,
+                        href: `/serbisyo/${selectedGuide.slug}`,
                       })
                     }
                     className={`inline-flex items-center gap-1.5 rounded border px-3 py-1.5 text-xs font-semibold ${

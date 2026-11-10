@@ -402,4 +402,203 @@ describe("GabayPH Security, Validation, RBAC & Universal Search Suite", () => {
       expect(ann.sourceUrl).toMatch(/^https:\/\//);
     }
   });
+
+  it("verifies Phase 5 record freshness evaluation, .gov.ph source classification, and effective verification status", async () => {
+    const {
+      evaluateRecordFreshness,
+      classifySourceUrl,
+      resolveEffectiveVerificationStatus,
+    } = await import("../components/trust/verification-badge");
+
+    const refNow = new Date("2025-05-15T00:00:00Z");
+
+    // Fresh record (15 days old)
+    const fresh = evaluateRecordFreshness("2025-05-01", undefined, refNow);
+    expect(fresh.isStale).toBe(false);
+    expect(fresh.isExpired).toBe(false);
+
+    // Stale record (>270 days old)
+    const stale = evaluateRecordFreshness("2024-01-01", undefined, refNow);
+    expect(stale.isStale).toBe(true);
+    expect(
+      resolveEffectiveVerificationStatus(
+        "officially_verified",
+        "2024-01-01",
+        undefined
+      )
+    ).toBe("needs_review");
+
+    // Expired opportunity deadline
+    const expired = evaluateRecordFreshness("2025-05-01", "2025-04-01", refNow);
+    expect(expired.isExpired).toBe(true);
+
+    // Official .gov.ph vs humanitarian partner classification
+    const govSource = classifySourceUrl("https://www.pagibigfund.gov.ph");
+    expect(govSource).toBe("official_gov_ph");
+
+    const partnerSource = classifySourceUrl("https://redcross.org.ph");
+    expect(partnerSource).toBe("secondary_partner");
+  });
+
+  it("verifies Phase 5 server actions, PII redaction in Bayanihan posts, and verification RBAC", async () => {
+    const { containsSensitivePersonalData } = await import(
+      "../lib/validations/schemas"
+    );
+    const {
+      saveBookmarkServerAction,
+      submitBayanihanCommunityPostAction,
+      submitModuleReportServerAction,
+      verifyModuleResourceServerAction,
+    } = await import("../lib/modules/server-actions");
+
+    // 1. PII detector catches 12+ digit government IDs / bank accounts and exact residential street addresses
+    expect(
+      containsSensitivePersonalData(
+        "Please send to my bank account 12345678901234 immediately"
+      ).flagged
+    ).toBe(true);
+    expect(
+      containsSensitivePersonalData(
+        "Pick up at Blk 14 Lot 8 Sampaguita Subdivision"
+      ).flagged
+    ).toBe(true);
+    expect(
+      containsSensitivePersonalData(
+        "Drop off at Barangay Commonwealth Covered Court, Quezon City"
+      ).flagged
+    ).toBe(false);
+
+    // 2. Bayanihan submission blocks sensitive PII and defaults valid posts to under_review moderation queue
+    const blockedBayanihan = await submitBayanihanCommunityPostAction({
+      postType: "community_request",
+      title: "Need medicines at home",
+      organizationName: "Barangay Health Desk",
+      regionCode: "NCR",
+      cityMunicipality: "Quezon City",
+      urgencyLevel: "high",
+      summary: "Please deliver to House #42 Sampaguita St, account 1234567890123",
+      itemsOrSkillsNeeded: "Maintenance medicine",
+      dropOffOrMeetingPoint: "House #42 Sampaguita St",
+      contactChannel: "09171234567",
+    });
+    expect(blockedBayanihan.ok).toBe(false);
+
+    const validBayanihan = await submitBayanihanCommunityPostAction({
+      postType: "volunteer_call",
+      title: "Barangay Coastal Clean-Up & Relief Sorting",
+      organizationName: "Cebu City DRRMO Volunteers",
+      regionCode: "Region VII",
+      cityMunicipality: "Cebu City",
+      urgencyLevel: "normal",
+      summary:
+        "Need 25 community volunteers for Saturday morning relief pack sorting at the Barangay Gymnasium.",
+      itemsOrSkillsNeeded: "Sorting volunteers, drinking water",
+      dropOffOrMeetingPoint: "Barangay Lahug Multi-Purpose Gym",
+      contactChannel: "(032) 255-0000",
+    });
+    expect(validBayanihan.ok).toBe(true);
+    expect(validBayanihan.moderationStatus).toBe("under_review");
+
+    // 3. Bookmark action supports guest device fallback and authenticated account sync
+    const guestBookmark = await saveBookmarkServerAction(
+      {
+        targetType: "resource",
+        targetId: "res-psa-birth-cert",
+        targetSlug: "psa-birth-certificate-first-time-jobseeker",
+        targetTitle: "PSA Birth Certificate",
+        targetModule: "serbisyo",
+      },
+      false
+    );
+    expect(guestBookmark.ok).toBe(true);
+    expect(guestBookmark.message).toContain("Sign in to sync");
+
+    const authBookmark = await saveBookmarkServerAction(
+      {
+        targetType: "resource",
+        targetId: "res-psa-birth-cert",
+        targetSlug: "psa-birth-certificate-first-time-jobseeker",
+        targetTitle: "PSA Birth Certificate",
+        targetModule: "serbisyo",
+      },
+      true
+    );
+    expect(authBookmark.ok).toBe(true);
+
+    // 4. Module inaccuracy report queues record for review
+    const reportRes = await submitModuleReportServerAction({
+      targetType: "resource",
+      targetId: "res-pagibig-housing",
+      targetTitle: "Pag-IBIG Affordable Housing Guide",
+      reason: "outdated_info",
+      details:
+        "Updated Pag-IBIG Virtual Portal URL verified on official pagibigfund.gov.ph circular.",
+      officialReferenceUrl: "https://www.pagibigfund.gov.ph",
+    });
+    expect(reportRes.ok).toBe(true);
+
+    // 5. Verification workflow restricts official verification to content_manager/administrator
+    const deniedVerify = await verifyModuleResourceServerAction(
+      {
+        targetType: "resource",
+        targetId: "res-pagibig-housing",
+        newStatus: "officially_verified",
+        verificationNotes: "Verified against Pag-IBIG Circular 2025",
+        officialReferenceUrl: "https://www.pagibigfund.gov.ph",
+      },
+      "user"
+    );
+    expect(deniedVerify.ok).toBe(false);
+
+    const allowedVerify = await verifyModuleResourceServerAction(
+      {
+        targetType: "resource",
+        targetId: "res-pagibig-housing",
+        newStatus: "officially_verified",
+        verificationNotes: "Verified against Pag-IBIG Circular 2025",
+        officialReferenceUrl: "https://www.pagibigfund.gov.ph",
+      },
+      "content_manager"
+    );
+    expect(allowedVerify.ok).toBe(true);
+  });
+
+  it("verifies Phase 5 additive migration 0006, expanded Serbisyo categories, and all 6 module detail routes", () => {
+    const mig0006Path = path.resolve(
+      __dirname,
+      "../../supabase/migrations/0006_phase5_core_modules_and_freshness.sql"
+    );
+    const mig0006Sql = fs.readFileSync(mig0006Path, "utf-8");
+    const executableSql = mig0006Sql
+      .split("\n")
+      .filter((line) => !line.trim().startsWith("--"))
+      .join("\n");
+
+    expect(executableSql).not.toMatch(/DROP\s+TABLE/i);
+    expect(executableSql).not.toMatch(/TRUNCATE/i);
+    expect(mig0006Sql).toContain("needs_review");
+    expect(mig0006Sql).toContain("is_verification_stale");
+
+    // Verify Housing & Business Registration guides exist in Serbisyo
+    const slugs = VERIFIED_RESOURCES.map((r) => r.slug);
+    expect(slugs).toContain("pag-ibig-affordable-housing-loan-guide");
+    expect(slugs).toContain("dti-business-name-and-lgu-barangay-clearance-guide");
+
+    // Verify all 6 dynamic [slug] detail routes exist
+    const modules = [
+      "trabaho",
+      "serbisyo",
+      "pera",
+      "bayanihan",
+      "aral",
+      "kaligtasan",
+    ];
+    for (const mod of modules) {
+      const routeFile = path.resolve(
+        __dirname,
+        `../app/(public)/${mod}/[slug]/page.tsx`
+      );
+      expect(fs.existsSync(routeFile)).toBe(true);
+    }
+  });
 });

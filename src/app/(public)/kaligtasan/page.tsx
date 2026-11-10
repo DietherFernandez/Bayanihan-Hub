@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 import {
   ShieldAlert,
   PhoneCall,
@@ -10,8 +11,11 @@ import {
   Square,
   ExternalLink,
   AlertTriangle,
+  Info,
+  Search,
 } from "lucide-react";
 import {
+  ACTIVE_ANNOUNCEMENTS,
   PH_LOCATIONS,
   VERIFIED_EMERGENCY_HOTLINES,
   VERIFIED_EVACUATION_CENTERS,
@@ -62,19 +66,34 @@ const FIRST_AID_GUIDES = [
 export default function KaligtasanPage() {
   const [regionFilter, setRegionFilter] = useState<string>("ALL");
   const [hotlineCategory, setHotlineCategory] = useState<string>("all");
+  const [searchQuery, setSearchQuery] = useState<string>("");
   const { completedChecklistIds, toggleChecklistStep } = useCitizenState();
 
   const goBagGuide = VERIFIED_RESOURCES.find(
     (r) => r.slug === "ndrrmc-72-hour-emergency-go-bag-and-first-aid"
   );
 
-  const filteredHotlines = VERIFIED_EMERGENCY_HOTLINES.filter((h) =>
-    hotlineCategory === "all" ? true : h.category === hotlineCategory
-  );
+  const filteredHotlines = VERIFIED_EMERGENCY_HOTLINES.filter((h) => {
+    const matchesCategory =
+      hotlineCategory === "all" ? true : h.category === hotlineCategory;
+    const matchesSearch =
+      searchQuery.trim().length === 0 ||
+      `${h.agencyName} ${h.primaryNumber} ${h.coverage}`
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase());
+    return matchesCategory && matchesSearch;
+  });
 
-  const filteredEvacCenters = VERIFIED_EVACUATION_CENTERS.filter((e) =>
-    regionFilter === "ALL" ? true : e.regionCode === regionFilter
-  );
+  const filteredEvacCenters = VERIFIED_EVACUATION_CENTERS.filter((e) => {
+    const matchesRegion =
+      regionFilter === "ALL" ? true : e.regionCode === regionFilter;
+    const matchesSearch =
+      searchQuery.trim().length === 0 ||
+      `${e.name} ${e.cityMunicipality} ${e.barangay} ${e.address}`
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase());
+    return matchesRegion && matchesSearch;
+  });
 
   return (
     <div className="mx-auto max-w-7xl px-3 py-6 sm:px-6">
@@ -93,7 +112,7 @@ export default function KaligtasanPage() {
       </div>
 
       {/* Emergency Top Banner */}
-      <div className="mb-6 flex flex-col justify-between gap-3 rounded-md border border-red-300 bg-red-50 p-4 sm:flex-row sm:items-center">
+      <div className="mb-4 flex flex-col justify-between gap-3 rounded-md border border-red-300 bg-red-50 p-4 sm:flex-row sm:items-center">
         <div className="flex items-start gap-3">
           <AlertTriangle
             className="mt-0.5 h-5 w-5 shrink-0 text-red-700"
@@ -127,6 +146,48 @@ export default function KaligtasanPage() {
         </div>
       </div>
 
+      {/* Important Safety & Scope Disclosure Banner */}
+      <div className="mb-6 flex items-start gap-2.5 rounded-md border border-slate-300 bg-white p-3 text-xs text-slate-700">
+        <Info className="mt-0.5 h-4 w-4 shrink-0 text-[#17365D]" aria-hidden="true" />
+        <div>
+          <strong>Emergency Information Scope & Static vs. Official Advisory Notice:</strong>{" "}
+          GabayPH provides verified emergency contact directories and static educational preparedness/first-aid guides. It does <strong>not</strong> replace emergency responders (911/143) or licensed medical professionals, and does not claim real-time seismic/weather sensor telemetry. Always follow live evacuation directives from your local Barangay DRRMO, NDRRMC, PAGASA, and PHIVOLCS.
+        </div>
+      </div>
+
+      {/* Search & Quick Filter Bar */}
+      <div className="mb-6 flex flex-col gap-3 rounded-md border border-slate-200 bg-white p-3.5 sm:flex-row sm:items-center sm:justify-between">
+        <div className="relative flex-1">
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
+          <input
+            type="search"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Filter hotlines or evacuation centers by agency, city, or barangay..."
+            aria-label="Filter emergency hotlines and evacuation centers"
+            className="w-full rounded border border-slate-300 py-1.5 pl-8 pr-3 text-xs text-slate-900"
+          />
+        </div>
+        <div className="flex items-center gap-2 text-xs">
+          <label htmlFor="evac-region-select" className="font-medium text-slate-700">
+            Region:
+          </label>
+          <select
+            id="evac-region-select"
+            value={regionFilter}
+            onChange={(e) => setRegionFilter(e.target.value)}
+            className="rounded border border-slate-300 bg-white px-2.5 py-1.5 text-xs text-slate-900"
+          >
+            <option value="ALL">All Regions</option>
+            {PH_LOCATIONS.filter((l) => !l.isNational).map((loc) => (
+              <option key={loc.id} value={loc.regionCode}>
+                {loc.regionCode} — {loc.regionName}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
       {/* Section 1: Emergency Hotlines Directory */}
       <section id="hotlines" aria-labelledby="hotlines-heading" className="mb-8">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
@@ -134,7 +195,7 @@ export default function KaligtasanPage() {
             id="hotlines-heading"
             className="text-base font-bold text-slate-900"
           >
-            1. Verified National Emergency & Crisis Hotlines
+            1. Verified National Emergency & Crisis Hotlines ({filteredHotlines.length})
           </h2>
 
           <div className="flex flex-wrap gap-1.5 text-xs">
@@ -224,95 +285,111 @@ export default function KaligtasanPage() {
           <div className="flex items-center gap-2">
             <MapPin className="h-4 w-4 text-[#17365D]" aria-hidden="true" />
             <h2 id="evac-heading" className="text-base font-bold text-slate-900">
-              2. Verified Regional & LGU Evacuation Center Directory
+              2. Verified Regional & LGU Evacuation Center Directory ({filteredEvacCenters.length})
             </h2>
           </div>
+          <span className="text-xs text-slate-500">
+            Pre-designated LGU & DRRMO facilities
+          </span>
+        </div>
 
-          <div className="flex items-center gap-2 text-xs">
-            <label htmlFor="evac-region-select" className="font-medium text-slate-700">
-              Filter Region:
-            </label>
-            <select
-              id="evac-region-select"
-              value={regionFilter}
-              onChange={(e) => setRegionFilter(e.target.value)}
-              className="rounded border border-slate-300 bg-white px-2.5 py-1.5 text-xs text-slate-900"
+        {filteredEvacCenters.length === 0 ? (
+          <div className="rounded-md border border-slate-200 bg-white p-6 text-center text-xs text-slate-600">
+            No evacuation centers matched your current region or keyword filter.{" "}
+            <button
+              type="button"
+              onClick={() => {
+                setRegionFilter("ALL");
+                setSearchQuery("");
+              }}
+              className="font-semibold text-[#17365D] underline"
             >
-              <option value="ALL">All Regions</option>
-              {PH_LOCATIONS.filter((l) => !l.isNational).map((loc) => (
-                <option key={loc.id} value={loc.regionCode}>
-                  {loc.regionCode} — {loc.regionName}
-                </option>
-              ))}
-            </select>
+              Show all verified evacuation centers
+            </button>
           </div>
-        </div>
-
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          {filteredEvacCenters.map((evac) => (
-            <article
-              key={evac.id}
-              className="rounded-md border border-slate-200 bg-white p-4"
-            >
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <span className="rounded bg-blue-50 px-2 py-0.5 font-mono text-[11px] font-bold text-[#17365D]">
-                  {evac.regionCode} · {evac.cityMunicipality}
-                </span>
-                <VerificationBadge
-                  status={evac.verificationStatus}
-                  lastVerifiedAt={evac.lastVerifiedAt}
-                />
-              </div>
-
-              <h3 className="mt-2 text-sm font-bold text-slate-900">
-                {evac.name}
-              </h3>
-              <p className="mt-1 text-xs text-slate-600">
-                <strong>Address:</strong> {evac.address} ({evac.barangay})
-              </p>
-              <p className="mt-1 text-xs text-slate-600">
-                <strong>Capacity:</strong> {evac.capacityEstimate}
-              </p>
-
-              <div className="mt-2.5 flex flex-wrap gap-1.5">
-                {evac.facilities.map((fac) => (
-                  <span
-                    key={fac}
-                    className="rounded border border-slate-200 bg-slate-50 px-2 py-0.5 text-[11px] text-slate-700"
-                  >
-                    {fac}
+        ) : (
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            {filteredEvacCenters.map((evac) => (
+              <article
+                key={evac.id}
+                className="rounded-md border border-slate-200 bg-white p-4"
+              >
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <span className="rounded bg-blue-50 px-2 py-0.5 font-mono text-[11px] font-bold text-[#17365D]">
+                    {evac.regionCode} · {evac.cityMunicipality}
                   </span>
-                ))}
-              </div>
+                  <VerificationBadge
+                    status={evac.verificationStatus}
+                    lastVerifiedAt={evac.lastVerifiedAt}
+                  />
+                </div>
 
-              <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-slate-100 pt-2.5 text-xs text-slate-600">
-                <span>
-                  LGU Desk: <strong>{evac.managingLgu}</strong> ({evac.contactNumber})
-                </span>
-                <a
-                  href={evac.sourceUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 font-semibold text-[#17365D] hover:underline"
-                >
-                  <span>LGU DRRMO Link</span>
-                  <ExternalLink className="h-3 w-3" />
-                </a>
-              </div>
-            </article>
-          ))}
-        </div>
+                <h3 className="mt-2 text-sm font-bold text-slate-900">
+                  {evac.name}
+                </h3>
+                <p className="mt-1 text-xs text-slate-600">
+                  <strong>Address:</strong> {evac.address} ({evac.barangay})
+                </p>
+                <p className="mt-1 text-xs text-slate-600">
+                  <strong>Capacity:</strong> {evac.capacityEstimate}
+                </p>
+
+                <div className="mt-2.5 flex flex-wrap gap-1.5">
+                  {evac.facilities.map((fac) => (
+                    <span
+                      key={fac}
+                      className="rounded border border-slate-200 bg-slate-50 px-2 py-0.5 text-[11px] text-slate-700"
+                    >
+                      {fac}
+                    </span>
+                  ))}
+                </div>
+
+                <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-slate-100 pt-2.5 text-xs text-slate-600">
+                  <span>
+                    LGU Desk: <strong>{evac.managingLgu}</strong> ({evac.contactNumber})
+                  </span>
+                  <a
+                    href={evac.sourceUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 font-semibold text-[#17365D] hover:underline"
+                  >
+                    <span>LGU DRRMO Link</span>
+                    <ExternalLink className="h-3 w-3" />
+                  </a>
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
       </section>
 
-      {/* Section 3: 72-Hour Emergency Go-Bag Checklist & First Aid */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
+      {/* Section 3: 72-Hour Emergency Go-Bag Checklist & First Aid (Static Educational Guides) */}
+      <div className="mb-8 grid grid-cols-1 gap-6 lg:grid-cols-12">
         {goBagGuide && (
           <section
             aria-labelledby="gobag-heading"
             className="rounded-md border border-slate-200 bg-white p-4 sm:p-5 lg:col-span-6"
           >
-            <h2 id="gobag-heading" className="text-base font-bold text-slate-900">
-              3. Interactive 72-Hour Family Emergency Go-Bag Checklist
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <span className="rounded bg-slate-100 px-2 py-0.5 font-mono text-[10px] font-bold uppercase text-slate-700">
+                Static Educational Preparedness Guide
+              </span>
+              <Link
+                href={`/kaligtasan/${goBagGuide.slug}`}
+                className="rounded border border-slate-300 bg-slate-50 px-2.5 py-1 text-xs font-semibold text-[#17365D] hover:bg-blue-50"
+              >
+                Open Printable Go-Bag Page
+              </Link>
+            </div>
+            <h2 id="gobag-heading" className="mt-2 text-base font-bold text-slate-900">
+              <Link
+                href={`/kaligtasan/${goBagGuide.slug}`}
+                className="hover:text-[#17365D] hover:underline"
+              >
+                3. Interactive 72-Hour Family Emergency Go-Bag Checklist
+              </Link>
             </h2>
             <p className="mt-1 text-xs text-slate-600">
               {goBagGuide.summary}
@@ -373,7 +450,10 @@ export default function KaligtasanPage() {
           aria-labelledby="firstaid-heading"
           className="rounded-md border border-slate-200 bg-white p-4 sm:p-5 lg:col-span-6"
         >
-          <div className="flex items-center gap-2">
+          <span className="rounded bg-slate-100 px-2 py-0.5 font-mono text-[10px] font-bold uppercase text-slate-700">
+            Static Educational First-Aid Protocols
+          </span>
+          <div className="mt-2 flex items-center gap-2">
             <HeartPulse className="h-4 w-4 text-red-700" aria-hidden="true" />
             <h2
               id="firstaid-heading"
@@ -411,6 +491,75 @@ export default function KaligtasanPage() {
           </div>
         </section>
       </div>
+
+      {/* Section 5: Official Agency Advisories & Weather/Disaster Bulletins */}
+      <section
+        aria-labelledby="official-advisories-heading"
+        className="rounded-md border border-slate-200 bg-white p-4 sm:p-5"
+      >
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <span className="rounded bg-amber-100 px-2 py-0.5 font-mono text-[10px] font-bold uppercase text-amber-900">
+              Verified Official Agency Bulletins
+            </span>
+            <h2
+              id="official-advisories-heading"
+              className="mt-1.5 text-base font-bold text-slate-900"
+            >
+              5. Official Agency Disaster Preparedness & Public Safety Advisories
+            </h2>
+          </div>
+          <div className="flex flex-wrap gap-2 text-xs">
+            <a
+              href="https://bagong.pagasa.dost.gov.ph"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 rounded border border-slate-300 bg-slate-50 px-2.5 py-1 font-semibold text-[#17365D] hover:bg-blue-50"
+            >
+              <span>DOST-PAGASA Live Bulletins</span>
+              <ExternalLink className="h-3 w-3" />
+            </a>
+            <a
+              href="https://www.phivolcs.dost.gov.ph"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 rounded border border-slate-300 bg-slate-50 px-2.5 py-1 font-semibold text-[#17365D] hover:bg-blue-50"
+            >
+              <span>DOST-PHIVOLCS Bulletins</span>
+              <ExternalLink className="h-3 w-3" />
+            </a>
+          </div>
+        </div>
+
+        <div className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-2">
+          {ACTIVE_ANNOUNCEMENTS.map((ann) => (
+            <div
+              key={ann.id}
+              className="rounded border border-slate-200 bg-slate-50 p-3.5 text-xs"
+            >
+              <div className="flex items-center justify-between gap-2">
+                <span className="font-mono text-[11px] font-bold uppercase text-[#17365D]">
+                  {ann.sourceName}
+                </span>
+                <span className="text-[11px] text-slate-500">
+                  Effective: {ann.startsAt}
+                </span>
+              </div>
+              <h3 className="mt-1 font-bold text-slate-900">{ann.title}</h3>
+              <p className="mt-1 text-slate-600">{ann.summary}</p>
+              <a
+                href={ann.sourceUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-2 inline-flex items-center gap-1 font-semibold text-[#17365D] hover:underline"
+              >
+                <span>Read Official Bulletin on Agency Portal</span>
+                <ExternalLink className="h-3 w-3" />
+              </a>
+            </div>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }

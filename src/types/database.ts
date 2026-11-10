@@ -21,6 +21,7 @@ export type AccountStatus =
 export type VerificationStatus =
   | "officially_verified"
   | "verification_pending"
+  | "needs_review"
   | "archived";
 
 export type RecordStatus =
