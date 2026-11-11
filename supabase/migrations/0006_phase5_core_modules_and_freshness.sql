@@ -8,11 +8,8 @@
 -- ============================================================================
 
 -- 1. Extend verification_status enum with 'needs_review'
-DO $$ BEGIN
-  ALTER TYPE public.verification_status ADD VALUE IF NOT EXISTS 'needs_review';
-EXCEPTION
-  WHEN others THEN NULL;
-END $$;
+-- Apply enum additions at top level and surface any failure.
+ALTER TYPE public.verification_status ADD VALUE IF NOT EXISTS 'needs_review';
 
 -- 2. Add optional expires_at to resources and assistance_programs for automatic expiration handling
 ALTER TABLE public.resources
