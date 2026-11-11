@@ -361,9 +361,7 @@ describe("GabayPH Security, Validation, RBAC & Universal Search Suite", () => {
     const homepageSource = fs.readFileSync(homepagePath, "utf-8");
 
     expect(homepageSource).toContain("Ano ang kailangan mong tulong ngayon?");
-    expect(homepageSource).toContain(
-      "Hanapin ang trabaho, serbisyo, tulong pinansyal, edukasyon, at mahahalagang impormasyon para sa iyong pang-araw-araw na pangangailangan."
-    );
+    expect(homepageSource).toContain("View all services (50+)");
     expect(homepageSource).toContain("Popular Government Services");
     expect(homepageSource).toContain(
       "Opportunities: Jobs, Scholarships &amp; Free Training"

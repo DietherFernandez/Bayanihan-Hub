@@ -122,62 +122,61 @@ export function DesktopNavigation({ pathname }: { pathname: string }) {
 }
 
 export function MobileBottomNavigation({ pathname }: { pathname: string }) {
+  const tabs = [
+    { href: "/", label: "Home", icon: Home, active: pathname === "/", danger: false },
+    {
+      href: "/serbisyo",
+      label: "Directory",
+      icon: FileCheck2,
+      active: pathname.startsWith("/serbisyo"),
+      danger: false,
+    },
+    {
+      href: "/bookmarks",
+      label: "Saved",
+      icon: Bookmark,
+      active: pathname === "/bookmarks",
+      danger: false,
+    },
+    {
+      href: "/kaligtasan#hotlines",
+      label: "Hotlines",
+      icon: PhoneCall,
+      active: pathname.startsWith("/kaligtasan"),
+      danger: true,
+    },
+  ];
   return (
     <nav
       aria-label="Quick Mobile Bottom Navigation"
-      className="no-print fixed bottom-0 left-0 right-0 z-40 flex items-center justify-around border-t border-slate-200 bg-white py-1 md:hidden"
+      className="no-print fixed bottom-0 left-0 right-0 z-40 border-t border-slate-200 bg-white pb-[env(safe-area-inset-bottom)] shadow-[0_-2px_8px_rgba(15,23,42,0.05)] md:hidden"
     >
-      <Link
-        href="/"
-        className={`flex min-h-[44px] min-w-[60px] flex-col items-center justify-center gap-0.5 text-[11px] font-semibold ${
-          pathname === "/"
-            ? "text-[#087F8C]"
-            : "text-slate-600 hover:text-[#17365D]"
-        }`}
-      >
-        <Home className="h-4 w-4" aria-hidden="true" />
-        <span>Home</span>
-      </Link>
-      <Link
-        href="/search"
-        className={`flex min-h-[44px] min-w-[60px] flex-col items-center justify-center gap-0.5 text-[11px] font-semibold ${
-          pathname === "/search"
-            ? "text-[#087F8C]"
-            : "text-slate-600 hover:text-[#17365D]"
-        }`}
-      >
-        <Search className="h-4 w-4" aria-hidden="true" />
-        <span>Search</span>
-      </Link>
-      <Link
-        href="/serbisyo"
-        className={`flex min-h-[44px] min-w-[60px] flex-col items-center justify-center gap-0.5 text-[11px] font-semibold ${
-          pathname.startsWith("/serbisyo")
-            ? "text-[#087F8C]"
-            : "text-slate-600 hover:text-[#17365D]"
-        }`}
-      >
-        <FileCheck2 className="h-4 w-4" aria-hidden="true" />
-        <span>Serbisyo</span>
-      </Link>
-      <Link
-        href="/kaligtasan"
-        className="flex min-h-[44px] min-w-[60px] flex-col items-center justify-center gap-0.5 text-[11px] font-semibold text-[#D94B4B]"
-      >
-        <PhoneCall className="h-4 w-4" aria-hidden="true" />
-        <span>911 / Evac</span>
-      </Link>
-      <Link
-        href="/bookmarks"
-        className={`flex min-h-[44px] min-w-[60px] flex-col items-center justify-center gap-0.5 text-[11px] font-semibold ${
-          pathname === "/bookmarks"
-            ? "text-[#087F8C]"
-            : "text-slate-600 hover:text-[#17365D]"
-        }`}
-      >
-        <Bookmark className="h-4 w-4" aria-hidden="true" />
-        <span>Saved</span>
-      </Link>
+      <ul className="grid grid-cols-4">
+        {tabs.map((tab) => {
+          const Icon = tab.icon;
+          const color = tab.active
+            ? tab.danger
+              ? "text-[#D94B4B]"
+              : "text-[#17365D]"
+            : tab.danger
+              ? "text-[#D94B4B]/80"
+              : "text-slate-600";
+          return (
+            <li key={tab.label}>
+              <Link
+                href={tab.href}
+                aria-current={tab.active ? "page" : undefined}
+                className={`flex min-h-[56px] flex-col items-center justify-center gap-0.5 text-[11px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#17365D] ${color} ${
+                  tab.active ? "font-bold" : "font-medium"
+                }`}
+              >
+                <Icon className="h-5 w-5" aria-hidden="true" />
+                <span>{tab.label}</span>
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
     </nav>
   );
 }
@@ -191,30 +190,32 @@ export function CivicHeader() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-slate-200 bg-white">
-      {/* Top Civic Trust & Emergency Strip */}
-      <div className="border-b border-slate-200/20 bg-[#17365D] px-3 py-1 text-[11.5px] text-white">
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-2">
-          <div className="flex items-center gap-1.5">
+      {/* Top Civic Trust & Emergency Strip (subtle utility strip) */}
+      <div className="border-b border-slate-200 bg-slate-50 px-3 text-[11.5px] text-slate-600">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-2">
+          <div className="flex min-w-0 items-center gap-1.5 py-1.5">
             <ShieldCheck
-              className="h-3.5 w-3.5 text-[#16A36A]"
+              className="h-3.5 w-3.5 shrink-0 text-[#16A36A]"
               aria-hidden="true"
             />
-            <span>
-              <strong>GabayPH</strong> · Independent Public-Service &amp; Community Guide
+            <span className="truncate">
+              <strong className="text-[#17365D]">GabayPH</strong>
+              <span className="hidden sm:inline"> · Independent Public-Service &amp; Community Guide</span>
+              <span className="sm:hidden"> · Independent public guide</span>
             </span>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex shrink-0 items-center gap-2">
             <Link
               href="/kaligtasan#hotlines"
-              className="gabay-interactive inline-flex items-center gap-1 rounded bg-[#D94B4B] px-2 py-0.5 text-[11px] font-semibold text-white hover:bg-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+              className="gabay-interactive inline-flex min-h-[28px] items-center gap-1 rounded-full border border-[#D94B4B]/30 bg-white px-2.5 text-[11px] font-semibold text-[#B83A3A] hover:bg-red-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D94B4B]"
             >
               <PhoneCall className="h-3 w-3" aria-hidden="true" />
-              <span>Emergency: 911 / 143</span>
+              <span>911 · 143</span>
             </Link>
             {isStaff && (
               <Link
                 href="/admin"
-                className="gabay-interactive inline-flex items-center gap-1 rounded border border-white/25 bg-white/10 px-2 py-0.5 text-[11px] font-medium text-white hover:bg-white/20"
+                className="gabay-interactive inline-flex items-center gap-1 rounded border border-slate-300 bg-white px-2 py-0.5 text-[11px] font-medium text-slate-700 hover:bg-slate-100"
               >
                 <LayoutDashboard className="h-3 w-3" aria-hidden="true" />
                 <span>Admin</span>
@@ -310,7 +311,7 @@ export function CivicHeader() {
           {user ? (
             <Link
               href="/profile"
-              className="gabay-interactive inline-flex min-h-[36px] items-center gap-1.5 rounded-md border border-slate-300 bg-white px-2.5 py-1 text-[12px] font-semibold text-slate-800 hover:border-[#087F8C] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#087F8C]"
+              className="gabay-interactive hidden min-h-[36px] items-center gap-1.5 rounded-md border border-slate-300 bg-white px-2.5 py-1 text-[12px] font-semibold text-slate-800 hover:border-[#087F8C] sm:inline-flex focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#087F8C]"
             >
               <User className="h-3.5 w-3.5 text-[#087F8C]" aria-hidden="true" />
               <span className="max-w-[90px] truncate">{user.fullName}</span>
@@ -319,7 +320,7 @@ export function CivicHeader() {
             <div className="flex items-center gap-1.5">
               <Link
                 href="/login"
-                className="gabay-interactive inline-flex min-h-[36px] items-center gap-1 rounded-md border border-slate-300 bg-white px-2.5 py-1 text-[12px] font-semibold text-slate-800 hover:border-[#087F8C] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#087F8C]"
+                className="gabay-interactive hidden min-h-[36px] items-center gap-1 rounded-md border border-slate-300 bg-white px-2.5 py-1 text-[12px] font-semibold text-slate-800 hover:border-[#087F8C] sm:inline-flex focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#087F8C]"
               >
                 <User className="h-3.5 w-3.5 text-[#17365D]" aria-hidden="true" />
                 <span>Login</span>
@@ -338,9 +339,9 @@ export function CivicHeader() {
             type="button"
             onClick={() => setDrawerOpen(true)}
             aria-label="Open navigation menu"
-            className="gabay-interactive inline-flex min-h-[36px] min-w-[36px] items-center justify-center rounded-md border border-slate-300 bg-white text-slate-700 lg:hidden"
+            className="gabay-interactive inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg border border-slate-200 bg-white text-[#17365D] hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#17365D] lg:hidden"
           >
-            <Menu className="h-4 w-4" aria-hidden="true" />
+            <Menu className="h-5 w-5" aria-hidden="true" />
           </button>
         </div>
       </div>
@@ -395,6 +396,39 @@ export function CivicHeader() {
               </div>
               <span className="rounded bg-[#087F8C]/10 px-1.5 py-0.5 text-[10px] font-bold text-[#087F8C]">AI Guide</span>
             </Link>
+            <Link
+              href="/search"
+              onClick={() => setDrawerOpen(false)}
+              className="flex min-h-[44px] items-center gap-2 rounded-md px-2.5 py-2 text-xs font-semibold text-slate-800 hover:bg-slate-100"
+            >
+              <Search className="h-4 w-4 text-[#17365D]" aria-hidden="true" />
+              <span>Search</span>
+            </Link>
+            <Link
+              href="/bookmarks"
+              onClick={() => setDrawerOpen(false)}
+              className="flex min-h-[44px] items-center justify-between rounded-md px-2.5 py-2 text-xs font-semibold text-slate-800 hover:bg-slate-100"
+            >
+              <span className="flex items-center gap-2">
+                <Bookmark className="h-4 w-4 text-[#17365D]" aria-hidden="true" />
+                <span>Saved Bookmarks</span>
+              </span>
+              {bookmarks.length > 0 && (
+                <span className="rounded-full bg-[#17365D] px-1.5 text-[10px] font-bold text-white">
+                  {bookmarks.length}
+                </span>
+              )}
+            </Link>
+            {user && (
+              <Link
+                href="/profile"
+                onClick={() => setDrawerOpen(false)}
+                className="flex min-h-[44px] items-center gap-2 rounded-md px-2.5 py-2 text-xs font-semibold text-slate-800 hover:bg-slate-100"
+              >
+                <User className="h-4 w-4 text-[#17365D]" aria-hidden="true" />
+                <span className="truncate">Profile · {user.fullName}</span>
+              </Link>
+            )}
             <Link
               href="/about"
               onClick={() => setDrawerOpen(false)}
@@ -456,7 +490,7 @@ export function CivicHeader() {
 export function CivicFooter() {
   const pathname = usePathname();
   return (
-    <footer className="mt-12 border-t border-slate-200 bg-white pb-20 text-[12.5px] text-[#64748B] md:pb-8">
+    <footer className="mt-12 border-t border-slate-200 bg-white pb-[calc(5rem+env(safe-area-inset-bottom))] text-[12.5px] text-[#64748B] md:pb-8">
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
           <div>

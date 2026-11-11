@@ -228,3 +228,12 @@ html.dark textarea {
     color: #000000 !important;
   }
 }
+
+/* Hide scrollbars on horizontally scrollable tracks (e.g. popular search pills) */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}

@@ -13,15 +13,19 @@ import {
   CheckCircle2,
   MapPin,
   Clock,
+  Briefcase,
+  FileCheck2,
+  Wallet,
+  GraduationCap,
+  HeartHandshake,
+  ShieldAlert,
 } from "lucide-react";
+import { ServicePreviewRow } from "@/components/home/service-preview-row";
 import { UniversalSearchHero } from "@/components/search/universal-search-bar";
 import { VerificationBadge } from "@/components/trust/verification-badge";
 import {
   EmptyState,
   OpportunityListingRow,
-  ResourceListingRow,
-  ServiceCategoryShortcuts,
-  type ServiceCategoryShortcutItem,
 } from "@/components/ui/design-system";
 import {
   ACTIVE_ANNOUNCEMENTS,
@@ -33,64 +37,14 @@ import {
 } from "@/lib/constants/philippine-data";
 import { formatVerifiedDate } from "@/lib/utils";
 
-/**
- * Step 3C — Six Main Categories in Exact Specification Order:
- * 1. Trabaho
- * 2. Serbisyo
- * 3. Pera
- * 4. Bayanihan
- * 5. Aral
- * 6. Kaligtasan
- */
-const SIX_MODULES: ServiceCategoryShortcutItem[] = [
-  {
-    code: "TRABAHO",
-    name: "Trabaho",
-    href: "/trabaho",
-    summary:
-      "Jobs, printable resume builder, TESDA skills training, and job scam reporting.",
-    highlights: ["Verified Jobs", "Resume Builder", "Scam Report"],
-  },
-  {
-    code: "SERBISYO",
-    name: "Serbisyo",
-    href: "/serbisyo",
-    summary:
-      "Government service guides, document requirements, application steps, and official links.",
-    highlights: ["PSA Documents", "NBI Clearance", "PhilHealth & SSS"],
-  },
-  {
-    code: "PERA",
-    name: "Pera",
-    href: "/pera",
-    summary:
-      "Financial assistance directory, budgeting, MP2 savings planner, and debt calculators.",
-    highlights: ["DSWD AICS", "Malasakit Center", "Budget & Savings"],
-  },
-  {
-    code: "BAYANIHAN",
-    name: "Bayanihan",
-    href: "/bayanihan",
-    summary:
-      "Community donations, volunteer opportunities, local organizations, and assistance requests.",
-    highlights: ["Red Cross 143", "DSWD NROC", "Community Relief"],
-  },
-  {
-    code: "ARAL",
-    name: "Aral",
-    href: "/aral",
-    summary:
-      "Free online courses, CHED & TESDA scholarships, and learning progress tracking.",
-    highlights: ["e-TESDA Courses", "CHED Scholarships", "Progress Tracker"],
-  },
-  {
-    code: "KALIGTASAN",
-    name: "Kaligtasan",
-    href: "/kaligtasan",
-    summary:
-      "24/7 emergency hotlines, evacuation centers, first aid, and disaster preparedness.",
-    highlights: ["911 & 143 Hotlines", "Evacuation Centers", "72-Hour Go-Bag"],
-  },
+/** Launcher order: Trabaho, Serbisyo, Pera, Aral, Bayanihan, Kaligtasan. */
+const LAUNCHER_ITEMS = [
+  { name: "Trabaho", href: "/trabaho", icon: Briefcase },
+  { name: "Serbisyo", href: "/serbisyo", icon: FileCheck2 },
+  { name: "Pera", href: "/pera", icon: Wallet },
+  { name: "Aral", href: "/aral", icon: GraduationCap },
+  { name: "Bayanihan", href: "/bayanihan", icon: HeartHandshake },
+  { name: "Kaligtasan", href: "/kaligtasan", icon: ShieldAlert },
 ];
 
 export default function HomePage() {
@@ -103,76 +57,61 @@ export default function HomePage() {
       {/* =====================================================================
           SECTION B: HERO AND UNIVERSAL SEARCH
           ===================================================================== */}
-      <section aria-labelledby="hero-heading" className="mb-8">
-        <div className="mb-4 max-w-3xl">
-          <div className="inline-flex items-center gap-2 rounded-md border border-[#087F8C]/25 bg-[#087F8C]/10 px-2.5 py-0.5 text-[12px] font-semibold text-[#087F8C]">
-            <span>GabayPH · Your Everyday Guide to a Better Life.</span>
-          </div>
-          <h1 id="hero-heading" className="gabay-page-title mt-2">
-            Ano ang kailangan mong tulong ngayon?
-          </h1>
-          <p className="gabay-body mt-1.5">
-            Hanapin ang trabaho, serbisyo, tulong pinansyal, edukasyon, at mahahalagang impormasyon para sa iyong pang-araw-araw na pangangailangan.
-          </p>
-        </div>
-
+      <section aria-labelledby="hero-heading" className="mb-7">
+        <h1
+          id="hero-heading"
+          className="gabay-page-title mb-3 text-[24px] leading-tight text-[#17365D] sm:text-[30px]"
+        >
+          Ano ang kailangan mong tulong ngayon?
+        </h1>
         <UniversalSearchHero />
       </section>
 
       {/* =====================================================================
-          SECTION C: MAIN CATEGORIES (6 MODULE SHORTCUTS)
+          SECTION C: MAIN CATEGORIES (3-COLUMN LAUNCHER GRID)
           ===================================================================== */}
       <section
         id="explore-modules"
         aria-labelledby="modules-heading"
         className="mb-8"
       >
-        <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
-          <div>
-            <h2 id="modules-heading" className="gabay-section-title">
-              Main Service Categories
-            </h2>
-            <p className="text-[13px] text-[#64748B]">
-              Browse verified Philippine public services, employment tools, financial guides, and emergency resources — no registration required.
-            </p>
-          </div>
-          <Link
-            href="/search"
-            className="text-[13px] font-semibold text-[#087F8C] hover:underline"
-          >
-            Search all categories →
-          </Link>
-        </div>
-
-        <ServiceCategoryShortcuts items={SIX_MODULES} />
+        <h2 id="modules-heading" className="gabay-section-title mb-3">
+          Categories
+        </h2>
+        <ul className="grid grid-cols-3 gap-3 sm:grid-cols-6">
+          {LAUNCHER_ITEMS.map((item) => {
+            const Icon = item.icon;
+            return (
+              <li key={item.href}>
+                <Link
+                  href={item.href}
+                  className="flex min-h-[92px] flex-col items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm transition hover:border-[#17365D] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#17365D]"
+                >
+                  <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#17365D]/10 text-[#17365D]">
+                    <Icon className="h-6 w-6" aria-hidden="true" />
+                  </span>
+                  <span className="text-[13px] font-semibold text-slate-900">
+                    {item.name}
+                  </span>
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
       </section>
 
       {/* =====================================================================
-          SECTION D: POPULAR GOVERNMENT SERVICES
+          SECTION D: POPULAR GOVERNMENT SERVICES (compact previews)
           ===================================================================== */}
       <section
         aria-labelledby="popular-services-heading"
         className="mb-8"
       >
-        <div className="rounded-lg border border-slate-200 bg-white">
-          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 px-4 py-3">
-            <div>
-              <h2
-                id="popular-services-heading"
-                className="gabay-section-title"
-              >
-                Popular Government Services
-              </h2>
-              <p className="text-[12.5px] text-[#64748B]">
-                Frequently accessed guides for PSA documents, NBI Clearance, PhilSys National ID, PhilHealth, SSS, and Pag-IBIG with official source links and verification dates.
-              </p>
-            </div>
-            <Link
-              href="/serbisyo"
-              className="text-[12.5px] font-semibold text-[#087F8C] hover:underline"
-            >
-              Open Serbisyo Directory →
-            </Link>
+        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+          <div className="border-b border-slate-200 px-4 py-3">
+            <h2 id="popular-services-heading" className="gabay-section-title">
+              Popular Government Services
+            </h2>
           </div>
 
           {popularGovernmentServices.length === 0 ? (
@@ -184,11 +123,17 @@ export default function HomePage() {
             </div>
           ) : (
             <div className="divide-y divide-slate-200">
-              {popularGovernmentServices.map((res) => (
-                <ResourceListingRow key={res.id} resource={res} />
+              {popularGovernmentServices.slice(0, 6).map((res) => (
+                <ServicePreviewRow key={res.id} resource={res} />
               ))}
             </div>
           )}
+          <Link
+            href="/serbisyo"
+            className="flex min-h-[48px] items-center justify-center gap-1 border-t border-slate-200 bg-slate-50 text-[14px] font-semibold text-[#17365D] hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#17365D]"
+          >
+            View all services (50+) <span aria-hidden="true">→</span>
+          </Link>
         </div>
       </section>
 
