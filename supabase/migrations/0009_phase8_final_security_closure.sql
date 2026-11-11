@@ -70,7 +70,6 @@ BEGIN
         OR (required_role = 'administrator' AND ur.role = 'administrator')
         OR (required_role = 'content_manager' AND ur.role IN ('administrator', 'content_manager'))
         OR (required_role = 'moderator' AND ur.role IN ('administrator', 'moderator'))
-        OR (required_role = 'verified_contributor' AND ur.role IN ('administrator', 'content_manager', 'moderator'))
         OR (required_role = 'user' AND ur.role IN ('administrator', 'content_manager', 'moderator', 'user'))
       )
   ) THEN
