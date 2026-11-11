@@ -352,129 +352,152 @@ export function CivicHeader() {
         title="GabayPH Navigation"
         onClose={() => setDrawerOpen(false)}
       >
-        <div className="space-y-4">
-          <div className="space-y-1.5">
-            <p className="gabay-label uppercase tracking-wider text-[#64748B]">
-              Explore Modules
-            </p>
-            {PLATFORM_MODULE_LINKS.map((mod) => {
-              const Icon = mod.icon;
-              return (
-                <Link
-                  key={mod.href}
-                  href={mod.href}
-                  onClick={() => setDrawerOpen(false)}
-                  className="flex items-center gap-3 rounded-md border border-slate-200 bg-[#F7F9FC] p-2.5 text-xs hover:border-[#087F8C]"
-                >
-                  <Icon
-                    className="h-4 w-4 shrink-0 text-[#17365D]"
-                    aria-hidden="true"
-                  />
-                  <div>
-                    <div className="font-bold text-slate-900">{mod.label}</div>
-                    <div className="text-[11px] text-[#64748B]">
-                      {mod.sublabel}
+        <div className="space-y-4 py-1">
+          <div>
+            <div className="mb-1 flex items-center justify-between border-b border-slate-100 pb-2">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                Public Service Modules
+              </span>
+              <span className="rounded bg-emerald-50 px-1.5 py-0.5 text-[10px] font-bold text-emerald-700">
+                Verified
+              </span>
+            </div>
+            <div className="divide-y divide-slate-100 text-xs">
+              {PLATFORM_MODULE_LINKS.map((mod) => {
+                const Icon = mod.icon;
+                const iconColors: Record<string, string> = {
+                  "/serbisyo": "bg-blue-50 text-[#17365D]",
+                  "/pera": "bg-emerald-50 text-emerald-700",
+                  "/trabaho": "bg-sky-50 text-sky-700",
+                  "/bayanihan": "bg-amber-50 text-amber-700",
+                  "/aral": "bg-indigo-50 text-indigo-700",
+                  "/kaligtasan": "bg-red-50 text-[#B83A3A]",
+                };
+                const colorClass =
+                  iconColors[mod.href] || "bg-slate-100 text-[#17365D]";
+                return (
+                  <Link
+                    key={mod.href}
+                    href={mod.href}
+                    onClick={() => setDrawerOpen(false)}
+                    className="group -mx-2 flex items-center gap-3 rounded-lg px-2 py-2.5 transition hover:bg-slate-50"
+                  >
+                    <div
+                      className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg ${colorClass}`}
+                    >
+                      <Icon className="h-4 w-4" aria-hidden="true" />
                     </div>
-                  </div>
-                </Link>
-              );
-            })}
+                    <div className="min-w-0">
+                      <span className="block font-bold text-slate-900 group-hover:text-[#17365D]">
+                        {mod.label}
+                      </span>
+                      <span className="block truncate text-[11px] text-slate-500">
+                        {mod.sublabel}
+                      </span>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
           </div>
 
-          <div className="space-y-1.5 border-t border-slate-200 pt-3">
-            <p className="gabay-label uppercase tracking-wider text-[#64748B]">
+          <div className="border-t border-slate-200 pt-3">
+            <p className="mb-2 text-[11px] font-bold uppercase tracking-wider text-slate-400">
               Platform &amp; Account
             </p>
-            <Link
-              href="/assistant"
-              onClick={() => setDrawerOpen(false)}
-              className="flex items-center justify-between rounded-md px-2.5 py-2 text-xs font-semibold text-slate-800 hover:bg-slate-100"
-            >
-              <div className="flex items-center gap-2">
-                <Compass className="h-4 w-4 text-[#087F8C]" />
-                <span>GabayAI Grounded Assistant</span>
-              </div>
-              <span className="rounded bg-[#087F8C]/10 px-1.5 py-0.5 text-[10px] font-bold text-[#087F8C]">AI Guide</span>
-            </Link>
-            <Link
-              href="/search"
-              onClick={() => setDrawerOpen(false)}
-              className="flex min-h-[44px] items-center gap-2 rounded-md px-2.5 py-2 text-xs font-semibold text-slate-800 hover:bg-slate-100"
-            >
-              <Search className="h-4 w-4 text-[#17365D]" aria-hidden="true" />
-              <span>Search</span>
-            </Link>
-            <Link
-              href="/bookmarks"
-              onClick={() => setDrawerOpen(false)}
-              className="flex min-h-[44px] items-center justify-between rounded-md px-2.5 py-2 text-xs font-semibold text-slate-800 hover:bg-slate-100"
-            >
-              <span className="flex items-center gap-2">
-                <Bookmark className="h-4 w-4 text-[#17365D]" aria-hidden="true" />
-                <span>Saved Bookmarks</span>
-              </span>
-              {bookmarks.length > 0 && (
-                <span className="rounded-full bg-[#17365D] px-1.5 text-[10px] font-bold text-white">
-                  {bookmarks.length}
-                </span>
-              )}
-            </Link>
-            {user && (
+            <div className="divide-y divide-slate-100 text-xs">
               <Link
-                href="/profile"
+                href="/assistant"
                 onClick={() => setDrawerOpen(false)}
-                className="flex min-h-[44px] items-center gap-2 rounded-md px-2.5 py-2 text-xs font-semibold text-slate-800 hover:bg-slate-100"
+                className="-mx-2 flex min-h-[40px] items-center justify-between rounded-lg px-2 py-2 font-semibold text-slate-800 hover:bg-slate-50"
               >
-                <User className="h-4 w-4 text-[#17365D]" aria-hidden="true" />
-                <span className="truncate">Profile · {user.fullName}</span>
+                <div className="flex items-center gap-2">
+                  <Compass className="h-4 w-4 text-[#087F8C]" />
+                  <span>GabayAI Grounded Assistant</span>
+                </div>
+                <span className="rounded bg-[#087F8C]/10 px-1.5 py-0.5 text-[10px] font-bold text-[#087F8C]">
+                  AI Guide
+                </span>
               </Link>
-            )}
-            <Link
-              href="/about"
-              onClick={() => setDrawerOpen(false)}
-              className="block rounded-md px-2.5 py-2 text-xs font-semibold text-slate-800 hover:bg-slate-100"
-            >
-              About GabayPH
-            </Link>
-            <Link
-              href="/reports"
-              onClick={() => setDrawerOpen(false)}
-              className="block rounded-md px-2.5 py-2 text-xs font-semibold text-slate-800 hover:bg-slate-100"
-            >
-              Report Incorrect Information
-            </Link>
-            <button
-              type="button"
-              onClick={() => {
-                toggleTheme();
-              }}
-              className="flex w-full items-center justify-between rounded-md px-2.5 py-2 text-xs font-semibold text-slate-800 hover:bg-slate-100"
-            >
-              <div className="flex items-center gap-2">
-                {theme === "dark" ? (
-                  <Sun className="h-4 w-4 text-[#D99A28]" />
-                ) : (
-                  <Moon className="h-4 w-4 text-[#17365D]" />
+              <Link
+                href="/search"
+                onClick={() => setDrawerOpen(false)}
+                className="-mx-2 flex min-h-[40px] items-center gap-2 rounded-lg px-2 py-2 font-semibold text-slate-800 hover:bg-slate-50"
+              >
+                <Search className="h-4 w-4 text-[#17365D]" aria-hidden="true" />
+                <span>Search</span>
+              </Link>
+              <Link
+                href="/bookmarks"
+                onClick={() => setDrawerOpen(false)}
+                className="-mx-2 flex min-h-[40px] items-center justify-between rounded-lg px-2 py-2 font-semibold text-slate-800 hover:bg-slate-50"
+              >
+                <span className="flex items-center gap-2">
+                  <Bookmark className="h-4 w-4 text-[#17365D]" aria-hidden="true" />
+                  <span>Saved Bookmarks</span>
+                </span>
+                {bookmarks.length > 0 && (
+                  <span className="rounded-full bg-[#17365D] px-2 py-0.5 text-[10px] font-bold text-white">
+                    {bookmarks.length}
+                  </span>
                 )}
-                <span>Display Theme</span>
-              </div>
-              <span className="text-[11px] font-medium text-slate-500 capitalize">
-                {theme} mode
-              </span>
-            </button>
+              </Link>
+              {user && (
+                <Link
+                  href="/profile"
+                  onClick={() => setDrawerOpen(false)}
+                  className="-mx-2 flex min-h-[40px] items-center gap-2 rounded-lg px-2 py-2 font-semibold text-slate-800 hover:bg-slate-50"
+                >
+                  <User className="h-4 w-4 text-[#17365D]" aria-hidden="true" />
+                  <span className="truncate">Profile · {user.fullName}</span>
+                </Link>
+              )}
+              <Link
+                href="/about"
+                onClick={() => setDrawerOpen(false)}
+                className="-mx-2 block rounded-lg px-2 py-2 font-semibold text-slate-800 hover:bg-slate-50"
+              >
+                About GabayPH
+              </Link>
+              <Link
+                href="/reports"
+                onClick={() => setDrawerOpen(false)}
+                className="-mx-2 block rounded-lg px-2 py-2 font-semibold text-slate-800 hover:bg-slate-50"
+              >
+                Report Incorrect Information
+              </Link>
+              <button
+                type="button"
+                onClick={() => toggleTheme()}
+                className="-mx-2 flex w-[calc(100%+16px)] items-center justify-between rounded-lg px-2 py-2 font-semibold text-slate-800 hover:bg-slate-50"
+              >
+                <div className="flex items-center gap-2">
+                  {theme === "dark" ? (
+                    <Sun className="h-4 w-4 text-[#D99A28]" />
+                  ) : (
+                    <Moon className="h-4 w-4 text-[#17365D]" />
+                  )}
+                  <span>Display Theme</span>
+                </div>
+                <span className="text-[11px] font-medium capitalize text-slate-500">
+                  {theme} mode
+                </span>
+              </button>
+            </div>
+
             {!user && (
-              <div className="grid grid-cols-2 gap-2 pt-2">
+              <div className="grid grid-cols-2 gap-2 pt-3">
                 <Link
                   href="/login"
                   onClick={() => setDrawerOpen(false)}
-                  className="rounded-md border border-slate-300 bg-white py-2 text-center text-xs font-semibold text-slate-800"
+                  className="rounded-lg border border-slate-300 bg-white py-2 text-center text-xs font-semibold text-slate-800 hover:bg-slate-50"
                 >
                   Login
                 </Link>
                 <Link
                   href="/register"
                   onClick={() => setDrawerOpen(false)}
-                  className="rounded-md bg-[#17365D] py-2 text-center text-xs font-semibold text-white"
+                  className="rounded-lg bg-[#17365D] py-2 text-center text-xs font-semibold text-white hover:bg-[#102847]"
                 >
                   Register
                 </Link>
