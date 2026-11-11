@@ -393,7 +393,31 @@ BEGIN
         )
       );
 
-    -- 5. Verification Documents DELETE: owner branch requires positive active profile check; admin branch uses hardened has_role('administrator')
+    -- 5. Verification Documents SELECT: owners must have an active profile;
+    -- moderators/administrators are checked through hardened has_role().
+    DROP POLICY IF EXISTS "verification_docs_select" ON storage.objects;
+    CREATE POLICY "verification_docs_select"
+      ON storage.objects FOR SELECT
+      USING (
+        bucket_id = 'verification-documents'
+        AND (
+          (
+            auth.uid() IS NOT NULL
+            AND (storage.foldername(name))[1] = auth.uid()::text
+            AND EXISTS (
+              SELECT 1
+              FROM public.profiles p
+              WHERE p.id = auth.uid()
+                AND p.is_suspended IS FALSE
+                AND p.account_status = 'active'
+            )
+          )
+          OR public.has_role('moderator')
+          OR public.has_role('administrator')
+        )
+      );
+
+    -- 6. Verification Documents DELETE: owner branch requires positive active profile check; admin branch uses hardened has_role('administrator')
     DROP POLICY IF EXISTS "verification_docs_delete" ON storage.objects;
     CREATE POLICY "verification_docs_delete"
       ON storage.objects FOR DELETE
