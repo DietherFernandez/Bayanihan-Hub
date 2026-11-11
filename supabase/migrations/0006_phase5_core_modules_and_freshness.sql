@@ -26,7 +26,7 @@ CREATE OR REPLACE FUNCTION public.is_verification_stale(
 )
 RETURNS BOOLEAN
 LANGUAGE sql
-IMMUTABLE
+STABLE
 AS $$
   SELECT CASE
     WHEN last_verified IS NULL THEN TRUE
