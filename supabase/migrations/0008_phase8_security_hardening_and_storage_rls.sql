@@ -154,9 +154,12 @@ BEGIN
         bucket_id = 'avatars'
         AND auth.uid() IS NOT NULL
         AND (storage.foldername(name))[1] = auth.uid()::text
-        AND NOT EXISTS (
-          SELECT 1 FROM public.profiles p
-          WHERE p.id = auth.uid() AND (p.is_suspended = TRUE OR p.account_status <> 'active')
+        AND EXISTS (
+          SELECT 1
+          FROM public.profiles p
+          WHERE p.id = auth.uid()
+            AND p.is_suspended IS FALSE
+            AND p.account_status = 'active'
         )
       );
 
@@ -207,9 +210,12 @@ BEGIN
         bucket_id = 'verification-documents'
         AND auth.uid() IS NOT NULL
         AND (storage.foldername(name))[1] = auth.uid()::text
-        AND NOT EXISTS (
-          SELECT 1 FROM public.profiles p
-          WHERE p.id = auth.uid() AND (p.is_suspended = TRUE OR p.account_status <> 'active')
+        AND EXISTS (
+          SELECT 1
+          FROM public.profiles p
+          WHERE p.id = auth.uid()
+            AND p.is_suspended IS FALSE
+            AND p.account_status = 'active'
         )
       );
 
