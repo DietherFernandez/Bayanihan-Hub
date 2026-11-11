@@ -22,7 +22,7 @@ export async function generateMetadata({
   const description = opp?.description || res?.summary || "Verified employment opportunity, training program, or job assistance guide for Filipinos.";
 
   return {
-    title: `${title} | GabayPH`,
+    title: title,
     description,
     openGraph: {
       title: `${title} | GabayPH`,

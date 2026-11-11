@@ -24,7 +24,7 @@ export async function generateMetadata({
   const description = resource?.summary || "Verified emergency hotline, evacuation advisory, or disaster preparedness guide.";
 
   return {
-    title: `${title} | GabayPH`,
+    title: title,
     description,
     openGraph: {
       title: `${title} | GabayPH`,

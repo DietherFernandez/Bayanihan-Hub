@@ -22,7 +22,7 @@ export async function generateMetadata({
   const description = prog?.description || res?.summary || "Verified financial assistance, loan guide, or social welfare program for Filipinos.";
 
   return {
-    title: `${title} | GabayPH`,
+    title: title,
     description,
     openGraph: {
       title: `${title} | GabayPH`,

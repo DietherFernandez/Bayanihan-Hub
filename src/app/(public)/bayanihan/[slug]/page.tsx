@@ -22,7 +22,7 @@ export async function generateMetadata({
   const description = post?.summary || res?.summary || "Verified community donation drive, relief initiative, or volunteer opportunity.";
 
   return {
-    title: `${title} | GabayPH`,
+    title: title,
     description,
     openGraph: {
       title: `${title} | GabayPH`,

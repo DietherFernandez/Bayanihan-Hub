@@ -28,7 +28,7 @@ export async function generateMetadata({
   }
 
   return {
-    title: `${resource.title} | GabayPH`,
+    title: resource.title,
     description: resource.summary,
     openGraph: {
       title: `${resource.title} | GabayPH`,
