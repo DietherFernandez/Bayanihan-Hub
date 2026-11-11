@@ -2,10 +2,8 @@
 
 import React, { Suspense, useState } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 import {
   Briefcase,
-  FileText,
   ShieldAlert,
   Printer,
   Bookmark,
@@ -14,11 +12,7 @@ import {
   CheckCircle2,
   AlertCircle,
   Search,
-  Building2,
-  Calendar,
-  AlertTriangle,
   Info,
-  DollarSign,
 } from "lucide-react";
 import {
   PH_LOCATIONS,
@@ -29,9 +23,6 @@ import { jobScamReportSchema } from "@/lib/validations/schemas";
 import { useCitizenState } from "@/components/providers/citizen-state-provider";
 
 function TrabahoContent() {
-  const searchParams = useSearchParams();
-  const initialSlug = searchParams.get("item") || "";
-
   const [activeSection, setActiveSection] = useState<"jobs" | "resume" | "scam">(
     "jobs"
   );
@@ -765,6 +756,20 @@ function TrabahoContent() {
                   value={scamDetails}
                   onChange={(e) => setScamDetails(e.target.value)}
                   placeholder="Describe the scam method, phone numbers or usernames used, and how money was solicited..."
+                  className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-xs focus:outline-none focus:border-red-600"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label htmlFor="scam-url" className="font-semibold text-slate-700">
+                  Suspicious Link or Reference URL (Optional)
+                </label>
+                <input
+                  id="scam-url"
+                  type="url"
+                  value={scamRefLink}
+                  onChange={(e) => setScamRefLink(e.target.value)}
+                  placeholder="https://..."
                   className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-xs focus:outline-none focus:border-red-600"
                 />
               </div>

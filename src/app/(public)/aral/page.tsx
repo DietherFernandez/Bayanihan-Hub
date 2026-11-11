@@ -2,7 +2,6 @@
 
 import React, { useState, Suspense } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 import {
   GraduationCap,
   CheckSquare,
@@ -10,7 +9,6 @@ import {
   ExternalLink,
   Bookmark,
   BookmarkCheck,
-  Award,
   Search,
   Building2,
   Laptop,
@@ -78,9 +76,6 @@ const FREE_LEARNING_TRACKS = [
 ];
 
 function AralContent() {
-  const searchParams = useSearchParams();
-  const initialSlug = searchParams.get("item") || "";
-
   const [searchQuery, setSearchQuery] = useState("");
   const [topicFilter, setTopicFilter] = useState<string>("all");
   const [learningTypeFilter, setLearningTypeFilter] = useState<

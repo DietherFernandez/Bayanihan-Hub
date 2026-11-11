@@ -4,14 +4,10 @@ import React, { Suspense, useState } from "react";
 import Link from "next/link";
 import {
   HeartHandshake,
-  MapPin,
   CheckCircle2,
   AlertCircle,
-  PlusCircle,
   ExternalLink,
   Info,
-  ShieldCheck,
-  Search,
 } from "lucide-react";
 import {
   PH_LOCATIONS,
@@ -356,7 +352,14 @@ function BayanihanContent() {
                 <label className="font-semibold text-slate-700">Type of Initiative</label>
                 <select
                   value={postType}
-                  onChange={(e) => setPostType(e.target.value as any)}
+                  onChange={(e) =>
+                    setPostType(
+                      e.target.value as
+                        | "donation_offer"
+                        | "assistance_request"
+                        | "volunteer_call"
+                    )
+                  }
                   className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-xs focus:outline-none focus:border-[#17365D]"
                 >
                   <option value="volunteer_call">Volunteer Call (Repacking / Logistics)</option>
@@ -369,7 +372,11 @@ function BayanihanContent() {
                 <label className="font-semibold text-slate-700">Urgency Level</label>
                 <select
                   value={urgencyLevel}
-                  onChange={(e) => setUrgencyLevel(e.target.value as any)}
+                  onChange={(e) =>
+                    setUrgencyLevel(
+                      e.target.value as "normal" | "high" | "critical"
+                    )
+                  }
                   className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-xs focus:outline-none focus:border-[#17365D]"
                 >
                   <option value="normal">Normal / Scheduled Operation</option>

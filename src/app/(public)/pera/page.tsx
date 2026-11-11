@@ -14,8 +14,6 @@ import {
   ExternalLink,
   Search,
   Info,
-  ShieldCheck,
-  ChevronRight,
 } from "lucide-react";
 import {
   VERIFIED_ASSISTANCE_PROGRAMS,
