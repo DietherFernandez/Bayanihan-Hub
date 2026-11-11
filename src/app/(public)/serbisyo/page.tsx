@@ -8,8 +8,6 @@ import {
   Bookmark,
   BookmarkCheck,
   ExternalLink,
-  CheckSquare,
-  Square,
   Building2,
   Phone,
   Clock,
