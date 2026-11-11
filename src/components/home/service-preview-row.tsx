@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import type { ResourceRecord } from "@/types/database";
+import { formatVerifiedDate } from "@/lib/utils";
 
 /**
  * Derives a compact fee badge from the verified free-text fee summary.
@@ -48,31 +49,31 @@ export function ServicePreviewRow({ resource }: { resource: ResourceRecord }) {
   return (
     <Link
       href={`/${resource.module}/${resource.slug}`}
-      className="flex min-h-[64px] items-center gap-3 px-4 py-3 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#17365D]"
+      className="group -mx-2 flex min-h-[56px] items-center justify-between gap-3 rounded-lg px-2 py-3 transition hover:bg-slate-50/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#17365D]"
     >
-      <span className="inline-flex h-7 min-w-[52px] shrink-0 items-center justify-center rounded-md bg-[#17365D]/10 px-2 text-[11px] font-bold tracking-wide text-[#17365D]">
-        {resource.organizationAcronym}
-      </span>
-      <span className="min-w-0 flex-1">
-        <span className="block truncate text-[14px] font-semibold text-slate-900">
-          {resource.title}
-        </span>
-        {(fee || time) && (
-          <span className="mt-1 flex flex-wrap gap-1.5">
-            {fee && (
-              <span className="rounded border border-slate-200 bg-slate-50 px-1.5 py-0.5 text-[11px] font-semibold text-slate-700">
-                {fee}
-              </span>
-            )}
-            {time && (
-              <span className="rounded border border-slate-200 bg-slate-50 px-1.5 py-0.5 text-[11px] font-medium text-slate-600">
-                {time}
-              </span>
-            )}
+      <div className="min-w-0">
+        <div className="flex items-center gap-2">
+          <span className="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wide text-slate-700">
+            {resource.organizationAcronym}
           </span>
-        )}
-      </span>
-      <ChevronRight className="h-5 w-5 shrink-0 text-slate-400" aria-hidden="true" />
+          <span className="truncate text-xs font-semibold text-slate-900 group-hover:text-[#17365D] sm:text-sm">
+            {resource.title}
+          </span>
+        </div>
+        <div className="mt-1 flex flex-wrap items-center gap-2 text-[11px] text-slate-500">
+          {fee && <span className="font-semibold text-emerald-700">{fee}</span>}
+          {fee && time && <span>·</span>}
+          {time && <span>{time}</span>}
+          <span>·</span>
+          <span className="text-slate-400">
+            Verified {formatVerifiedDate(resource.lastVerifiedAt)}
+          </span>
+        </div>
+      </div>
+      <ChevronRight
+        className="h-4 w-4 shrink-0 text-slate-400 transition group-hover:translate-x-0.5 group-hover:text-slate-700"
+        aria-hidden="true"
+      />
     </Link>
   );
 }
