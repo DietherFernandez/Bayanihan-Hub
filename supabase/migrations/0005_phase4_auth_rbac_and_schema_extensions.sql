@@ -232,9 +232,11 @@ BEGIN
     RAISE EXCEPTION 'Unauthorized: Users cannot modify suspension status.';
   END IF;
 
+  -- Users may deactivate their own account, but cannot self-activate a
+  -- pending/deactivated account or otherwise change verification status.
   IF NEW.account_status IS DISTINCT FROM OLD.account_status
-     AND NEW.account_status NOT IN ('active', 'deactivated') THEN
-    RAISE EXCEPTION 'Unauthorized: Invalid account status transition.';
+     AND NEW.account_status <> 'deactivated' THEN
+    RAISE EXCEPTION 'Unauthorized: Users cannot activate or change account verification status.';
   END IF;
 
   RETURN NEW;
