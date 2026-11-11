@@ -335,26 +335,28 @@ export function ModuleDetailView({
             </div>
           </section>
 
-          {/* Step-by-Step Guide */}
-          <section className="mt-6">
-            <h2 className="text-sm font-bold text-[var(--gabay-text)]">
+          {/* Step-by-Step Guide (Connected Stepper) */}
+          <section className="mt-8 space-y-4">
+            <h2 className="text-sm font-bold text-[var(--gabay-text)] sm:text-base">
               2. Step-by-Step Official Procedure
             </h2>
-            <ol className="mt-2.5 space-y-2.5">
-              {resource.steps.map((step) => (
-                <li
-                  key={step.stepNumber}
-                  className="rounded border border-[var(--gabay-border)] bg-[var(--gabay-surface-muted)] p-3.5 text-xs"
-                >
-                  <div className="flex items-start gap-2.5">
-                    <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#17365D] font-mono text-[11px] font-bold text-white">
+            <div className="relative space-y-6 pl-6 before:absolute before:bottom-2 before:left-2.5 before:top-2 before:w-0.5 before:bg-slate-200 dark:before:bg-slate-700">
+              {resource.steps.map((step, idx) => {
+                const isLast = idx === resource.steps.length - 1;
+                return (
+                  <div key={step.stepNumber} className="relative">
+                    <span
+                      className={`absolute -left-6 top-0.5 flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold text-white ${
+                        isLast ? "bg-emerald-600" : "bg-[#17365D]"
+                      }`}
+                    >
                       {step.stepNumber}
                     </span>
                     <div>
-                      <h3 className="font-bold text-[var(--gabay-text)]">
+                      <h3 className="text-xs font-bold text-[var(--gabay-text)] sm:text-sm">
                         {step.title}
                       </h3>
-                      <p className="mt-1 leading-relaxed text-[var(--gabay-neutral)]">
+                      <p className="mt-0.5 text-xs leading-relaxed text-[var(--gabay-neutral)]">
                         {step.description}
                       </p>
                       {step.officialPortalLink && (
@@ -362,17 +364,17 @@ export function ModuleDetailView({
                           href={step.officialPortalLink}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="mt-2 inline-flex items-center gap-1 font-semibold text-[#087F8C] underline dark:text-teal-300"
+                          className="mt-1.5 inline-flex items-center gap-1 text-xs font-semibold text-[#17365D] hover:underline dark:text-teal-300"
                         >
-                          <span>Open Official Portal: {step.officialPortalLink}</span>
+                          <span>Open Official Portal</span>
                           <ExternalLink className="h-3 w-3" />
                         </a>
                       )}
                     </div>
                   </div>
-                </li>
-              ))}
-            </ol>
+                );
+              })}
+            </div>
           </section>
 
           {/* Responsible Agency Info */}

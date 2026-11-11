@@ -169,81 +169,97 @@ function SerbisyoContent() {
         </div>
       </div>
 
-      {/* Master-Detail Split Layout */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
+      {/* Master-Detail Split Layout (Clean Cardless Editorial Style) */}
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
         {/* Left List of Services (Desktop Only) */}
         <aside
           aria-label="Government Services List"
           className="no-print hidden lg:col-span-4 lg:block"
         >
-          <div className="divide-y divide-slate-200 rounded-md border border-slate-200 bg-white">
+          <div className="sticky top-20 space-y-1">
+            <div className="px-2 pb-1 text-[11px] font-bold uppercase tracking-wider text-slate-400">
+              Verified Service Guides ({filteredGuides.length})
+            </div>
             {filteredGuides.length === 0 ? (
-              <div className="p-4 text-center text-xs text-slate-600">
+              <div className="py-4 text-xs text-slate-500">
                 No government service guide matches your search.
               </div>
             ) : (
-              filteredGuides.map((guide) => {
-                const isSelected = selectedGuide?.slug === guide.slug;
-                const checkedCount =
-                  (completedChecklistIds[guide.slug] || []).length;
-                return (
-                  <button
-                    key={guide.id}
-                    type="button"
-                    onClick={() => setActiveSlug(guide.slug)}
-                    className={`w-full p-3.5 text-left transition-colors ${
-                      isSelected
-                        ? "border-l-4 border-l-[#17365D] bg-blue-50/90"
-                        : "hover:bg-slate-50"
-                    }`}
-                  >
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[11px] font-bold text-slate-800">
-                        {guide.organizationAcronym}
+              <div className="space-y-1">
+                {filteredGuides.map((guide) => {
+                  const isSelected = selectedGuide?.slug === guide.slug;
+                  const checkedCount =
+                    (completedChecklistIds[guide.slug] || []).length;
+                  return (
+                    <button
+                      key={guide.id}
+                      type="button"
+                      onClick={() => setActiveSlug(guide.slug)}
+                      className={`group flex w-full flex-col rounded-xl px-3 py-2.5 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#17365D] ${
+                        isSelected
+                          ? "border-l-2 border-[#17365D] bg-blue-50/80 font-semibold text-[#17365D]"
+                          : "text-slate-700 hover:bg-slate-50 hover:text-slate-900"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="rounded bg-slate-100 px-1.5 py-0.2 font-mono text-[10px] font-bold text-slate-700">
+                          {guide.organizationAcronym}
+                        </span>
+                        {checkedCount > 0 && (
+                          <span className="text-[10.5px] font-medium text-emerald-700">
+                            {checkedCount}/{guide.requirementsChecklist.length} ready
+                          </span>
+                        )}
+                      </div>
+                      <span className="mt-1 text-xs leading-snug">
+                        {guide.title}
                       </span>
-                      <span className="text-[11px] font-medium text-emerald-800">
-                        {checkedCount}/{guide.requirementsChecklist.length} checked
-                      </span>
-                    </div>
-                    <h2 className="mt-1.5 text-xs font-bold text-slate-900">
-                      {guide.title}
-                    </h2>
-                    <p className="mt-1 line-clamp-2 text-[11px] text-slate-600">
-                      {guide.summary}
-                    </p>
-                  </button>
-                );
-              })
+                    </button>
+                  );
+                })}
+              </div>
             )}
           </div>
         </aside>
 
-        {/* Right Detailed Guide & Interactive Checklist */}
+        {/* Right Detailed Guide (Cardless Open Reading Surface) */}
         <div className="lg:col-span-8">
           {selectedGuide && (
-            <article className="rounded-md border border-slate-200 bg-white p-4 sm:p-6">
-              <div className="flex flex-wrap items-start justify-between gap-3 border-b border-slate-200 pb-4">
-                <div>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="rounded bg-[#17365D] px-2 py-0.5 font-mono text-xs font-bold text-white">
-                      {selectedGuide.organizationAcronym}
-                    </span>
-                    <span className="text-xs font-medium text-slate-600">
-                      {selectedGuide.organizationName}
-                    </span>
-                  </div>
-                  <h2 className="mt-2 text-lg font-bold text-slate-900 sm:text-xl">
-                    {selectedGuide.title}
-                  </h2>
+            <article className="space-y-6">
+              {/* Header Lockup */}
+              <div className="space-y-2">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="rounded bg-slate-100 px-2 py-0.5 font-mono text-[11px] font-bold text-slate-800">
+                    {selectedGuide.organizationAcronym}
+                  </span>
+                  <span className="text-xs text-slate-500">
+                    {selectedGuide.organizationName}
+                  </span>
+                  <span className="text-slate-300">·</span>
+                  <VerificationBadge
+                    status={selectedGuide.verificationStatus}
+                    lastVerifiedAt={selectedGuide.lastVerifiedAt}
+                  />
                 </div>
 
-                <div className="no-print flex flex-wrap items-center gap-2">
+                <h2 className="text-xl font-extrabold tracking-tight text-slate-900 sm:text-2xl">
+                  {selectedGuide.title}
+                </h2>
+
+                <p className="text-xs leading-relaxed text-slate-600 sm:text-sm">
+                  {selectedGuide.summary}
+                </p>
+
+                {/* Direct Action Links */}
+                <div className="flex flex-wrap items-center gap-2 pt-1 text-xs">
                   <a
                     href={`/serbisyo/${selectedGuide.slug}`}
-                    className="inline-flex items-center gap-1 rounded border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-[#17365D] hover:bg-slate-50"
+                    className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-3 py-1.5 font-semibold text-[#17365D] hover:bg-slate-50"
                   >
-                    <span>Standalone Guide Page →</span>
+                    <span>Standalone Guide Page</span>
+                    <ExternalLink className="h-3 w-3" />
                   </a>
+
                   <button
                     type="button"
                     onClick={() =>
@@ -256,10 +272,10 @@ function SerbisyoContent() {
                         href: `/serbisyo/${selectedGuide.slug}`,
                       })
                     }
-                    className={`inline-flex items-center gap-1.5 rounded border px-3 py-1.5 text-xs font-semibold ${
+                    className={`inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 font-semibold transition ${
                       isBookmarked(selectedGuide.id)
                         ? "border-emerald-300 bg-emerald-50 text-emerald-900"
-                        : "border-slate-300 bg-white text-slate-800 hover:bg-slate-50"
+                        : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
                     }`}
                   >
                     {isBookmarked(selectedGuide.id) ? (
@@ -274,204 +290,194 @@ function SerbisyoContent() {
                       </>
                     )}
                   </button>
+
+                  <CopyButton
+                    textToCopy={`Checklist for ${selectedGuide.title}:\n${selectedGuide.requirementsChecklist
+                      .map((r, i) => `${i + 1}. ${r.label}${r.isMandatory ? " [Required]" : ""}`)
+                      .join("\n")}`}
+                    label="Copy Checklist"
+                    copiedLabel="Checklist Copied!"
+                  />
                 </div>
               </div>
 
-              {/* Key Statutory Metadata Grid */}
-              <dl className="mt-4 grid grid-cols-1 gap-3 rounded border border-slate-200 bg-slate-50 p-3.5 text-xs sm:grid-cols-3">
+              {/* Statutory Metadata Row (Open, airy, NO gray boxed card enclosure) */}
+              <div className="grid grid-cols-1 gap-4 border-y border-slate-200/80 py-4 text-xs sm:grid-cols-3">
                 <div>
-                  <dt className="flex items-center gap-1 font-semibold text-slate-700">
+                  <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-500">
                     <Banknote className="h-3.5 w-3.5 text-[#17365D]" />
-                    <span>Official Fee</span>
-                  </dt>
-                  <dd className="mt-1 text-slate-900">
+                    <span>Statutory Fee</span>
+                  </div>
+                  <div className="mt-1 text-sm font-bold text-slate-900">
                     {selectedGuide.feesSummary}
-                  </dd>
+                  </div>
                 </div>
+
                 <div>
-                  <dt className="flex items-center gap-1 font-semibold text-slate-700">
+                  <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-500">
                     <Clock className="h-3.5 w-3.5 text-[#17365D]" />
                     <span>Processing Time</span>
-                  </dt>
-                  <dd className="mt-1 text-slate-900">
+                  </div>
+                  <div className="mt-1 text-sm font-bold text-slate-900">
                     {selectedGuide.processingTime}
-                  </dd>
+                  </div>
                 </div>
+
                 <div>
-                  <dt className="flex items-center gap-1 font-semibold text-slate-700">
+                  <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-500">
                     <Phone className="h-3.5 w-3.5 text-[#17365D]" />
-                    <span>Official Hotline & Hours</span>
-                  </dt>
-                  <dd className="mt-1 font-mono text-slate-900">
-                    <div className="flex items-center gap-2">
-                      <span>{selectedGuide.contactInfo.hotline || "See portal"}</span>
-                      {selectedGuide.contactInfo.hotline && (
-                        <CopyButton
-                          textToCopy={selectedGuide.contactInfo.hotline}
-                          label="Copy"
-                          className="py-0.5 text-[10px]"
-                        />
-                      )}
-                    </div>
-                    {selectedGuide.contactInfo.hours && (
-                      <span className="block font-sans text-[11px] text-slate-600">
-                        {selectedGuide.contactInfo.hours}
-                      </span>
+                    <span>Official Hotline &amp; Hours</span>
+                  </div>
+                  <div className="mt-1 flex items-center gap-1.5 font-mono text-sm font-bold text-slate-900">
+                    <span>{selectedGuide.contactInfo.hotline || "See portal"}</span>
+                    {selectedGuide.contactInfo.hotline && (
+                      <CopyButton
+                        textToCopy={selectedGuide.contactInfo.hotline}
+                        label="Copy"
+                        className="py-0.5 text-[10px]"
+                      />
                     )}
-                  </dd>
+                  </div>
+                  {selectedGuide.contactInfo.hours && (
+                    <span className="block text-[11px] text-slate-500">
+                      {selectedGuide.contactInfo.hours}
+                    </span>
+                  )}
                 </div>
-              </dl>
+              </div>
 
               {/* Eligibility */}
-              <div className="mt-4 text-xs">
-                <h3 className="font-bold uppercase tracking-wider text-slate-700">
+              <div className="space-y-1 text-xs">
+                <h3 className="font-bold uppercase tracking-wider text-slate-500 text-[10px]">
                   Who Can Apply (Eligibility)
                 </h3>
-                <p className="mt-1 leading-relaxed text-slate-700">
+                <p className="leading-relaxed text-slate-700">
                   {selectedGuide.eligibilitySummary}
                 </p>
               </div>
 
-              {/* Interactive Document Requirements Checklist */}
-              <div className="mt-5">
+              {/* Section 1: Interactive Document Requirements Checklist */}
+              <section className="space-y-3">
                 {(() => {
                   const checkedCount = (completedChecklistIds[selectedGuide.slug] || []).length;
                   const totalReqs = selectedGuide.requirementsChecklist.length;
                   const pct = totalReqs > 0 ? Math.round((checkedCount / totalReqs) * 100) : 0;
-                  const allReqsText = selectedGuide.requirementsChecklist
-                    .map((r, i) => `${i + 1}. ${r.label}${r.isMandatory ? " [Required]" : ""} ${r.notes ? `(${r.notes})` : ""}`)
-                    .join("\n");
 
                   return (
-                    <div className="mb-3 rounded-lg border border-slate-200 bg-slate-50 p-3">
-                      <div className="flex flex-wrap items-center justify-between gap-2 text-xs font-semibold">
-                        <span className="text-slate-800">Application Readiness Tracker</span>
-                        <span className={pct === 100 ? "font-bold text-emerald-700" : "text-[#17365D]"}>
-                          {checkedCount} of {totalReqs} prepared ({pct}%)
+                    <div>
+                      <div className="flex items-center justify-between pb-1.5">
+                        <h3 className="text-sm font-bold text-slate-900 sm:text-base">
+                          1. Document Requirements Checklist
+                        </h3>
+                        <span className="font-mono text-xs font-semibold text-[#17365D]">
+                          {checkedCount} of {totalReqs} ready ({pct}%)
                         </span>
                       </div>
-                      <div className="mt-1.5 h-2 w-full overflow-hidden rounded-full bg-slate-200">
+                      <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
                         <div
-                          className={`h-full transition-all duration-300 ${pct === 100 ? "bg-emerald-600" : "bg-[#17365D]"}`}
+                          className={`h-full transition-all duration-300 ${
+                            pct === 100 ? "bg-emerald-600" : "bg-[#17365D]"
+                          }`}
                           style={{ width: `${pct}%` }}
-                        />
-                      </div>
-                      <div className="mt-2.5 flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-slate-200/60">
-                        <span className="text-[11px] text-slate-500">
-                          Click any item to mark as ready. Saved automatically on this device.
-                        </span>
-                        <CopyButton
-                          textToCopy={`Checklist for ${selectedGuide.title}:\n${allReqsText}`}
-                          label="Copy All Requirements"
-                          copiedLabel="Checklist Copied!"
-                          className="text-[11px]"
                         />
                       </div>
                     </div>
                   );
                 })()}
 
-                <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-bold text-slate-900">
-                    1. Required Documents
-                  </h3>
-                  <span className="text-xs text-slate-500">
-                    Tap to check off
-                  </span>
-                </div>
-
-                <div className="mt-2.5 divide-y divide-slate-200 rounded border border-slate-200">
+                <div className="divide-y divide-slate-100 border-y border-slate-200">
                   {selectedGuide.requirementsChecklist.map((req) => {
                     const checked = (
                       completedChecklistIds[selectedGuide.slug] || []
                     ).includes(req.id);
                     return (
-                      <div
+                      <label
                         key={req.id}
-                        className={`flex items-start gap-3 p-3 text-xs ${
-                          checked ? "bg-emerald-50/50" : "bg-white"
-                        }`}
+                        className="flex cursor-pointer items-start gap-3 rounded-lg px-2 py-3 transition hover:bg-slate-50/60"
                       >
-                        <button
-                          type="button"
-                          onClick={() =>
+                        <input
+                          type="checkbox"
+                          checked={checked}
+                          onChange={() =>
                             toggleChecklistStep(selectedGuide.slug, req.id)
                           }
-                          aria-pressed={checked}
-                          className="mt-0.5 text-[#17365D] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#17365D]"
-                        >
-                          {checked ? (
-                            <CheckSquare className="h-4 w-4 text-emerald-700" />
-                          ) : (
-                            <Square className="h-4 w-4 text-slate-400" />
-                          )}
-                        </button>
-                        <div className="flex-1">
-                          <div className="flex flex-wrap items-center gap-2">
-                            <span
-                              className={`font-semibold ${
-                                checked
-                                  ? "line-through text-slate-500"
-                                  : "text-slate-900"
-                              }`}
-                            >
-                              {req.label}
+                          className="mt-0.5 h-4 w-4 rounded text-[#17365D] accent-[#17365D] focus:ring-[#17365D]"
+                        />
+                        <div className="flex-1 text-xs">
+                          <span
+                            className={`font-semibold ${
+                              checked
+                                ? "text-slate-400 line-through"
+                                : "text-slate-900"
+                            }`}
+                          >
+                            {req.label}
+                          </span>
+                          {req.isMandatory ? (
+                            <span className="ml-2 rounded bg-blue-50 px-1.5 py-0.2 text-[10px] font-bold uppercase text-[#17365D]">
+                              Required
                             </span>
-                            {req.isMandatory ? (
-                              <span className="rounded bg-blue-50 px-1.5 py-0.5 text-[10px] font-semibold text-[#17365D]">
-                                Required
-                              </span>
-                            ) : (
-                              <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[10px] text-slate-600">
-                                Conditional / If Applicable
-                              </span>
-                            )}
-                          </div>
+                          ) : (
+                            <span className="ml-2 rounded bg-slate-100 px-1.5 py-0.2 text-[10px] text-slate-500">
+                              Conditional
+                            </span>
+                          )}
                           {req.notes && (
-                            <p className="mt-1 text-slate-600">{req.notes}</p>
+                            <p className="mt-0.5 text-[11px] text-slate-500">
+                              {req.notes}
+                            </p>
+                          )}
+                        </div>
+                      </label>
+                    );
+                  })}
+                </div>
+              </section>
+
+              {/* Section 2: Connected Vertical Stepper (Step-by-Step Procedure) */}
+              <section className="space-y-4 pt-2">
+                <h3 className="text-sm font-bold text-slate-900 sm:text-base">
+                  2. Step-by-Step Official Procedure
+                </h3>
+
+                <div className="relative space-y-6 pl-6 before:absolute before:bottom-2 before:left-2.5 before:top-2 before:w-0.5 before:bg-slate-200">
+                  {selectedGuide.steps.map((step, idx) => {
+                    const isLast = idx === selectedGuide.steps.length - 1;
+                    return (
+                      <div key={step.stepNumber} className="relative">
+                        <span
+                          className={`absolute -left-6 top-0.5 flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold text-white ${
+                            isLast ? "bg-emerald-600" : "bg-[#17365D]"
+                          }`}
+                        >
+                          {step.stepNumber}
+                        </span>
+                        <div>
+                          <h4 className="text-xs font-bold text-slate-900 sm:text-sm">
+                            {step.title}
+                          </h4>
+                          <p className="mt-0.5 text-xs leading-relaxed text-slate-600">
+                            {step.description}
+                          </p>
+                          {step.officialPortalLink && (
+                            <a
+                              href={step.officialPortalLink}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="mt-1.5 inline-flex items-center gap-1 text-xs font-semibold text-[#17365D] hover:underline"
+                            >
+                              <span>Open Official Portal</span>
+                              <ExternalLink className="h-3 w-3" />
+                            </a>
                           )}
                         </div>
                       </div>
                     );
                   })}
                 </div>
-              </div>
+              </section>
 
-              {/* Step-by-Step Instructions */}
-              <div className="mt-6">
-                <h3 className="text-sm font-bold text-slate-900">
-                  2. Step-by-Step Official Procedure
-                </h3>
-                <ol className="mt-2.5 space-y-2.5">
-                  {selectedGuide.steps.map((step) => (
-                    <li
-                      key={step.stepNumber}
-                      className="rounded border border-slate-200 bg-slate-50/60 p-3 text-xs"
-                    >
-                      <div className="flex items-start justify-between gap-2">
-                        <span className="font-bold text-slate-900">
-                          Step {step.stepNumber}: {step.title}
-                        </span>
-                        {step.officialPortalLink && (
-                          <a
-                            href={step.officialPortalLink}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex shrink-0 items-center gap-1 font-semibold text-[#17365D] hover:underline"
-                          >
-                            <span>Official Portal</span>
-                            <ExternalLink className="h-3 w-3" />
-                          </a>
-                        )}
-                      </div>
-                      <p className="mt-1 leading-relaxed text-slate-600">
-                        {step.description}
-                      </p>
-                    </li>
-                  ))}
-                </ol>
-              </div>
-
+              {/* Transparency Source Citation Bar */}
               <SourceCitationBar
                 sourceName={selectedGuide.sourceName}
                 sourceUrl={selectedGuide.sourceUrl}
