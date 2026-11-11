@@ -1,6 +1,7 @@
 "use client";
 
 import React, { Suspense, useState } from "react";
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import {
   Briefcase,
@@ -12,13 +13,18 @@ import {
   ExternalLink,
   CheckCircle2,
   AlertCircle,
+  Search,
+  Building2,
+  Calendar,
+  AlertTriangle,
+  Info,
+  DollarSign,
 } from "lucide-react";
 import {
   PH_LOCATIONS,
   VERIFIED_OPPORTUNITIES,
 } from "@/lib/constants/philippine-data";
 import { SourceCitationBar } from "@/components/trust/verification-badge";
-import { CopyButton } from "@/components/ui/copy-button";
 import { jobScamReportSchema } from "@/lib/validations/schemas";
 import { useCitizenState } from "@/components/providers/citizen-state-provider";
 
@@ -26,6 +32,9 @@ function TrabahoContent() {
   const searchParams = useSearchParams();
   const initialSlug = searchParams.get("item") || "";
 
+  const [activeSection, setActiveSection] = useState<"jobs" | "resume" | "scam">(
+    "jobs"
+  );
   const [regionFilter, setRegionFilter] = useState<string>("ALL");
   const [typeFilter, setTypeFilter] = useState<
     "all" | "job" | "scholarship" | "training"
@@ -42,43 +51,74 @@ function TrabahoContent() {
       setResumeLocation("Manila, Philippines");
       setResumePhone("0917-123-4567");
       setResumeEmail("maria.santos@email.ph");
-      setResumeSummary("Proactive and detail-oriented Administrative Assistant with 2+ years of experience managing records, public inquiry desks, and office procurement. Proficient in MS Office, Google Workspace, and official document filing.");
-      setResumeExperience("Administrative Assistant — Barangay Operations (2023 – Present)\n• Handled official correspondence and daily resident inquiries with 98% positive satisfaction.\n• Managed records inventory and digitized 1,200+ municipal civil documents.");
-      setResumeEducation("Bachelor of Science in Office Administration\nPamantasan ng Lungsod ng Maynila (Graduated 2023)");
-      setResumeSkills("Office Administration, MS Word/Excel, Customer Relations, Fast 60 WPM Typing, Civil Service Sub-Professional Eligible");
+      setResumeSummary(
+        "Proactive and detail-oriented Administrative Assistant with 2+ years of experience managing records, public inquiry desks, and office procurement. Proficient in MS Office, Google Workspace, and official document filing."
+      );
+      setResumeExperience(
+        "Administrative Assistant — Barangay Operations (2023 – Present)\n• Handled official correspondence and daily resident inquiries with 98% positive satisfaction.\n• Managed records inventory and digitized 1,200+ municipal civil documents."
+      );
+      setResumeEducation(
+        "Bachelor of Science in Office Administration\nPamantasan ng Lungsod ng Maynila (Graduated 2023)"
+      );
+      setResumeSkills(
+        "Office Administration, MS Word/Excel, Customer Relations, Fast 60 WPM Typing, Civil Service Sub-Professional Eligible"
+      );
     } else if (type === "bpo") {
       setResumeFullName("Mark Christian Reyes");
       setResumeTitle("Customer Support Specialist (Inbound & Chat)");
       setResumeLocation("Quezon City, Metro Manila");
       setResumePhone("0918-987-6543");
       setResumeEmail("mark.reyes@email.ph");
-      setResumeSummary("Customer Service Representative with 1.5+ years of voice and non-voice experience in e-commerce and technical support. Dedicated to achieving high CSAT scores, rapid first-call resolution, and empathetic customer communication.");
-      setResumeExperience("Customer Service Representative — Teleperformance (2023 – 2024)\n• Handled 50+ inbound customer interactions daily maintaining a 94% CSAT rating.\n• Resolved customer order and billing inquiries following strict SLA guidelines.");
-      setResumeEducation("Associate in Information Technology / Senior High School TVL Track\nSTI College (2022)");
-      setResumeSkills("Active Listening, CRM Tools (Zendesk, Salesforce), English & Filipino Fluency, Conflict Resolution, 55 WPM Typing");
+      setResumeSummary(
+        "Customer Service Representative with 1.5+ years of voice and non-voice experience in e-commerce and technical support. Dedicated to achieving high CSAT scores, rapid first-call resolution, and empathetic customer communication."
+      );
+      setResumeExperience(
+        "Customer Service Representative — Teleperformance (2023 – 2024)\n• Handled 50+ inbound customer interactions daily maintaining a 94% CSAT rating.\n• Resolved customer order and billing inquiries following strict SLA guidelines."
+      );
+      setResumeEducation(
+        "Associate in Information Technology / Senior High School TVL Track\nSTI College (2022)"
+      );
+      setResumeSkills(
+        "Active Listening, CRM Tools (Zendesk, Salesforce), English & Filipino Fluency, Conflict Resolution, 55 WPM Typing"
+      );
     } else if (type === "trade") {
       setResumeFullName("Eduardo D. Garcia");
       setResumeTitle("Electrical Technician / Installation & Maintenance");
       setResumeLocation("Cebu City, Central Visayas");
       setResumePhone("0920-555-0192");
       setResumeEmail("eduardo.garcia@email.ph");
-      setResumeSummary("TESDA National Certificate (NC II) Certified Electrical Installation and Maintenance technician with 3 years of residential and commercial wiring experience. Strict adherence to Philippine Electrical Code and OSH safety standards.");
-      setResumeExperience("Electrician Assistant — Metro Builders & Contractors (2022 – Present)\n• Installed conduit piping, breaker panels, and lighting fixtures for 20+ commercial units.\n• Conducted routine preventive maintenance and circuit testing without workplace injury.");
-      setResumeEducation("TESDA NC II in Electrical Installation and Maintenance\nTESDA Regional Training Center (2022)");
-      setResumeSkills("Blueprint Reading, Conduit Bending, Panel Board Wiring, Safety Compliance (DOLE BOSH), Power Tools Operation");
+      setResumeSummary(
+        "TESDA National Certificate (NC II) Certified Electrical Installation and Maintenance technician with 3 years of residential and commercial wiring experience. Strict adherence to Philippine Electrical Code and OSH safety standards."
+      );
+      setResumeExperience(
+        "Electrician Assistant — Metro Builders & Contractors (2022 – Present)\n• Installed conduit piping, breaker panels, and lighting fixtures for 20+ commercial units.\n• Conducted routine preventive maintenance and circuit testing without workplace injury."
+      );
+      setResumeEducation(
+        "TESDA NC II in Electrical Installation and Maintenance\nTESDA Regional Training Center (2022)"
+      );
+      setResumeSkills(
+        "Blueprint Reading, Conduit Bending, Panel Board Wiring, Safety Compliance (DOLE BOSH), Power Tools Operation"
+      );
     } else {
       setResumeFullName("Angela Rose Bautista");
       setResumeTitle("Entry-Level Junior Associate");
       setResumeLocation("Davao City, Davao del Sur");
       setResumePhone("0929-333-8821");
       setResumeEmail("angela.bautista@email.ph");
-      setResumeSummary("Motivated and adaptive recent graduate with strong leadership, communication, and digital research abilities. Eager to contribute disciplined work ethic, creative problem solving, and technical adaptability to a collaborative team.");
-      setResumeExperience("Student Council Public Relations Officer — University of Mindanao (2023 – 2024)\n• Coordinated event logistics and digital marketing for 4 campus-wide student seminars.\n• Created infographics and social media updates reaching 5,000+ student followers.");
-      setResumeEducation("Bachelor of Science in Business Management\nUniversity of Mindanao (Graduated Magna Cum Laude, 2024)");
-      setResumeSkills("Project Coordination, Canva & MS Office, Social Media Management, Public Speaking, Tagalog & English Fluency");
+      setResumeSummary(
+        "Motivated and adaptive recent graduate with strong leadership, communication, and digital research abilities. Eager to contribute disciplined work ethic, creative problem solving, and technical adaptability to a collaborative team."
+      );
+      setResumeExperience(
+        "Student Council Public Relations Officer — University of Mindanao (2023 – 2024)\n• Coordinated event logistics and digital marketing for 4 campus-wide student seminars.\n• Created infographics and social media updates reaching 5,000+ student followers."
+      );
+      setResumeEducation(
+        "Bachelor of Science in Business Management\nUniversity of Mindanao (Graduated Magna Cum Laude, 2024)"
+      );
+      setResumeSkills(
+        "Project Coordination, Canva & MS Office, Social Media Management, Public Speaking, Tagalog & English Fluency"
+      );
     }
   };
-
 
   // Resume Builder State
   const [resumeFullName, setResumeFullName] = useState("Juan M. Dela Cruz");
@@ -153,7 +193,9 @@ function TrabahoContent() {
       targetTitle: `Job Scam Report: ${parsed.data.companyOrRecruiterName} (${parsed.data.jobTitleOffered})`,
       reason: "suspected_scam",
       details: `Channel: ${parsed.data.platformOrChannel} | Illegal Fee Asked: ${
-        parsed.data.illegalFeeRequested ? `Yes (PHP ${parsed.data.amountRequestedPHP || 0})` : "No"
+        parsed.data.illegalFeeRequested
+          ? `Yes (PHP ${parsed.data.amountRequestedPHP || 0})`
+          : "No"
       } | Details: ${parsed.data.incidentDescription}`,
       officialReferenceUrl: parsed.data.referenceLink || undefined,
     });
@@ -164,174 +206,168 @@ function TrabahoContent() {
     setScamDetails("");
   };
 
-  return (
-    <div className="mx-auto max-w-7xl px-3 py-6 sm:px-6">
-      {/* Header */}
-      <div className="no-print mb-6 border-b border-slate-200 pb-4">
-        <div className="inline-flex items-center gap-1.5 rounded bg-blue-50 px-2.5 py-0.5 text-xs font-bold uppercase text-[#17365D]">
-          <Briefcase className="h-3.5 w-3.5" aria-hidden="true" />
-          <span>Module A · Trabaho</span>
-        </div>
-        <h1 className="mt-1.5 text-xl font-bold tracking-tight text-slate-900 sm:text-2xl">
-          Verified Employment, Scholarships, Skills Training, Resume Builder & Anti-Scam Center
-        </h1>
-        <p className="mt-1 text-xs text-slate-600">
-          Explore vetted government and DOLE PhilJobNet career portals, DOST/CHED scholarships, free TESDA skills grants, build a printable resume, or report illegal recruitment and task scams.
-        </p>
-        <div className="mt-3 rounded border border-amber-200 bg-amber-50/80 px-3 py-2 text-[11px] text-amber-950">
-          <strong>Employer & Recruitment Disclosure:</strong> GabayPH is an independent public directory and is <strong>not</strong> the employer or recruitment agency. We do not invent job vacancies, charge placement fees, or guarantee employment. All applications are submitted directly on the official employer or <code>.gov.ph</code> portal.
-        </div>
+  const handlePrintResume = () => {
+    if (typeof window !== "undefined") {
+      window.print();
+    }
+  };
 
-        {/* Trabaho 3-Section Jump Bar */}
-        <div className="mt-4 flex flex-wrap gap-2">
-          <a
-            href="#jobs-directory"
-            className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-800 shadow-2xs hover:border-[#17365D] hover:text-[#17365D]"
+  return (
+    <div className="mx-auto max-w-5xl px-4 py-8 sm:py-10 space-y-8 sm:space-y-10">
+      {/* Header & Page Title (Cardless Editorial Style) */}
+      <div className="no-print space-y-2 border-b border-slate-200 pb-5">
+        <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase text-[#17365D]">
+          <Briefcase className="h-4 w-4 text-[#17365D]" aria-hidden="true" />
+          <span>Module A · Trabaho at Kabuhayan</span>
+        </div>
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+          Verified Careers, Free Skills Grants &amp; Resume Builder
+        </h1>
+        <p className="text-xs sm:text-sm text-slate-500 max-w-3xl leading-relaxed">
+          Official civil service vacancies, PhilJobNet openings, TESDA NC-II skills grants, printable Philippine standard resume generator, and anti-scam reporting.
+        </p>
+
+        {/* Section Navigation Tabs (Civic Underline Tabs, No Heavy Pills) */}
+        <div className="no-scrollbar flex gap-4 overflow-x-auto whitespace-nowrap pt-3 text-xs font-semibold text-slate-500">
+          <button
+            type="button"
+            onClick={() => setActiveSection("jobs")}
+            className={`pb-2.5 transition ${
+              activeSection === "jobs"
+                ? "border-b-2 border-[#17365D] font-bold text-[#17365D]"
+                : "hover:text-slate-800"
+            }`}
           >
-            <Briefcase className="h-3.5 w-3.5 text-[#17365D]" />
-            <span>1. Jobs & Scholarships ({jobsAndTraining.length})</span>
-          </a>
-          <a
-            href="#resume-builder"
-            className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-800 shadow-2xs hover:border-[#17365D] hover:text-[#17365D]"
+            1. Career &amp; Training Directory ({jobsAndTraining.length})
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveSection("resume")}
+            className={`pb-2.5 transition ${
+              activeSection === "resume"
+                ? "border-b-2 border-[#17365D] font-bold text-[#17365D]"
+                : "hover:text-slate-800"
+            }`}
           >
-            <FileText className="h-3.5 w-3.5 text-[#17365D]" />
-            <span>2. Free Printable Resume Builder</span>
-          </a>
-          <a
-            href="#scam-report"
-            className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-800 shadow-2xs hover:border-[#17365D] hover:text-[#17365D]"
+            2. Printable Resume Builder
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveSection("scam")}
+            className={`pb-2.5 transition ${
+              activeSection === "scam"
+                ? "border-b-2 border-red-700 font-bold text-red-700"
+                : "hover:text-red-700"
+            }`}
           >
-            <ShieldAlert className="h-3.5 w-3.5 text-red-600" />
-            <span>3. Anti-Scam Reporting Center</span>
-          </a>
+            3. Anti-Scam Reporting Center
+          </button>
         </div>
       </div>
 
-      {/* Section 1: Verified Job, Scholarship & Training Listings */}
-      <section
-        aria-labelledby="jobs-directory-heading"
-        className="no-print mb-10"
-      >
-        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-          <h2
-            id="jobs-directory-heading"
-            className="text-base font-bold text-slate-900"
-          >
-            1. Verified Job Portals, Scholarships & Free Skills Training ({jobsAndTraining.length})
-          </h2>
+      {/* SECTION 1: Career & Training Directory */}
+      {activeSection === "jobs" && (
+        <section aria-labelledby="jobs-heading" className="space-y-4">
+          <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
+            <div className="relative flex-1">
+              <Search className="pointer-events-none absolute left-3.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
+              <input
+                type="search"
+                value={keyword}
+                onChange={(e) => setKeyword(e.target.value)}
+                placeholder="Filter by position, agency, skill, or qualification..."
+                aria-label="Filter jobs, scholarships, and training by keyword"
+                className="w-full rounded-lg border border-slate-200 bg-white py-2 pl-9 pr-3 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[#17365D] focus:ring-1 focus:ring-[#17365D] transition"
+              />
+            </div>
 
-          <div className="flex flex-wrap items-center gap-2 text-xs">
-            <input
-              type="search"
-              value={keyword}
-              onChange={(e) => setKeyword(e.target.value)}
-              placeholder="Filter by job title, agency, or skill..."
-              aria-label="Filter jobs, scholarships, and training by keyword"
-              className="rounded border border-slate-300 bg-white px-3 py-1.5 text-xs"
-            />
+            <div className="flex flex-wrap items-center gap-2 text-xs shrink-0">
+              <select
+                value={typeFilter}
+                onChange={(e) =>
+                  setTypeFilter(
+                    e.target.value as "all" | "job" | "scholarship" | "training"
+                  )
+                }
+                aria-label="Filter by opportunity type"
+                className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#17365D]"
+              >
+                <option value="all">All Opportunities</option>
+                <option value="job">Plantilla &amp; Corporate Jobs</option>
+                <option value="scholarship">Scholarship Programs</option>
+                <option value="training">TESDA Skills Training</option>
+              </select>
 
-            <select
-              value={typeFilter}
-              onChange={(e) =>
-                setTypeFilter(
-                  e.target.value as "all" | "job" | "scholarship" | "training"
-                )
-              }
-              aria-label="Filter by opportunity type"
-              className="rounded border border-slate-300 bg-white px-2.5 py-1.5 text-xs"
-            >
-              <option value="all">All (Jobs, Scholarships & Training)</option>
-              <option value="job">Employment Openings</option>
-              <option value="scholarship">Scholarship Directory</option>
-              <option value="training">TESDA & DICT Skills Training</option>
-            </select>
-
-            <select
-              value={regionFilter}
-              onChange={(e) => setRegionFilter(e.target.value)}
-              aria-label="Filter by region"
-              className="rounded border border-slate-300 bg-white px-2.5 py-1.5 text-xs"
-            >
-              <option value="ALL">All Regions</option>
-              {PH_LOCATIONS.map((l) => (
-                <option key={l.id} value={l.regionCode}>
-                  {l.regionCode}
-                </option>
-              ))}
-            </select>
+              <select
+                value={regionFilter}
+                onChange={(e) => setRegionFilter(e.target.value)}
+                aria-label="Filter by region"
+                className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#17365D]"
+              >
+                <option value="ALL">All Regions (Nationwide)</option>
+                {PH_LOCATIONS.map((l) => (
+                  <option key={l.id} value={l.regionCode}>
+                    {l.regionCode} — {l.regionName}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
-        </div>
 
-        {jobsAndTraining.length === 0 ? (
-          <div className="rounded-md border border-slate-200 bg-white p-6 text-center text-xs text-slate-600">
-            <p className="font-semibold text-slate-900">
-              No verified opportunities match your current filters.
-            </p>
-            <p className="mt-1">
-              We never fabricate job vacancies. Try clearing your keyword or selecting &quot;All Regions&quot;.
-            </p>
-            <button
-              type="button"
-              onClick={() => {
-                setKeyword("");
-                setTypeFilter("all");
-                setRegionFilter("ALL");
-              }}
-              className="mt-3 rounded bg-[#17365D] px-3 py-1.5 font-semibold text-white hover:bg-[#102847]"
-            >
-              Reset Filters
-            </button>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {jobsAndTraining.map((opp) => {
-              const isHighlighted = initialSlug === opp.slug;
-              return (
-                <article
+          {/* Opportunities List (Open Editorial Dividers, No Boxed Cards) */}
+          {jobsAndTraining.length === 0 ? (
+            <div className="py-10 text-center text-xs text-slate-500 space-y-2">
+              <p className="font-semibold text-slate-900">
+                No verified opportunities matched your filter criteria.
+              </p>
+              <p className="text-slate-500">
+                GabayPH only lists verified civil service and PhilJobNet vacancies. Try clearing your keyword or selecting &quot;All Regions&quot;.
+              </p>
+              <button
+                type="button"
+                onClick={() => {
+                  setKeyword("");
+                  setTypeFilter("all");
+                  setRegionFilter("ALL");
+                }}
+                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#17365D] text-white font-semibold text-xs hover:bg-[#102847]"
+              >
+                Reset Filters
+              </button>
+            </div>
+          ) : (
+            <div className="divide-y divide-slate-100 border-y border-slate-200 text-xs">
+              {jobsAndTraining.map((opp) => (
+                <div
                   key={opp.id}
-                  className={`rounded-md border bg-white p-4 sm:p-5 ${
-                    isHighlighted
-                      ? "border-[#17365D] ring-2 ring-[#17365D]/20"
-                      : "border-slate-200"
-                  }`}
+                  className="py-4 space-y-2 group hover:bg-slate-50/60 -mx-2 px-2 rounded-lg transition"
                 >
-                  <div className="flex flex-wrap items-start justify-between gap-2">
-                    <div>
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div className="space-y-0.5">
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className="rounded bg-blue-50 px-2 py-0.5 font-mono text-[11px] font-bold uppercase text-[#17365D]">
-                          {opp.type}
+                        <span className="rounded bg-blue-50 px-1.5 py-0.5 font-mono text-[10px] font-bold uppercase text-[#17365D]">
+                          {opp.organizationName.split(" ")[0]} · {opp.type}
                         </span>
-                        <span className="text-xs font-semibold text-slate-700">
-                          {opp.organizationName}
-                        </span>
-                        <span className="text-xs text-slate-500">
-                          · {opp.employmentType}
+                        <span className="text-[11px] text-slate-400 capitalize">
+                          {opp.employmentType} · {opp.regionName}
                         </span>
                         {opp.deadlineAt && (
-                          <span className="rounded bg-amber-50 px-2 py-0.5 text-[11px] font-medium text-amber-900">
-                            Deadline: {opp.deadlineAt}
-                          </span>
+                          <>
+                            <span className="text-slate-300">·</span>
+                            <span className="text-[11px] text-amber-700 font-medium">
+                              Deadline: {opp.deadlineAt}
+                            </span>
+                          </>
                         )}
                       </div>
-                      <h3 className="mt-1.5 text-base font-bold text-slate-900">
-                        <a
-                          href={`/trabaho/${opp.slug}`}
-                          className="hover:text-[#17365D] hover:underline"
-                        >
+                      <h3 className="font-bold text-slate-900 group-hover:text-[#17365D] text-sm sm:text-base transition">
+                        <Link href={`/trabaho/${opp.slug}`}>
                           {opp.title}
-                        </a>
+                        </Link>
                       </h3>
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-2">
-                      <a
-                        href={`/trabaho/${opp.slug}`}
-                        className="inline-flex items-center gap-1 rounded border border-slate-300 bg-white px-2.5 py-1.5 text-xs font-semibold text-[#17365D] hover:bg-slate-50"
-                      >
-                        <span>Full Details</span>
-                      </a>
-
+                    <div className="flex items-center gap-2 shrink-0 self-start sm:self-auto">
                       <button
                         type="button"
                         onClick={() =>
@@ -344,26 +380,20 @@ function TrabahoContent() {
                             href: `/trabaho/${opp.slug}`,
                           })
                         }
-                        className="inline-flex items-center gap-1 rounded border border-slate-300 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50"
+                        className="p-1.5 rounded-lg border border-slate-200 text-slate-400 hover:text-[#17365D] transition"
+                        title="Save opportunity"
                       >
                         {isBookmarked(opp.id) ? (
-                          <>
-                            <BookmarkCheck className="h-3.5 w-3.5 text-emerald-700" />
-                            <span>Saved</span>
-                          </>
+                          <BookmarkCheck className="h-4 w-4 text-emerald-700" />
                         ) : (
-                          <>
-                            <Bookmark className="h-3.5 w-3.5" />
-                            <span>Save</span>
-                          </>
+                          <Bookmark className="h-4 w-4" />
                         )}
                       </button>
-
                       <a
                         href={opp.applicationUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 rounded bg-[#17365D] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#102847]"
+                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#17365D] text-white font-semibold hover:bg-[#102847] shadow-2xs transition"
                       >
                         <span>Official Portal</span>
                         <ExternalLink className="h-3.5 w-3.5" />
@@ -371,31 +401,16 @@ function TrabahoContent() {
                     </div>
                   </div>
 
-                  <p className="mt-2 text-xs leading-relaxed text-slate-700">
+                  <p className="text-slate-600 leading-relaxed text-[11.5px]">
                     {opp.description}
                   </p>
 
-                  <div className="mt-3 rounded border border-slate-200 bg-slate-50 p-3 text-xs">
-                    <div className="font-semibold text-slate-900">
-                      Compensation / Grant Benefit:{" "}
-                      <span className="font-normal text-emerald-900">
-                        {opp.compensationOrBenefit}
-                      </span>
-                    </div>
-                    <div className="mt-2 font-semibold text-slate-800">
-                      Documentary & Qualification Requirements:
-                    </div>
-                    <ul className="mt-1 grid grid-cols-1 gap-1 sm:grid-cols-2">
-                      {opp.requirements.map((req, idx) => (
-                        <li
-                          key={idx}
-                          className="flex items-start gap-1.5 text-slate-600"
-                        >
-                          <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#17365D]" />
-                          <span>{req}</span>
-                        </li>
-                      ))}
-                    </ul>
+                  <div className="text-[11px] text-slate-500 flex flex-wrap items-center gap-2 pt-1 border-t border-slate-50">
+                    <span className="font-semibold text-slate-800">
+                      {opp.compensationOrBenefit}
+                    </span>
+                    <span>·</span>
+                    <span>{opp.requirements.slice(0, 2).join(" · ")}</span>
                   </div>
 
                   <SourceCitationBar
@@ -410,419 +425,373 @@ function TrabahoContent() {
                     shareHref={`/trabaho/${opp.slug}`}
                     deadlineOrExpiresAt={opp.deadlineAt}
                   />
-                </article>
-              );
-            })}
-          </div>
-        )}
-      </section>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+      )}
 
-      {/* Section 2: Interactive Printable Resume Builder */}
-      <section
-        id="resume-builder"
-        aria-labelledby="resume-builder-heading"
-        className="mb-10 rounded-md border border-slate-200 bg-white p-4 sm:p-6"
-      >
-        <div className="no-print flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-4">
-          <div className="flex items-center gap-2">
-            <FileText className="h-4 w-4 text-[#17365D]" aria-hidden="true" />
+      {/* SECTION 2: Free Printable Resume Builder */}
+      {activeSection === "resume" && (
+        <section id="resume-builder" aria-labelledby="resume-heading" className="space-y-4">
+          <div className="no-print flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-3">
             <div>
-              <h2
-                id="resume-builder-heading"
-                className="text-base font-bold text-slate-900"
-              >
-                2. Free Printable Resume Builder (Philippine Standard Format)
+              <h2 id="resume-heading" className="text-sm sm:text-base font-bold text-slate-900">
+                Philippine Standard Resume Generator
               </h2>
-              <p className="text-xs text-slate-600">
-                Choose a pre-filled Philippine industry template below or fill in your details to print a clean, employer-ready resume.
-              </p>
-              <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
-                <span className="text-[11px] font-semibold text-slate-500">Industry Templates:</span>
-                <button
-                  type="button"
-                  onClick={() => applyResumeTemplate("admin")}
-                  className="rounded border border-slate-200 bg-slate-50 px-2 py-0.5 text-[11px] font-medium text-slate-700 hover:bg-slate-100"
-                >
-                  Admin & Office
-                </button>
-                <button
-                  type="button"
-                  onClick={() => applyResumeTemplate("bpo")}
-                  className="rounded border border-slate-200 bg-slate-50 px-2 py-0.5 text-[11px] font-medium text-slate-700 hover:bg-slate-100"
-                >
-                  BPO & Support
-                </button>
-                <button
-                  type="button"
-                  onClick={() => applyResumeTemplate("trade")}
-                  className="rounded border border-slate-200 bg-slate-50 px-2 py-0.5 text-[11px] font-medium text-slate-700 hover:bg-slate-100"
-                >
-                  TESDA Skilled Trade
-                </button>
-                <button
-                  type="button"
-                  onClick={() => applyResumeTemplate("graduate")}
-                  className="rounded border border-slate-200 bg-slate-50 px-2 py-0.5 text-[11px] font-medium text-slate-700 hover:bg-slate-100"
-                >
-                  Fresh Graduate
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => typeof window !== "undefined" && window.print()}
-            className="inline-flex items-center gap-1.5 rounded bg-[#17365D] px-3.5 py-2 text-xs font-semibold text-white hover:bg-[#102847]"
-          >
-            <Printer className="h-3.5 w-3.5" />
-            <span>Print / Save Resume as PDF</span>
-          </button>
-        </div>
-
-        <div className="mt-5 grid grid-cols-1 gap-6 lg:grid-cols-12">
-          {/* Left Form Editor (Hidden when printing) */}
-          <div className="no-print space-y-3 text-xs lg:col-span-6">
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <div>
-                <label htmlFor="res-name" className="block font-semibold text-slate-800">
-                  Full Name
-                </label>
-                <input
-                  id="res-name"
-                  type="text"
-                  value={resumeFullName}
-                  onChange={(e) => setResumeFullName(e.target.value)}
-                  className="mt-1 w-full rounded border border-slate-300 px-2.5 py-1.5"
-                />
-              </div>
-              <div>
-                <label htmlFor="res-title" className="block font-semibold text-slate-800">
-                  Target Role / Headline
-                </label>
-                <input
-                  id="res-title"
-                  type="text"
-                  value={resumeTitle}
-                  onChange={(e) => setResumeTitle(e.target.value)}
-                  className="mt-1 w-full rounded border border-slate-300 px-2.5 py-1.5"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-              <div>
-                <label htmlFor="res-loc" className="block font-semibold text-slate-800">
-                  City / Province
-                </label>
-                <input
-                  id="res-loc"
-                  type="text"
-                  value={resumeLocation}
-                  onChange={(e) => setResumeLocation(e.target.value)}
-                  className="mt-1 w-full rounded border border-slate-300 px-2.5 py-1.5"
-                />
-              </div>
-              <div>
-                <label htmlFor="res-phone" className="block font-semibold text-slate-800">
-                  Mobile Number
-                </label>
-                <input
-                  id="res-phone"
-                  type="text"
-                  value={resumePhone}
-                  onChange={(e) => setResumePhone(e.target.value)}
-                  className="mt-1 w-full rounded border border-slate-300 px-2.5 py-1.5"
-                />
-              </div>
-              <div>
-                <label htmlFor="res-email" className="block font-semibold text-slate-800">
-                  Email Address
-                </label>
-                <input
-                  id="res-email"
-                  type="email"
-                  value={resumeEmail}
-                  onChange={(e) => setResumeEmail(e.target.value)}
-                  className="mt-1 w-full rounded border border-slate-300 px-2.5 py-1.5"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label htmlFor="res-summary" className="block font-semibold text-slate-800">
-                Professional Summary
-              </label>
-              <textarea
-                id="res-summary"
-                rows={2}
-                value={resumeSummary}
-                onChange={(e) => setResumeSummary(e.target.value)}
-                className="mt-1 w-full rounded border border-slate-300 px-2.5 py-1.5"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="res-exp" className="block font-semibold text-slate-800">
-                Work Experience / OJT / Volunteer Service
-              </label>
-              <textarea
-                id="res-exp"
-                rows={3}
-                value={resumeExperience}
-                onChange={(e) => setResumeExperience(e.target.value)}
-                className="mt-1 w-full rounded border border-slate-300 px-2.5 py-1.5"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="res-edu" className="block font-semibold text-slate-800">
-                Education & Training
-              </label>
-              <textarea
-                id="res-edu"
-                rows={2}
-                value={resumeEducation}
-                onChange={(e) => setResumeEducation(e.target.value)}
-                className="mt-1 w-full rounded border border-slate-300 px-2.5 py-1.5"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="res-skills" className="block font-semibold text-slate-800">
-                Skills, TESDA NC & Statutory Readiness
-              </label>
-              <input
-                id="res-skills"
-                type="text"
-                value={resumeSkills}
-                onChange={(e) => setResumeSkills(e.target.value)}
-                className="mt-1 w-full rounded border border-slate-300 px-2.5 py-1.5"
-              />
-            </div>
-          </div>
-
-          {/* Right Live Printable Resume Sheet */}
-          <div className="rounded border border-slate-300 bg-white p-6 shadow-xs lg:col-span-6">
-            <div className="border-b-2 border-slate-900 pb-3">
-              <h3 className="text-lg font-bold uppercase tracking-tight text-slate-900">
-                {resumeFullName}
-              </h3>
-              <p className="text-xs font-semibold text-[#17365D]">
-                {resumeTitle}
-              </p>
-              <p className="mt-1 text-[11px] text-slate-600">
-                {resumeLocation} · {resumePhone} · {resumeEmail}
+              <p className="text-xs text-slate-500">
+                Fill in your details or pick an industry template below to preview and print a clean 1-page CV.
               </p>
             </div>
-
-            <div className="mt-3 space-y-3 text-xs text-slate-800">
-              <div>
-                <h4 className="font-bold uppercase tracking-wider text-slate-900">
-                  Professional Summary
-                </h4>
-                <p className="mt-1 leading-relaxed">{resumeSummary}</p>
-              </div>
-
-              <div>
-                <h4 className="font-bold uppercase tracking-wider text-slate-900">
-                  Relevant Experience & Community Service
-                </h4>
-                <pre className="mt-1 whitespace-pre-wrap font-sans leading-relaxed">
-                  {resumeExperience}
-                </pre>
-              </div>
-
-              <div>
-                <h4 className="font-bold uppercase tracking-wider text-slate-900">
-                  Education
-                </h4>
-                <pre className="mt-1 whitespace-pre-wrap font-sans leading-relaxed">
-                  {resumeEducation}
-                </pre>
-              </div>
-
-              <div>
-                <h4 className="font-bold uppercase tracking-wider text-slate-900">
-                  Core Competencies & Certifications
-                </h4>
-                <p className="mt-1 leading-relaxed">{resumeSkills}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Section 3: Job Scam Reporting Center */}
-      <section
-        id="scam-report"
-        aria-labelledby="scam-report-heading"
-        className="no-print rounded-md border border-red-200 bg-white p-4 sm:p-6"
-      >
-        <div className="flex items-start gap-3 border-b border-slate-200 pb-4">
-          <ShieldAlert
-            className="mt-0.5 h-5 w-5 shrink-0 text-red-700"
-            aria-hidden="true"
-          />
-          <div>
-            <h2
-              id="scam-report-heading"
-              className="text-base font-bold text-slate-900"
-            >
-              3. Report a Suspected Job Scam or Illegal Recruitment Offer
-            </h2>
-            <p className="mt-0.5 text-xs text-slate-600">
-              Under Philippine labor laws (DOLE & DMW), legitimate employers and licensed agencies do not charge placement fees for domestic jobs or require &quot;task recharge deposits&quot; via e-wallets. Report suspicious offers below to alert moderators and CICC 1326.
-            </p>
-          </div>
-        </div>
-
-        {scamSubmittedRef ? (
-          <div className="mt-4 rounded border border-emerald-300 bg-emerald-50 p-4 text-xs text-emerald-950">
-            <div className="flex items-center gap-2 font-bold">
-              <CheckCircle2 className="h-4 w-4 text-emerald-700" />
-              <span>Scam Report Logged (Reference #{scamSubmittedRef})</span>
-            </div>
-            <p className="mt-1">
-              Your report has been added to the GabayPH Moderation & Anti-Scam queue. For immediate cybercrime assistance or financial recovery, also call the CICC Hotline at <strong>1326</strong> or PNP-ACG at <strong>(02) 8723-0401</strong>.
-            </p>
             <button
               type="button"
-              onClick={() => setScamSubmittedRef(null)}
-              className="mt-3 rounded bg-[#17365D] px-3 py-1.5 font-semibold text-white"
+              onClick={handlePrintResume}
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-[#17365D] text-white text-xs font-semibold hover:bg-[#102847] shadow-2xs transition"
             >
-              Submit Another Report
+              <Printer className="h-3.5 w-3.5" />
+              <span>Print / Save PDF</span>
             </button>
           </div>
-        ) : (
-          <form
-            onSubmit={handleScamReportSubmit}
-            className="mt-4 grid grid-cols-1 gap-3 text-xs sm:grid-cols-2"
-          >
-            {scamError && (
-              <div
-                role="alert"
-                className="flex items-center gap-2 rounded border border-red-300 bg-red-50 p-2.5 text-red-900 sm:col-span-2"
-              >
-                <AlertCircle className="h-4 w-4 shrink-0 text-red-700" />
-                <span>{scamError}</span>
+
+          {/* Industry Template Presets */}
+          <div className="no-print flex flex-wrap items-center gap-1.5 text-xs">
+            <span className="font-semibold text-slate-500">Industry Presets:</span>
+            <button
+              type="button"
+              onClick={() => applyResumeTemplate("admin")}
+              className="px-2.5 py-1 rounded-md border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+            >
+              Admin &amp; Office
+            </button>
+            <button
+              type="button"
+              onClick={() => applyResumeTemplate("bpo")}
+              className="px-2.5 py-1 rounded-md border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+            >
+              BPO &amp; Customer Support
+            </button>
+            <button
+              type="button"
+              onClick={() => applyResumeTemplate("trade")}
+              className="px-2.5 py-1 rounded-md border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+            >
+              TESDA NC-II Trade
+            </button>
+            <button
+              type="button"
+              onClick={() => applyResumeTemplate("graduate")}
+              className="px-2.5 py-1 rounded-md border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+            >
+              Fresh Graduate
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 pt-2">
+            {/* Editor Form (Cardless, No Print) */}
+            <div className="no-print space-y-3 text-xs lg:col-span-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label htmlFor="res-name" className="font-semibold text-slate-700">Full Name</label>
+                  <input
+                    id="res-name"
+                    type="text"
+                    value={resumeFullName}
+                    onChange={(e) => setResumeFullName(e.target.value)}
+                    className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs focus:outline-none focus:border-[#17365D]"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label htmlFor="res-title" className="font-semibold text-slate-700">Target Role / Headline</label>
+                  <input
+                    id="res-title"
+                    type="text"
+                    value={resumeTitle}
+                    onChange={(e) => setResumeTitle(e.target.value)}
+                    className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs focus:outline-none focus:border-[#17365D]"
+                  />
+                </div>
               </div>
-            )}
 
-            <div>
-              <label htmlFor="scam-comp" className="block font-semibold text-slate-800">
-                Company, Agency, or Recruiter Name Used
-              </label>
-              <input
-                id="scam-comp"
-                type="text"
-                required
-                value={scamCompany}
-                onChange={(e) => setScamCompany(e.target.value)}
-                placeholder="e.g., Fake DOLE Task Group / Unlicensed Agency"
-                className="mt-1 w-full rounded border border-slate-300 px-3 py-2"
-              />
-            </div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="space-y-1">
+                  <label htmlFor="res-loc" className="font-semibold text-slate-700">Location</label>
+                  <input
+                    id="res-loc"
+                    type="text"
+                    value={resumeLocation}
+                    onChange={(e) => setResumeLocation(e.target.value)}
+                    className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs focus:outline-none focus:border-[#17365D]"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label htmlFor="res-phone" className="font-semibold text-slate-700">Phone</label>
+                  <input
+                    id="res-phone"
+                    type="text"
+                    value={resumePhone}
+                    onChange={(e) => setResumePhone(e.target.value)}
+                    className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs focus:outline-none focus:border-[#17365D]"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label htmlFor="res-email" className="font-semibold text-slate-700">Email</label>
+                  <input
+                    id="res-email"
+                    type="email"
+                    value={resumeEmail}
+                    onChange={(e) => setResumeEmail(e.target.value)}
+                    className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs focus:outline-none focus:border-[#17365D]"
+                  />
+                </div>
+              </div>
 
-            <div>
-              <label htmlFor="scam-role" className="block font-semibold text-slate-800">
-                Job Title or Offer Promised
-              </label>
-              <input
-                id="scam-role"
-                type="text"
-                required
-                value={scamJobTitle}
-                onChange={(e) => setScamJobTitle(e.target.value)}
-                placeholder="e.g., Online Data Encoder / Part-Time App Reviewer"
-                className="mt-1 w-full rounded border border-slate-300 px-3 py-2"
-              />
-            </div>
+              <div className="space-y-1">
+                <label htmlFor="res-summary" className="font-semibold text-slate-700">Professional Summary</label>
+                <textarea
+                  id="res-summary"
+                  rows={2}
+                  value={resumeSummary}
+                  onChange={(e) => setResumeSummary(e.target.value)}
+                  className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs focus:outline-none focus:border-[#17365D]"
+                />
+              </div>
 
-            <div>
-              <label htmlFor="scam-platform" className="block font-semibold text-slate-800">
-                Platform Where Contact Occurred
-              </label>
-              <select
-                id="scam-platform"
-                value={scamPlatform}
-                onChange={(e) => setScamPlatform(e.target.value)}
-                className="mt-1 w-full rounded border border-slate-300 bg-white px-3 py-2"
-              >
-                <option value="SMS / Text Message">SMS / Text Message</option>
-                <option value="Telegram / WhatsApp / Viber">
-                  Telegram / WhatsApp / Viber
-                </option>
-                <option value="Facebook Page / Group">
-                  Facebook Page / Messenger
-                </option>
-                <option value="Email / Fake Website">Email / Fake Website</option>
-                <option value="Walk-in Unlicensed Office">
-                  Walk-in Unlicensed Office
-                </option>
-              </select>
-            </div>
+              <div className="space-y-1">
+                <label htmlFor="res-exp" className="font-semibold text-slate-700">Work Experience / OJT / Volunteer</label>
+                <textarea
+                  id="res-exp"
+                  rows={3}
+                  value={resumeExperience}
+                  onChange={(e) => setResumeExperience(e.target.value)}
+                  className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs focus:outline-none focus:border-[#17365D]"
+                />
+              </div>
 
-            <div>
-              <label htmlFor="scam-amount" className="block font-semibold text-slate-800">
-                Illegal Fee / Deposit Requested (PHP, if any)
-              </label>
-              <div className="mt-1 flex items-center gap-2">
+              <div className="space-y-1">
+                <label htmlFor="res-edu" className="font-semibold text-slate-700">Education &amp; Training</label>
+                <textarea
+                  id="res-edu"
+                  rows={2}
+                  value={resumeEducation}
+                  onChange={(e) => setResumeEducation(e.target.value)}
+                  className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs focus:outline-none focus:border-[#17365D]"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label htmlFor="res-skills" className="font-semibold text-slate-700">Skills &amp; Statutory Certifications</label>
                 <input
-                  id="scam-amount"
-                  type="number"
-                  min={0}
-                  value={scamAmount}
-                  onChange={(e) => {
-                    const val = Number(e.target.value) || 0;
-                    setScamAmount(val);
-                    setScamFeeAsked(val > 0);
-                  }}
-                  className="w-full rounded border border-slate-300 px-3 py-2 font-mono"
+                  id="res-skills"
+                  type="text"
+                  value={resumeSkills}
+                  onChange={(e) => setResumeSkills(e.target.value)}
+                  className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs focus:outline-none focus:border-[#17365D]"
                 />
               </div>
             </div>
 
-            <div className="sm:col-span-2">
-              <label htmlFor="scam-desc" className="block font-semibold text-slate-800">
-                Red Flags & Incident Description (Minimum 20 characters)
-              </label>
-              <textarea
-                id="scam-desc"
-                rows={3}
-                required
-                value={scamDetails}
-                onChange={(e) => setScamDetails(e.target.value)}
-                placeholder="Describe what happened, the phone number or handle used, and any payment demands..."
-                className="mt-1 w-full rounded border border-slate-300 px-3 py-2"
-              />
-            </div>
+            {/* Printable Paper Sheet View */}
+            <div className="p-6 rounded-xl border border-slate-200 bg-white shadow-2xs lg:col-span-6 space-y-3 text-xs">
+              <div className="border-b-2 border-slate-900 pb-2">
+                <h3 className="text-base font-bold uppercase tracking-tight text-slate-900">
+                  {resumeFullName}
+                </h3>
+                <p className="font-semibold text-[#17365D] text-xs">
+                  {resumeTitle}
+                </p>
+                <p className="text-[11px] text-slate-500 mt-0.5">
+                  {resumeLocation} · {resumePhone} · {resumeEmail}
+                </p>
+              </div>
 
-            <div className="sm:col-span-2">
-              <label htmlFor="scam-url" className="block font-semibold text-slate-800">
-                Suspicious Link or Reference URL (Optional)
-              </label>
-              <input
-                id="scam-url"
-                type="url"
-                value={scamRefLink}
-                onChange={(e) => setScamRefLink(e.target.value)}
-                placeholder="https://..."
-                className="mt-1 w-full rounded border border-slate-300 px-3 py-2"
-              />
-            </div>
+              <div className="space-y-2.5 text-slate-800">
+                <div>
+                  <h4 className="font-bold uppercase tracking-wider text-slate-900 text-[11px]">
+                    Professional Summary
+                  </h4>
+                  <p className="mt-0.5 leading-relaxed text-slate-600 text-[11px]">{resumeSummary}</p>
+                </div>
 
-            <div className="sm:col-span-2 flex justify-end pt-2">
+                <div>
+                  <h4 className="font-bold uppercase tracking-wider text-slate-900 text-[11px]">
+                    Experience &amp; Community Service
+                  </h4>
+                  <pre className="mt-0.5 whitespace-pre-wrap font-sans leading-relaxed text-slate-600 text-[11px]">
+                    {resumeExperience}
+                  </pre>
+                </div>
+
+                <div>
+                  <h4 className="font-bold uppercase tracking-wider text-slate-900 text-[11px]">
+                    Education
+                  </h4>
+                  <pre className="mt-0.5 whitespace-pre-wrap font-sans leading-relaxed text-slate-600 text-[11px]">
+                    {resumeEducation}
+                  </pre>
+                </div>
+
+                <div>
+                  <h4 className="font-bold uppercase tracking-wider text-slate-900 text-[11px]">
+                    Core Competencies
+                  </h4>
+                  <p className="mt-0.5 text-slate-600 text-[11px]">{resumeSkills}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* SECTION 3: Anti-Scam Reporting Center */}
+      {activeSection === "scam" && (
+        <section id="scam-report" aria-labelledby="scam-heading" className="space-y-4">
+          <div className="border-b border-slate-200 pb-3">
+            <div className="flex items-center gap-2">
+              <ShieldAlert className="h-5 w-5 text-red-700" aria-hidden="true" />
+              <h2 id="scam-heading" className="text-sm sm:text-base font-bold text-slate-900">
+                Report Illegal Recruitment or Online Job Scam
+              </h2>
+            </div>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Under RA 8042 (Migrant Workers Act) and DOLE Department Orders, legitimate employers do not charge placement fees for local work or require &quot;task deposits&quot; via GCash or Maya.
+            </p>
+          </div>
+
+          {scamSubmittedRef ? (
+            <div className="py-6 text-center space-y-2 text-xs">
+              <div className="w-10 h-10 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto">
+                <CheckCircle2 className="h-5 w-5" />
+              </div>
+              <h3 className="font-bold text-slate-900 text-sm">
+                Report Logged Successfully (Ref #{scamSubmittedRef})
+              </h3>
+              <p className="text-slate-500 max-w-md mx-auto">
+                Your report has been forwarded to the GabayPH civic safety moderation queue. For urgent financial recovery, also report to the Cybercrime Investigation and Coordinating Center (CICC) at Hotline <strong>1326</strong>.
+              </p>
               <button
-                type="submit"
-                className="rounded bg-red-700 px-4 py-2 text-xs font-semibold text-white hover:bg-red-800"
+                type="button"
+                onClick={() => setScamSubmittedRef(null)}
+                className="mt-2 px-3.5 py-1.5 rounded-lg bg-[#17365D] text-white font-semibold text-xs"
               >
-                Submit Job Scam Report
+                Submit Another Report
               </button>
             </div>
-          </form>
-        )}
-      </section>
+          ) : (
+            <form onSubmit={handleScamReportSubmit} className="space-y-4 text-xs">
+              {scamError && (
+                <div className="flex items-center gap-2 p-3 rounded-lg bg-red-50 text-red-900 border border-red-200">
+                  <AlertCircle className="h-4 w-4 shrink-0 text-red-700" />
+                  <span>{scamError}</span>
+                </div>
+              )}
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label htmlFor="scam-comp" className="font-semibold text-slate-700">
+                    Company, Agency, or Recruiter Handle
+                  </label>
+                  <input
+                    id="scam-comp"
+                    type="text"
+                    required
+                    value={scamCompany}
+                    onChange={(e) => setScamCompany(e.target.value)}
+                    placeholder="e.g. Unregistered FB Group, Telegram Recruiter"
+                    className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-xs focus:outline-none focus:border-red-600"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label htmlFor="scam-role" className="font-semibold text-slate-700">
+                    Job Title or Work Promised
+                  </label>
+                  <input
+                    id="scam-role"
+                    type="text"
+                    required
+                    value={scamJobTitle}
+                    onChange={(e) => setScamJobTitle(e.target.value)}
+                    placeholder="e.g. Online Typist, E-commerce App Reviewer"
+                    className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-xs focus:outline-none focus:border-red-600"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label htmlFor="scam-platform" className="font-semibold text-slate-700">
+                    Platform Where Contact Occurred
+                  </label>
+                  <select
+                    id="scam-platform"
+                    value={scamPlatform}
+                    onChange={(e) => setScamPlatform(e.target.value)}
+                    className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-xs focus:outline-none focus:border-red-600"
+                  >
+                    <option value="SMS / Text Message">SMS / Text Message</option>
+                    <option value="Telegram / WhatsApp / Viber">Telegram / WhatsApp / Viber</option>
+                    <option value="Facebook Page / Group">Facebook Page / Messenger</option>
+                    <option value="Email / Fake Website">Email / Fake Website</option>
+                    <option value="Walk-in Unlicensed Office">Walk-in Unlicensed Office</option>
+                  </select>
+                </div>
+
+                <div className="space-y-1">
+                  <label htmlFor="scam-amount" className="font-semibold text-slate-700">
+                    Illegal Fee / Task Deposit Requested (PHP)
+                  </label>
+                  <input
+                    id="scam-amount"
+                    type="number"
+                    min={0}
+                    value={scamAmount}
+                    onChange={(e) => {
+                      const val = Number(e.target.value) || 0;
+                      setScamAmount(val);
+                      setScamFeeAsked(val > 0);
+                    }}
+                    className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white font-mono text-xs focus:outline-none focus:border-red-600"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <label htmlFor="scam-desc" className="font-semibold text-slate-700">
+                  Incident Description &amp; Red Flags
+                </label>
+                <textarea
+                  id="scam-desc"
+                  rows={3}
+                  required
+                  value={scamDetails}
+                  onChange={(e) => setScamDetails(e.target.value)}
+                  placeholder="Describe the scam method, phone numbers or usernames used, and how money was solicited..."
+                  className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-xs focus:outline-none focus:border-red-600"
+                />
+              </div>
+
+              <div className="flex justify-end pt-2">
+                <button
+                  type="submit"
+                  className="px-4 py-2 rounded-lg bg-red-700 text-white font-bold text-xs hover:bg-red-800 transition shadow-2xs"
+                >
+                  Submit Anti-Scam Report
+                </button>
+              </div>
+            </form>
+          )}
+        </section>
+      )}
+
+      {/* Statutory Recruitment Disclosure (Open Civic Text, No Box Card) */}
+      <div className="no-print pt-4 text-xs text-slate-500 space-y-1.5 border-t border-slate-200/80">
+        <div className="flex items-center gap-1.5 font-bold text-slate-700">
+          <Info className="h-4 w-4 text-[#17365D]" aria-hidden="true" />
+          <span>Employer &amp; Recruitment Transparency Notice</span>
+        </div>
+        <p className="leading-relaxed">
+          GabayPH publishes verified career portals and official government vacancies. We do not act as an employer or private recruitment agency. Applications must be completed on official employer or <code>.gov.ph</code> portals.
+        </p>
+      </div>
     </div>
   );
 }
@@ -831,8 +800,8 @@ export default function TrabahoPage() {
   return (
     <Suspense
       fallback={
-        <div className="mx-auto max-w-7xl px-4 py-8 text-xs text-slate-600">
-          Loading Trabaho Employment & Resume Module...
+        <div className="mx-auto max-w-5xl px-4 py-8 text-xs text-slate-600">
+          Loading Trabaho Careers &amp; Resume Module...
         </div>
       }
     >
