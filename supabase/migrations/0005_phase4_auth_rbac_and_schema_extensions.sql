@@ -11,14 +11,13 @@
 -- ============================================================================
 
 -- 1. Extend user_role enum safely with Phase 4 canonical role values
-DO $$ BEGIN
-  ALTER TYPE public.user_role ADD VALUE IF NOT EXISTS 'user';
-  ALTER TYPE public.user_role ADD VALUE IF NOT EXISTS 'content_manager';
-  ALTER TYPE public.user_role ADD VALUE IF NOT EXISTS 'moderator';
-  ALTER TYPE public.user_role ADD VALUE IF NOT EXISTS 'administrator';
-EXCEPTION
-  WHEN others THEN NULL;
-END $$;
+-- Keep enum changes at migration top level: PostgreSQL can reject
+-- ALTER TYPE ADD VALUE inside a DO-block/subtransaction, and errors must not
+-- be swallowed because later statements depend on these labels.
+ALTER TYPE public.user_role ADD VALUE IF NOT EXISTS 'user';
+ALTER TYPE public.user_role ADD VALUE IF NOT EXISTS 'content_manager';
+ALTER TYPE public.user_role ADD VALUE IF NOT EXISTS 'moderator';
+ALTER TYPE public.user_role ADD VALUE IF NOT EXISTS 'administrator';
 
 -- 2. Extend public.profiles with Phase 4 citizen & location columns
 -- Note: Precise residential street address is intentionally NOT required.
