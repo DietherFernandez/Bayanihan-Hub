@@ -13,6 +13,9 @@ import {
   Award,
   Search,
   Building2,
+  Laptop,
+  TrendingUp,
+  HeartPulse,
 } from "lucide-react";
 import {
   PH_LOCATIONS,
@@ -177,28 +180,32 @@ function AralContent() {
         </p>
       </div>
 
-      {/* Quick Topic Chips */}
+      {/* Quick Topic Chips (SVG Icons Only) */}
       <div className="no-scrollbar mb-4 flex gap-2 overflow-x-auto whitespace-nowrap pb-1">
         {[
-          { id: "all", label: "All Learning" },
-          { id: "ICT & Digital", label: "💻 ICT & Web Development" },
-          { id: "STEM & College", label: "🎓 DOST College Scholarships" },
-          { id: "Business & Entrepreneurship", label: "📈 Negosyo & MSME" },
-          { id: "Healthcare & Caregiving", label: "🏥 Caregiving & Health" },
-        ].map((chip) => (
-          <button
-            key={chip.id}
-            type="button"
-            onClick={() => setTopicFilter(chip.id)}
-            className={`inline-flex shrink-0 items-center rounded-full border px-3 py-1.5 text-xs font-semibold shadow-2xs transition ${
-              topicFilter === chip.id
-                ? "border-[#17365D] bg-[#17365D] text-white"
-                : "border-slate-200 bg-white text-slate-700 hover:border-slate-300"
-            }`}
-          >
-            {chip.label}
-          </button>
-        ))}
+          { id: "all", label: "All Learning", icon: null },
+          { id: "ICT & Digital", label: "ICT & Web Development", icon: Laptop },
+          { id: "STEM & College", label: "DOST College Scholarships", icon: GraduationCap },
+          { id: "Business & Entrepreneurship", label: "Negosyo & MSME", icon: TrendingUp },
+          { id: "Healthcare & Caregiving", label: "Caregiving & Health", icon: HeartPulse },
+        ].map((chip) => {
+          const Icon = chip.icon;
+          return (
+            <button
+              key={chip.id}
+              type="button"
+              onClick={() => setTopicFilter(chip.id)}
+              className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold shadow-2xs transition ${
+                topicFilter === chip.id
+                  ? "border-[#17365D] bg-[#17365D] text-white"
+                  : "border-slate-200 bg-white text-slate-700 hover:border-slate-300"
+              }`}
+            >
+              {Icon && <Icon className="h-3.5 w-3.5" aria-hidden="true" />}
+              <span>{chip.label}</span>
+            </button>
+          );
+        })}
       </div>
 
       {/* Multi-Faceted Filter Bar: Topic, Learning Type, Provider, Location & Keyword */}
