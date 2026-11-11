@@ -440,3 +440,16 @@ BEGIN
   END IF;
 END
 $$;
+
+-- -----------------------------------------------------------------------------
+-- 5. REMOVE SELF-REFERENTIAL PROFILES UPDATE POLICY
+-- -----------------------------------------------------------------------------
+-- The old WITH CHECK subquery reads public.profiles from a policy on the same
+-- table, which can trigger infinite-recursion errors under RLS. The dedicated
+-- BEFORE UPDATE anti-escalation trigger from migration 0005 remains responsible
+-- for protecting role/suspension/account-status columns.
+DROP POLICY IF EXISTS "Users can update their own profile details" ON public.profiles;
+CREATE POLICY "Users can update their own profile details"
+  ON public.profiles FOR UPDATE
+  USING (auth.uid() = id)
+  WITH CHECK (auth.uid() = id);
