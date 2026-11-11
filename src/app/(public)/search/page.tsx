@@ -8,8 +8,8 @@ import {
   ExternalLink,
   Bookmark,
   BookmarkCheck,
-  SlidersHorizontal,
   RotateCcw,
+  Compass,
 } from "lucide-react";
 import {
   PH_LOCATIONS,
@@ -18,17 +18,18 @@ import {
 import { VerificationBadge } from "@/components/trust/verification-badge";
 import { useCitizenState } from "@/components/providers/citizen-state-provider";
 import { useThemeAndToast } from "@/components/providers/theme-provider";
-import {
-  Button,
-  EmptyState,
-  FormField,
-  Input,
-  Pagination,
-  SelectDropdown,
-  SkeletonLoader,
-} from "@/components/ui/design-system";
 
 const PAGE_SIZE = 8;
+
+const MODULE_OPTIONS = [
+  { id: "all", label: "All Modules" },
+  { id: "serbisyo", label: "Serbisyo" },
+  { id: "trabaho", label: "Trabaho" },
+  { id: "pera", label: "Pera" },
+  { id: "aral", label: "Aral" },
+  { id: "kaligtasan", label: "Kaligtasan" },
+  { id: "bayanihan", label: "Bayanihan" },
+];
 
 function SearchContent() {
   const searchParams = useSearchParams();
@@ -87,276 +88,238 @@ function SearchContent() {
   };
 
   return (
-    <div className="mx-auto max-w-7xl px-3 py-6 sm:px-6">
-      <div className="mb-5 border-b border-slate-200 pb-4">
-        <h1 className="gabay-page-title">
-          Universal Public Service & Resource Search
+    <div className="mx-auto max-w-5xl px-4 py-8 sm:py-10 space-y-8 sm:space-y-10">
+      {/* Header & Page Title (Cardless Editorial Style) */}
+      <div className="space-y-2 border-b border-slate-200 pb-5">
+        <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase text-[#17365D]">
+          <Compass className="h-4 w-4 text-[#17365D]" aria-hidden="true" />
+          <span>Universal Civic Search</span>
+        </div>
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+          Public Service &amp; Resource Directory Search
         </h1>
-        <p className="gabay-body mt-1">
-          Search across government IDs & services, jobs, scholarships, financial aid, community relief, and emergency hotlines. No login required.
+        <p className="text-xs sm:text-sm text-slate-500 max-w-3xl leading-relaxed">
+          Search across government IDs, civil certificates, scholarships, medical assistance, community aid, and 24/7 emergency hotlines. No account or login required.
         </p>
       </div>
 
-      {/* Search & Multi-Faceted Filter Bar */}
-      <form
-        onSubmit={handleApplyUrlFilters}
-        className="mb-6 rounded-lg border border-slate-200 bg-white p-4 shadow-2xs"
-      >
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-12">
-          <div className="sm:col-span-2 lg:col-span-5">
-            <FormField id="search-page-q" label="Keyword or Agency Name">
-              <div className="relative">
-                <Search
-                  className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#64748B]"
-                  aria-hidden="true"
-                />
-                <Input
-                  id="search-page-q"
-                  type="search"
-                  value={q}
-                  onChange={(e) => {
-                    setQ(e.target.value);
-                    setCurrentPage(1);
-                  }}
-                  placeholder="e.g., PSA Birth Certificate, NBI, DSWD AICS, TESDA, 911..."
-                  className="pl-9"
-                />
-              </div>
-            </FormField>
-          </div>
+      {/* Search Input & Filter Controls (Clean Editorial, No Box Card Enclosure) */}
+      <form onSubmit={handleApplyUrlFilters} className="space-y-4">
+        <div className="relative">
+          <Search
+            className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+            aria-hidden="true"
+          />
+          <input
+            id="search-page-q"
+            type="search"
+            value={q}
+            onChange={(e) => {
+              setQ(e.target.value);
+              setCurrentPage(1);
+            }}
+            placeholder="Search PSA Birth Certificate, NBI, DSWD AICS, PhilHealth, 911, TESDA..."
+            className="w-full rounded-lg border border-slate-200 bg-white py-2.5 pl-10 pr-4 text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[#17365D] focus:ring-1 focus:ring-[#17365D] transition"
+          />
+        </div>
 
-          <div className="lg:col-span-2">
-            <FormField id="search-page-module" label="Platform Module">
-              <SelectDropdown
-                id="search-page-module"
-                value={moduleFilter}
-                onChange={(e) => {
-                  setModuleFilter(e.target.value);
+        {/* Filter Bar Controls */}
+        <div className="flex flex-wrap items-center justify-between gap-3 text-xs">
+          {/* Module Selector (Civic Underline Tabs) */}
+          <div className="no-scrollbar flex gap-3 overflow-x-auto whitespace-nowrap text-xs font-semibold text-slate-500 border-b border-slate-200 pb-1 w-full sm:w-auto">
+            {MODULE_OPTIONS.map((m) => (
+              <button
+                key={m.id}
+                type="button"
+                onClick={() => {
+                  setModuleFilter(m.id);
                   setCurrentPage(1);
                 }}
+                className={`pb-1.5 transition ${
+                  moduleFilter === m.id
+                    ? "border-b-2 border-[#17365D] font-bold text-[#17365D]"
+                    : "hover:text-slate-800"
+                }`}
               >
-                <option value="all">All Modules</option>
-                <option value="serbisyo">Serbisyo (Gov Guides)</option>
-                <option value="trabaho">Trabaho (Jobs & Training)</option>
-                <option value="pera">Pera (Financial Aid)</option>
-                <option value="bayanihan">Bayanihan (Community)</option>
-                <option value="aral">Aral (Learning & Grants)</option>
-                <option value="kaligtasan">Kaligtasan (Emergency)</option>
-              </SelectDropdown>
-            </FormField>
+                {m.label}
+              </button>
+            ))}
           </div>
 
-          <div className="lg:col-span-2">
-            <FormField id="search-page-region" label="Geographic Coverage">
-              <SelectDropdown
-                id="search-page-region"
-                value={regionFilter}
-                onChange={(e) => {
-                  setRegionFilter(e.target.value);
-                  setCurrentPage(1);
-                }}
-              >
-                <option value="ALL">All Regions (Nationwide)</option>
-                {PH_LOCATIONS.map((loc) => (
-                  <option key={loc.id} value={loc.regionCode}>
-                    {loc.regionCode}
-                  </option>
-                ))}
-              </SelectDropdown>
-            </FormField>
-          </div>
+          <div className="flex items-center gap-2 self-end">
+            <select
+              value={regionFilter}
+              onChange={(e) => {
+                setRegionFilter(e.target.value);
+                setCurrentPage(1);
+              }}
+              className="rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-slate-900 focus:outline-none focus:border-[#17365D]"
+            >
+              <option value="ALL">All Regions</option>
+              {PH_LOCATIONS.map((loc) => (
+                <option key={loc.id} value={loc.regionCode}>
+                  {loc.regionCode}
+                </option>
+              ))}
+            </select>
 
-          <div className="lg:col-span-3">
-            <FormField id="search-page-verification" label="Verification Status">
-              <div className="flex gap-1.5">
-                <SelectDropdown
-                  id="search-page-verification"
-                  value={verificationFilter}
-                  onChange={(e) => {
-                    setVerificationFilter(e.target.value);
-                    setCurrentPage(1);
-                  }}
-                  className="flex-1"
-                >
-                  <option value="all">All Statuses</option>
-                  <option value="officially_verified">
-                    Officially Verified Only
-                  </option>
-                  <option value="verification_pending">
-                    Verification Pending
-                  </option>
-                </SelectDropdown>
-                <Button type="submit" variant="primary">
-                  <SlidersHorizontal
-                    className="h-3.5 w-3.5"
-                    aria-hidden="true"
-                  />
-                  <span>Apply</span>
-                </Button>
-              </div>
-            </FormField>
+            {(q.trim() || moduleFilter !== "all" || regionFilter !== "ALL") && (
+              <button
+                type="button"
+                onClick={handleReset}
+                className="inline-flex items-center gap-1 font-semibold text-[#17365D] hover:underline px-2 py-1"
+              >
+                <RotateCcw className="h-3 w-3" />
+                <span>Reset</span>
+              </button>
+            )}
           </div>
         </div>
 
-        <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-slate-100 pt-2.5 text-[12.5px] text-[#64748B]">
-          <span>
-            Showing <strong className="text-slate-900">{results.length}</strong>{" "}
-            verified directory records
-            {q.trim() ? ` matching "${q.trim()}"` : ""}
-          </span>
-          <button
-            type="button"
-            onClick={handleReset}
-            className="gabay-interactive inline-flex items-center gap-1 font-semibold text-[#087F8C] hover:underline"
-          >
-            <RotateCcw className="h-3 w-3" aria-hidden="true" />
-            <span>Reset all filters</span>
-          </button>
+        <div className="text-[11.5px] text-slate-500">
+          Showing <strong className="text-slate-900">{results.length}</strong> verified directory records
+          {q.trim() ? ` matching "${q.trim()}"` : ""}
         </div>
       </form>
 
-      {/* Search Results List */}
+      {/* Search Results (Open Editorial Dividers, No Box Cards) */}
       {results.length === 0 ? (
-        <EmptyState
-          title="No matching verified records found"
-          description="Try clearing one of the module or region filters, or search by agency acronym (e.g., PSA, NBI, DSWD, TESDA, PhilHealth, 911)."
-          actionLabel="Show All Directory Records"
-          onAction={handleReset}
-        />
+        <div className="py-12 text-center text-xs text-slate-500 space-y-2">
+          <p className="font-semibold text-slate-900">No verified civic records matched your query.</p>
+          <p className="text-slate-400">
+            Try searching by agency acronym (e.g. PSA, NBI, DSWD, TESDA, PhilHealth, 911) or clear the module filter.
+          </p>
+          <button
+            type="button"
+            onClick={handleReset}
+            className="mt-2 inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#17365D] text-white text-xs font-semibold hover:bg-[#102847]"
+          >
+            Show All Directory Records
+          </button>
+        </div>
       ) : (
-        <>
-          <div className="divide-y divide-slate-200 rounded-lg border border-slate-200 bg-white">
+        <div className="space-y-4">
+          <div className="divide-y divide-slate-100 border-y border-slate-200 text-xs">
             {paginatedResults.map((item) => {
               const saved = isBookmarked(item.id);
               return (
-                <article
+                <div
                   key={item.id}
-                  className="gabay-interactive p-4 hover:bg-slate-50/70"
+                  className="py-4 space-y-1.5 group hover:bg-slate-50/60 -mx-2 px-2 rounded-lg transition"
                 >
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="rounded bg-[#17365D]/10 px-2 py-0.5 font-mono text-[11px] font-bold uppercase text-[#17365D]">
-                        {item.module}
-                      </span>
-                      <span className="rounded border border-slate-200 bg-[#F7F9FC] px-2 py-0.5 text-[11.5px] font-medium text-slate-700">
-                        {item.badgeLabel}
-                      </span>
-                      <VerificationBadge
-                        status={item.verificationStatus}
-                        lastVerifiedAt={item.lastVerifiedAt}
-                      />
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div className="space-y-0.5">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[10px] font-bold uppercase text-slate-700">
+                          {item.module}
+                        </span>
+                        <span className="text-[11px] text-slate-500 font-medium">
+                          {item.badgeLabel}
+                        </span>
+                        <VerificationBadge
+                          status={item.verificationStatus}
+                          lastVerifiedAt={item.lastVerifiedAt}
+                        />
+                      </div>
+                      <h3 className="font-bold text-slate-900 group-hover:text-[#17365D] text-sm sm:text-base transition">
+                        <Link href={item.href}>
+                          {item.title}
+                        </Link>
+                      </h3>
                     </div>
 
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const added = toggleBookmark({
-                          targetType:
+                    <div className="flex items-center gap-2 shrink-0 self-start sm:self-auto">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const targetType =
                             item.recordKind === "bayanihan"
                               ? "bayanihan_post"
                               : item.recordKind === "hotline"
                               ? "resource"
-                              : item.recordKind,
-                          targetId: item.id,
-                          targetSlug: item.slug,
-                          targetTitle: item.title,
-                          targetModule: item.module,
-                          href: item.href,
-                        });
-                        showToast({
-                          title: added
-                            ? "Saved to Bookmarks"
-                            : "Removed from Bookmarks",
-                          description: item.title,
-                          variant: added ? "success" : "info",
-                        });
-                      }}
-                      className={`gabay-interactive inline-flex min-h-[34px] items-center gap-1 rounded-md border px-2.5 py-1 text-xs font-semibold ${
-                        saved
-                          ? "border-[#16A36A]/40 bg-[#16A36A]/10 text-[#065F46]"
-                          : "border-slate-300 bg-white text-slate-700 hover:border-[#087F8C]"
-                      }`}
-                    >
-                      {saved ? (
-                        <>
-                          <BookmarkCheck className="h-3.5 w-3.5 text-[#16A36A]" />
-                          <span>Saved</span>
-                        </>
-                      ) : (
-                        <>
-                          <Bookmark className="h-3.5 w-3.5" />
-                          <span>Save</span>
-                        </>
-                      )}
-                    </button>
+                              : item.recordKind;
+                          toggleBookmark({
+                            targetType,
+                            targetId: item.id,
+                            targetSlug: item.slug,
+                            targetTitle: item.title,
+                            targetModule: item.module,
+                            href: item.href,
+                          });
+                          showToast({
+                            title: saved ? "Removed from bookmarks" : "Saved to bookmarks",
+                            variant: "info",
+                          });
+                        }}
+                        className="p-1.5 rounded-lg border border-slate-200 text-slate-400 hover:text-[#17365D] transition"
+                        title={saved ? "Saved" : "Save guide"}
+                      >
+                        {saved ? (
+                          <BookmarkCheck className="h-4 w-4 text-emerald-700" />
+                        ) : (
+                          <Bookmark className="h-4 w-4" />
+                        )}
+                      </button>
+                      <Link
+                        href={item.href}
+                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#17365D] text-white text-xs font-semibold hover:bg-[#102847] shadow-2xs transition"
+                      >
+                        <span>Open Guide</span>
+                        <ExternalLink className="h-3.5 w-3.5" />
+                      </Link>
+                    </div>
                   </div>
 
-                  <h2 className="mt-2 text-[16px] font-bold text-slate-900">
-                    <Link
-                      href={item.href}
-                      className="text-[#17365D] hover:text-[#087F8C] hover:underline"
-                    >
-                      {item.title}
-                    </Link>
-                  </h2>
-
-                  <p className="mt-1 text-[13.5px] leading-relaxed text-slate-600">
+                  <p className="text-slate-600 leading-relaxed text-[11.5px]">
                     {item.summary}
                   </p>
 
-                  <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-slate-100 pt-2.5 text-[12px] text-[#64748B]">
-                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
-                      <span>
-                        Source Organization:{" "}
-                        <strong className="text-slate-800">
-                          {item.sourceName}
-                        </strong>
-                      </span>
-                      <span>Coverage: {item.regionName}</span>
-                    </div>
-
-                    <div className="flex items-center gap-3">
-                      <Link
-                        href={item.href}
-                        className="font-semibold text-[#17365D] hover:text-[#087F8C] hover:underline"
-                      >
-                        View Guide & Checklist →
-                      </Link>
-                      <a
-                        href={item.sourceUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 font-semibold text-[#087F8C] hover:underline"
-                      >
-                        <span>Official Link</span>
-                        <ExternalLink className="h-3 w-3" aria-hidden="true" />
-                      </a>
-                    </div>
+                  <div className="text-[11px] text-slate-400 flex flex-wrap items-center gap-2 pt-1 border-t border-slate-50">
+                    <span>Region: {item.regionCode}</span>
+                    <span>·</span>
+                    <span>Verified Source: {item.sourceName}</span>
                   </div>
-                </article>
+                </div>
               );
             })}
           </div>
 
-          <Pagination
-            currentPage={safePage}
-            totalPages={totalPages}
-            totalItems={results.length}
-            pageSize={PAGE_SIZE}
-            onPageChange={(page) => setCurrentPage(page)}
-          />
-        </>
+          {/* Pagination (Clean text links) */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between text-xs text-slate-500 pt-2">
+              <span>Page {safePage} of {totalPages}</span>
+              <div className="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  disabled={safePage <= 1}
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  className="px-3 py-1 rounded-md border border-slate-200 bg-white disabled:opacity-40 hover:bg-slate-50"
+                >
+                  Previous
+                </button>
+                <button
+                  type="button"
+                  disabled={safePage >= totalPages}
+                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                  className="px-3 py-1 rounded-md border border-slate-200 bg-white disabled:opacity-40 hover:bg-slate-50"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
       )}
     </div>
   );
 }
 
-export default function UniversalSearchPage() {
+export default function SearchPage() {
   return (
     <Suspense
       fallback={
-        <div className="mx-auto max-w-7xl px-4 py-8">
-          <SkeletonLoader rows={5} />
+        <div className="mx-auto max-w-5xl px-4 py-8 text-xs text-slate-600">
+          Loading Universal Public Service Search...
         </div>
       }
     >
