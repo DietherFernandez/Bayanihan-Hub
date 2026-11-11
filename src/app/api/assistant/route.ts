@@ -65,12 +65,39 @@ const adminSettingsPatchSchema = z.object({
  */
 export async function GET() {
   const snapshot = getAiAdminRuntimeState();
+  const supabase = await createSupabaseServerClient();
+  let aiEnabled = snapshot.settings.aiEnabled;
+  let maxInputChars = snapshot.settings.maxInputChars;
+
+  if (supabase) {
+    const { data: dbSettings } = await supabase
+      .from("ai_admin_settings")
+      .select("ai_enabled, max_input_chars, provider_mode, model_name, strict_grounding_enforced, prompt_injection_shield, emergency_triage_priority, max_requests_per_minute")
+      .eq("id", "default")
+      .maybeSingle();
+
+    if (dbSettings) {
+      aiEnabled = dbSettings.ai_enabled ?? aiEnabled;
+      maxInputChars = dbSettings.max_input_chars ?? maxInputChars;
+      updateAiAdminSettings({
+        aiEnabled: dbSettings.ai_enabled,
+        maxInputChars: dbSettings.max_input_chars,
+        providerMode: dbSettings.provider_mode,
+        modelName: dbSettings.model_name,
+        strictGroundingEnforced: dbSettings.strict_grounding_enforced,
+        promptInjectionShield: dbSettings.prompt_injection_shield,
+        emergencyTriagePriority: dbSettings.emergency_triage_priority,
+        maxRequestsPerMinute: dbSettings.max_requests_per_minute,
+      }, "administrator");
+    }
+  }
+
   return NextResponse.json({
     ok: true,
-    aiEnabled: snapshot.settings.aiEnabled,
-    maxInputChars: snapshot.settings.maxInputChars,
+    aiEnabled,
+    maxInputChars,
     suggestedQuestions: SUGGESTED_STARTING_QUESTIONS,
-    adminSnapshot: snapshot,
+    adminSnapshot: getAiAdminRuntimeState(),
   });
 }
 
@@ -294,6 +321,25 @@ export async function PATCH(request: NextRequest) {
       { ok: false, error: updated.message },
       { status: 403 }
     );
+  }
+
+  if (supabase && verifiedRole === "administrator" && updated.snapshot) {
+    try {
+      await supabase.from("ai_admin_settings").upsert({
+        id: "default",
+        ai_enabled: updated.snapshot.settings.aiEnabled,
+        provider_mode: updated.snapshot.settings.providerMode,
+        model_name: updated.snapshot.settings.modelName,
+        max_requests_per_minute: updated.snapshot.settings.maxRequestsPerMinute,
+        max_input_chars: updated.snapshot.settings.maxInputChars,
+        strict_grounding_enforced: updated.snapshot.settings.strictGroundingEnforced,
+        prompt_injection_shield: updated.snapshot.settings.promptInjectionShield,
+        emergency_triage_priority: updated.snapshot.settings.emergencyTriagePriority,
+        updated_at: new Date().toISOString(),
+      });
+    } catch {
+      // In-memory update succeeded; DB sync is best-effort
+    }
   }
 
   return NextResponse.json({

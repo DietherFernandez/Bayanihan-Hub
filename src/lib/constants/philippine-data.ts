@@ -260,7 +260,7 @@ export const VERIFIED_RESOURCES: ResourceRecord[] = [
     regionCode: "NATIONAL",
     regionName: "Nationwide (All Regions)",
     slug: "psa-birth-certificate-request",
-    title: "PSA Birth Certificate (Walk-InCRS Appointment & PSAHelpline / PSASerbilis)",
+    title: "PSA Birth Certificate (Walk-In CRS Appointment & PSAHelpline / PSASerbilis)",
     summary:
       "Official guide for requesting an authenticated PSA Birth Certificate for employment, passport application, scholarship, or school enrollment.",
     requirementsChecklist: [

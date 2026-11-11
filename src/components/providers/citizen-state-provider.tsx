@@ -11,6 +11,12 @@ import type {
 import { INITIAL_REPORTS } from "@/lib/constants/philippine-data";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { normalizeToCanonicalRole } from "@/lib/auth/rbac";
+import {
+  saveBookmarkServerAction,
+  removeBookmarkServerAction,
+  fetchUserBookmarksServerAction,
+  submitModuleReportServerAction,
+} from "@/lib/modules/server-actions";
 
 export interface SearchHistoryEntry {
   id: string;
@@ -176,6 +182,32 @@ export function CitizenStateProvider({
       } catch {
         // no-op
       }
+
+      // Synchronize cloud bookmarks
+      try {
+        const cloudBm = await fetchUserBookmarksServerAction();
+        if (cloudBm.ok && cloudBm.bookmarks.length > 0) {
+          setBookmarks((prev) => {
+            const merged = [...prev];
+            for (const bm of cloudBm.bookmarks) {
+              if (!merged.some((m) => m.targetId === bm.targetId)) {
+                merged.push({
+                  ...bm,
+                  href: `/${bm.targetModule}/${bm.targetSlug}`,
+                });
+              }
+            }
+            try {
+              localStorage.setItem(STORAGE_KEYS.BOOKMARKS, JSON.stringify(merged));
+            } catch {
+              // no-op
+            }
+            return merged;
+          });
+        }
+      } catch {
+        // no-op
+      }
     };
 
     void syncSession();
@@ -318,6 +350,24 @@ export function CitizenStateProvider({
       }
       return next;
     });
+
+    // Asynchronously synchronize with Supabase backend
+    if (added) {
+      void saveBookmarkServerAction({
+        targetType: item.targetType,
+        targetId: item.targetId,
+        targetSlug: item.targetSlug,
+        targetTitle: item.targetTitle,
+        targetModule: item.targetModule,
+      }).catch(() => {
+        // graceful offline fallback
+      });
+    } else {
+      void removeBookmarkServerAction(item.targetId).catch(() => {
+        // graceful offline fallback
+      });
+    }
+
     return added;
   };
 
@@ -381,6 +431,19 @@ export function CitizenStateProvider({
       }
       return next;
     });
+
+    // Asynchronously submit to Supabase reports table
+    void submitModuleReportServerAction({
+      targetType: report.targetType,
+      targetId: report.targetId,
+      targetTitle: report.targetTitle,
+      reason: report.reason,
+      details: report.details,
+      officialReferenceUrl: report.officialReferenceUrl,
+    }).catch(() => {
+      // graceful offline fallback
+    });
+
     return created;
   };
 

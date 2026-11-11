@@ -85,6 +85,92 @@ export async function saveBookmarkServerAction(
 }
 
 /**
+ * Remove Bookmark Server Action
+ */
+export async function removeBookmarkServerAction(
+  targetId: string
+): Promise<{ ok: boolean; message: string }> {
+  const supabase = await createSupabaseServerClient();
+  if (!supabase) {
+    return { ok: true, message: "Removed from device bookmarks." };
+  }
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { ok: true, message: "Removed from device bookmarks." };
+  }
+
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(targetId);
+  if (isUuid) {
+    await supabase
+      .from("bookmarks")
+      .delete()
+      .eq("user_id", user.id)
+      .eq("target_id", targetId);
+  }
+
+  return {
+    ok: true,
+    message: "Bookmark removed from your GabayPH account.",
+  };
+}
+
+/**
+ * Fetch Authenticated User Bookmarks
+ */
+export async function fetchUserBookmarksServerAction(): Promise<{
+  ok: boolean;
+  bookmarks: Array<{
+    id: string;
+    targetType: "resource" | "opportunity" | "assistance_program" | "bayanihan_post";
+    targetId: string;
+    targetSlug: string;
+    targetTitle: string;
+    targetModule: ModuleType;
+    createdAt: string;
+  }>;
+}> {
+  const supabase = await createSupabaseServerClient();
+  if (!supabase) {
+    return { ok: true, bookmarks: [] };
+  }
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { ok: true, bookmarks: [] };
+  }
+
+  const { data, error } = await supabase
+    .from("bookmarks")
+    .select("id, target_type, target_id, target_slug, target_title, target_module, created_at")
+    .eq("user_id", user.id)
+    .order("created_at", { ascending: false });
+
+  if (error || !data) {
+    return { ok: false, bookmarks: [] };
+  }
+
+  return {
+    ok: true,
+    bookmarks: data.map((b) => ({
+      id: b.id,
+      targetType: b.target_type as "resource" | "opportunity" | "assistance_program" | "bayanihan_post",
+      targetId: b.target_id,
+      targetSlug: b.target_slug,
+      targetTitle: b.target_title,
+      targetModule: b.target_module as ModuleType,
+      createdAt: b.created_at,
+    })),
+  };
+}
+
+/**
  * 2. Bayanihan Community Submission Server Action (With Privacy, Rate Limit & Moderation Safeguards)
  */
 export async function submitBayanihanCommunityPostAction(
