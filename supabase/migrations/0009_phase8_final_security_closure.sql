@@ -23,12 +23,10 @@
 -- public.audit_logs.actor_role is typed as `public.user_role NOT NULL` (from 0002).
 -- Adding 'service_role' and 'db_bootstrap' prevents falsely attributing automated
 -- service-role or database-owner bootstrap operations to a human 'super_admin'.
-DO $$ BEGIN
-  ALTER TYPE public.user_role ADD VALUE IF NOT EXISTS 'service_role';
-  ALTER TYPE public.user_role ADD VALUE IF NOT EXISTS 'db_bootstrap';
-EXCEPTION
-  WHEN others THEN NULL;
-END $$;
+-- Keep enum additions at top level. Do not swallow failures: later
+-- role-assignment statements require these labels to exist.
+ALTER TYPE public.user_role ADD VALUE IF NOT EXISTS 'service_role';
+ALTER TYPE public.user_role ADD VALUE IF NOT EXISTS 'db_bootstrap';
 
 -- -----------------------------------------------------------------------------
 -- 2. HARDEN public.has_role(TEXT) — FAIL-CLOSED & COMPLETE LEGACY ROLE MAPPING
@@ -115,17 +113,7 @@ BEGIN
         )
         OR (
           required_role = 'verified_contributor'
-          AND p.role::text IN (
-            'super_admin',
-            'administrator',
-            'content_admin',
-            'content_manager',
-            'agency_editor',
-            'moderator',
-            'regional_moderator',
-            'organization',
-            'verified_partner'
-          )
+          AND p.role::text = 'verified_partner'
         )
         OR (
           required_role = 'user'
