@@ -32,6 +32,7 @@ import {
 import { useCitizenState } from "@/components/providers/citizen-state-provider";
 import { useThemeAndToast } from "@/components/providers/theme-provider";
 import { EmptyState } from "@/components/ui/design-system";
+import { CopyButton } from "@/components/ui/copy-button";
 
 const MODULE_META: Record<
   ModuleType,
@@ -240,12 +241,49 @@ export function ModuleDetailView({
 
           {/* Interactive Documentary Requirements Checklist */}
           <section className="mt-6">
+            {(() => {
+              const checkedCount = completedList.length;
+              const totalReqs = resource.requirementsChecklist.length;
+              const pct = totalReqs > 0 ? Math.round((checkedCount / totalReqs) * 100) : 0;
+              const allReqsText = resource.requirementsChecklist
+                .map((r, i) => `${i + 1}. ${r.label}${r.isMandatory ? " [Required]" : ""} ${r.notes ? `(${r.notes})` : ""}`)
+                .join("\n");
+
+              return (
+                <div className="mb-4 rounded-xl border border-slate-200 bg-slate-50 p-3.5 shadow-2xs dark:border-slate-800 dark:bg-slate-900/50">
+                  <div className="flex flex-wrap items-center justify-between gap-2 text-xs font-semibold">
+                    <span className="text-slate-800 dark:text-slate-200">Application Readiness Tracker</span>
+                    <span className={pct === 100 ? "font-bold text-emerald-600 dark:text-emerald-400" : "text-[#17365D] dark:text-teal-300"}>
+                      {checkedCount} of {totalReqs} prepared ({pct}%)
+                    </span>
+                  </div>
+                  <div className="mt-1.5 h-2 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700">
+                    <div
+                      className={`h-full transition-all duration-300 ${pct === 100 ? "bg-emerald-600" : "bg-[#17365D] dark:bg-teal-500"}`}
+                      style={{ width: `${pct}%` }}
+                    />
+                  </div>
+                  <div className="mt-2.5 flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-slate-200/60 dark:border-slate-800">
+                    <span className="text-[11px] text-slate-500 dark:text-slate-400">
+                      Tap any checkbox to track your document preparation.
+                    </span>
+                    <CopyButton
+                      textToCopy={`Checklist for ${resource.title}:\n${allReqsText}`}
+                      label="Copy All Requirements"
+                      copiedLabel="Checklist Copied!"
+                      className="text-[11px]"
+                    />
+                  </div>
+                </div>
+              );
+            })()}
+
             <div className="flex items-center justify-between">
               <h2 className="text-sm font-bold text-[var(--gabay-text)]">
-                1. Documentary Requirements Checklist
+                1. Required Documents
               </h2>
               <span className="font-mono text-xs text-[var(--gabay-neutral)]">
-                {completedList.length} / {resource.requirementsChecklist.length} prepared
+                {completedList.length} / {resource.requirementsChecklist.length} ready
               </span>
             </div>
             <div className="mt-2.5 space-y-2">

@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ShieldCheck, AlertCircle, Lock, KeyRound } from "lucide-react";
+import { ShieldCheck, AlertCircle, Lock, KeyRound, Eye, EyeOff } from "lucide-react";
 import { authLoginSchema } from "@/lib/validations/schemas";
 import { loginCitizenAction } from "@/lib/auth/actions";
 import { canAccessAdminDashboard } from "@/lib/auth/rbac";
@@ -18,6 +18,7 @@ export default function LoginPage() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [selectedRole, setSelectedRole] = useState<UserRole>("user");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -136,16 +137,26 @@ export default function LoginPage() {
                 <span>Forgot password?</span>
               </Link>
             </div>
-            <input
-              id="login-password"
-              type="password"
-              required
-              autoComplete="current-password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              className="mt-1 min-h-[40px] w-full rounded border border-[var(--gabay-border)] bg-[var(--gabay-surface)] px-3 py-2 text-xs text-[var(--gabay-text)]"
-            />
+            <div className="relative mt-1">
+              <input
+                id="login-password"
+                type={showPassword ? "text" : "password"}
+                required
+                autoComplete="current-password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                className="min-h-[40px] w-full rounded border border-[var(--gabay-border)] bg-[var(--gabay-surface)] py-2 pl-3 pr-10 text-xs text-[var(--gabay-text)] focus:border-[#17365D] focus:outline-none"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700"
+              >
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
           </div>
 
           <details className="rounded border border-[var(--gabay-border)] bg-[var(--gabay-surface-muted)] p-2.5">

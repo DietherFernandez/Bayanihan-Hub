@@ -2,11 +2,15 @@
 
 import React from "react";
 import Link from "next/link";
-import { Bookmark, Trash2, ArrowUpRight } from "lucide-react";
+import { Bookmark, Trash2, ArrowUpRight, Printer } from "lucide-react";
+import { useState } from "react";
 import { useCitizenState } from "@/components/providers/citizen-state-provider";
 
 export default function BookmarksPage() {
   const { bookmarks, toggleBookmark } = useCitizenState();
+  const [activeModule, setActiveModule] = useState<string>("all");
+
+  const filteredBookmarks = bookmarks.filter((b) => activeModule === "all" || b.targetModule === activeModule);
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
@@ -18,9 +22,44 @@ export default function BookmarksPage() {
         <h1 className="mt-1.5 text-xl font-bold text-slate-900">
           Your Bookmarked Guides, Opportunities & Aid Programs
         </h1>
-        <p className="mt-1 text-xs text-slate-600">
-          Quickly return to saved government document checklists, scholarship deadlines, and financial assistance guides.
-        </p>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <p className="mt-1 text-xs text-slate-600">
+            Quickly return to saved government document checklists, scholarship deadlines, and financial assistance guides.
+          </p>
+          {bookmarks.length > 0 && (
+            <button
+              type="button"
+              onClick={() => typeof window !== "undefined" && window.print()}
+              className="no-print inline-flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-800 shadow-2xs hover:bg-slate-50"
+            >
+              <Printer className="h-3.5 w-3.5 text-[#17365D]" />
+              <span>Print Saved Checklist Pack</span>
+            </button>
+          )}
+        </div>
+
+        {bookmarks.length > 0 && (
+          <div className="no-print mt-4 flex flex-wrap gap-1.5 text-xs">
+            {["all", "serbisyo", "trabaho", "pera", "aral", "kaligtasan"].map((mod) => {
+              const count = mod === "all" ? bookmarks.length : bookmarks.filter((b) => b.targetModule === mod).length;
+              if (mod !== "all" && count === 0) return null;
+              return (
+                <button
+                  key={mod}
+                  type="button"
+                  onClick={() => setActiveModule(mod)}
+                  className={`rounded-full border px-3 py-1 font-semibold transition ${
+                    activeModule === mod
+                      ? "border-[#17365D] bg-[#17365D] text-white"
+                      : "border-slate-200 bg-white text-slate-700 hover:border-slate-300"
+                  }`}
+                >
+                  <span className="capitalize">{mod}</span> ({count})
+                </button>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {bookmarks.length === 0 ? (
@@ -48,7 +87,7 @@ export default function BookmarksPage() {
         </div>
       ) : (
         <div className="divide-y divide-slate-200 rounded-md border border-slate-200 bg-white">
-          {bookmarks.map((bm) => (
+          {filteredBookmarks.map((bm) => (
             <div
               key={bm.id}
               className="flex flex-wrap items-center justify-between gap-3 p-4 hover:bg-slate-50"

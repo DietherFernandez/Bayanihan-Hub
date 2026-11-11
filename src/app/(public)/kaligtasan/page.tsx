@@ -22,6 +22,7 @@ import {
   VERIFIED_RESOURCES,
 } from "@/lib/constants/philippine-data";
 import { SourceCitationBar, VerificationBadge } from "@/components/trust/verification-badge";
+import { CopyButton } from "@/components/ui/copy-button";
 import { useCitizenState } from "@/components/providers/citizen-state-provider";
 
 const FIRST_AID_GUIDES = [
@@ -109,6 +110,29 @@ export default function KaligtasanPage() {
         <p className="mt-1 text-xs text-slate-600">
           Verified 24/7 national emergency numbers, LGU evacuation center directory, NDRRMC 72-hour Go-Bag checklist, and first-aid protocols.
         </p>
+      </div>
+
+      {/* High-Visibility 4-Number Emergency Grid */}
+      <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+        {[
+          { number: "911", label: "National Emergency", sub: "Police / Fire / Medical", color: "bg-red-700 text-white hover:bg-red-800", tel: "911" },
+          { number: "143", label: "Red Cross", sub: "Disaster & Blood Rescue", color: "bg-red-50 border border-red-300 text-red-900 hover:bg-red-100", tel: "143" },
+          { number: "8888", label: "Citizen Hotline", sub: "Govt Complaint & Aid", color: "bg-slate-50 border border-slate-300 text-slate-900 hover:bg-slate-100", tel: "8888" },
+          { number: "1343", label: "Anti-Trafficking", sub: "Action Line / OFW Safety", color: "bg-slate-50 border border-slate-300 text-slate-900 hover:bg-slate-100", tel: "1343" },
+        ].map((item) => (
+          <a
+            key={item.number}
+            href={`tel:${item.tel}`}
+            className={`flex min-h-[72px] flex-col justify-center rounded-xl p-3 shadow-2xs transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600 ${item.color}`}
+          >
+            <div className="flex items-center justify-between">
+              <span className="font-mono text-xl font-extrabold tracking-tight">{item.number}</span>
+              <PhoneCall className="h-4 w-4 shrink-0 opacity-80" aria-hidden="true" />
+            </div>
+            <div className="mt-0.5 text-xs font-bold leading-tight">{item.label}</div>
+            <div className="text-[10px] opacity-75">{item.sub}</div>
+          </a>
+        ))}
       </div>
 
       {/* Emergency Top Banner */}
@@ -249,13 +273,21 @@ export default function KaligtasanPage() {
                     </a>
                   </td>
                   <td className="px-4 py-3">
-                    <a
-                      href={`tel:${hot.primaryNumber.replace(/[^0-9+]/g, "")}`}
-                      className="inline-flex items-center gap-1.5 rounded border border-red-200 bg-red-50 px-2.5 py-1 font-mono text-xs font-bold text-red-800 hover:bg-red-100"
-                    >
-                      <PhoneCall className="h-3 w-3" />
-                      <span>{hot.primaryNumber}</span>
-                    </a>
+                    <div className="flex items-center gap-1.5">
+                      <a
+                        href={`tel:${hot.primaryNumber.replace(/[^0-9+]/g, "")}`}
+                        className="inline-flex items-center gap-1.5 rounded border border-red-200 bg-red-50 px-2.5 py-1 font-mono text-xs font-bold text-red-800 hover:bg-red-100"
+                      >
+                        <PhoneCall className="h-3 w-3" />
+                        <span>{hot.primaryNumber}</span>
+                      </a>
+                      <CopyButton
+                        textToCopy={hot.primaryNumber}
+                        label="Copy"
+                        showText={false}
+                        className="h-7 w-7 justify-center p-0"
+                      />
+                    </div>
                   </td>
                   <td className="px-4 py-3 font-mono text-slate-700">
                     {hot.secondaryNumbers.join(" · ") || "—"}

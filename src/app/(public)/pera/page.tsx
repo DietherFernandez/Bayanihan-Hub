@@ -16,6 +16,7 @@ import {
   VERIFIED_RESOURCES,
 } from "@/lib/constants/philippine-data";
 import { SourceCitationBar } from "@/components/trust/verification-badge";
+import { CopyButton } from "@/components/ui/copy-button";
 import { formatCurrencyPHP } from "@/lib/utils";
 import { useCitizenState } from "@/components/providers/citizen-state-provider";
 
@@ -159,8 +160,40 @@ function PeraContent() {
           </div>
         </div>
 
+        {/* Mobile Program Quick Selector Track (< lg) */}
+        <div className="no-print mb-4 lg:hidden">
+          <label className="mb-1.5 block text-xs font-semibold text-slate-700">
+            Select Assistance Program:
+          </label>
+          <div className="no-scrollbar flex gap-2 overflow-x-auto whitespace-nowrap pb-2">
+            {filteredPrograms.map((prog) => {
+              const isSelected = activeProgram?.slug === prog.slug;
+              return (
+                <button
+                  key={prog.id}
+                  type="button"
+                  onClick={() => setSelectedSlug(prog.slug)}
+                  className={`inline-flex shrink-0 items-center gap-1.5 rounded-lg border px-3 py-2 text-xs font-semibold shadow-xs transition ${
+                    isSelected
+                      ? "border-[#17365D] bg-[#17365D] text-white"
+                      : "border-slate-200 bg-white text-slate-800 hover:border-slate-300"
+                  }`}
+                >
+                  <span className={`rounded px-1.5 py-0.2 font-mono text-[10px] font-bold ${
+                    isSelected ? "bg-white/20 text-white" : "bg-emerald-100 text-emerald-900"
+                  }`}>
+                    {prog.programType}
+                  </span>
+                  <span>{prog.programName}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
-          <div className="divide-y divide-slate-200 rounded-md border border-slate-200 bg-white lg:col-span-4">
+          {/* Desktop Left List */}
+          <div className="divide-y divide-slate-200 rounded-md border border-slate-200 bg-white hidden lg:col-span-4 lg:block">
             {filteredPrograms.length === 0 ? (
               <div className="p-4 text-center text-xs text-slate-600">
                 No verified assistance program matches your search.
@@ -381,19 +414,45 @@ function PeraContent() {
           <div className="mt-5 grid grid-cols-1 gap-6 lg:grid-cols-12">
             <div className="grid grid-cols-1 gap-3 text-xs sm:grid-cols-2 lg:col-span-7">
               <div className="sm:col-span-2">
-                <label
-                  htmlFor="calc-income"
-                  className="block font-semibold text-slate-800"
-                >
-                  Monthly Household Take-Home Income (PHP)
-                </label>
+                <div className="flex flex-wrap items-center justify-between gap-1">
+                  <label
+                    htmlFor="calc-income"
+                    className="block font-semibold text-slate-800"
+                  >
+                    Monthly Household Take-Home Income (PHP)
+                  </label>
+                  <div className="flex flex-wrap items-center gap-1 text-[11px]">
+                    <span className="text-slate-500">Presets:</span>
+                    <button
+                      type="button"
+                      onClick={() => setMonthlyIncome(15000)}
+                      className="rounded border border-slate-200 bg-slate-50 px-2 py-0.5 hover:bg-slate-100"
+                    >
+                      ₱15K (Min Wage)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setMonthlyIncome(25000)}
+                      className="rounded border border-slate-200 bg-slate-50 px-2 py-0.5 hover:bg-slate-100"
+                    >
+                      ₱25K (NCR Avg)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setMonthlyIncome(45000)}
+                      className="rounded border border-slate-200 bg-slate-50 px-2 py-0.5 hover:bg-slate-100"
+                    >
+                      ₱45K (Family)
+                    </button>
+                  </div>
+                </div>
                 <input
                   id="calc-income"
                   type="number"
                   min={0}
                   value={monthlyIncome}
                   onChange={(e) => setMonthlyIncome(Number(e.target.value) || 0)}
-                  className="mt-1 w-full rounded border border-slate-300 px-3 py-2 font-mono text-sm text-slate-900"
+                  className="mt-1.5 w-full rounded-lg border border-slate-300 px-3 py-2 font-mono text-sm text-slate-900 focus:border-[#17365D] focus:ring-1 focus:ring-[#17365D]"
                 />
               </div>
 

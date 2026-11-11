@@ -20,6 +20,7 @@ import {
   VERIFIED_RESOURCES,
 } from "@/lib/constants/philippine-data";
 import { SourceCitationBar, VerificationBadge } from "@/components/trust/verification-badge";
+import { CopyButton } from "@/components/ui/copy-button";
 import { useCitizenState } from "@/components/providers/citizen-state-provider";
 
 function SerbisyoContent() {
@@ -137,12 +138,43 @@ function SerbisyoContent() {
         />
       </div>
 
+      {/* Mobile Guide Quick Selector Track (< lg) */}
+      <div className="no-print mb-4 lg:hidden">
+        <label htmlFor="mobile-guide-selector" className="mb-1.5 block text-xs font-semibold text-slate-700">
+          Select Government Service Guide:
+        </label>
+        <div className="no-scrollbar flex gap-2 overflow-x-auto whitespace-nowrap pb-2">
+          {filteredGuides.map((guide) => {
+            const isSelected = selectedGuide?.slug === guide.slug;
+            return (
+              <button
+                key={guide.id}
+                type="button"
+                onClick={() => setActiveSlug(guide.slug)}
+                className={`inline-flex shrink-0 items-center gap-1.5 rounded-lg border px-3 py-2 text-xs font-semibold shadow-xs transition ${
+                  isSelected
+                    ? "border-[#17365D] bg-[#17365D] text-white"
+                    : "border-slate-200 bg-white text-slate-800 hover:border-slate-300"
+                }`}
+              >
+                <span className={`rounded px-1.5 py-0.2 font-mono text-[10px] font-bold ${
+                  isSelected ? "bg-white/20 text-white" : "bg-slate-100 text-slate-700"
+                }`}>
+                  {guide.organizationAcronym}
+                </span>
+                <span>{guide.title}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
       {/* Master-Detail Split Layout */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
-        {/* Left List of Services */}
+        {/* Left List of Services (Desktop Only) */}
         <aside
           aria-label="Government Services List"
-          className="no-print lg:col-span-4"
+          className="no-print hidden lg:col-span-4 lg:block"
         >
           <div className="divide-y divide-slate-200 rounded-md border border-slate-200 bg-white">
             {filteredGuides.length === 0 ? (
@@ -271,7 +303,16 @@ function SerbisyoContent() {
                     <span>Official Hotline & Hours</span>
                   </dt>
                   <dd className="mt-1 font-mono text-slate-900">
-                    {selectedGuide.contactInfo.hotline || "See portal"}
+                    <div className="flex items-center gap-2">
+                      <span>{selectedGuide.contactInfo.hotline || "See portal"}</span>
+                      {selectedGuide.contactInfo.hotline && (
+                        <CopyButton
+                          textToCopy={selectedGuide.contactInfo.hotline}
+                          label="Copy"
+                          className="py-0.5 text-[10px]"
+                        />
+                      )}
+                    </div>
                     {selectedGuide.contactInfo.hours && (
                       <span className="block font-sans text-[11px] text-slate-600">
                         {selectedGuide.contactInfo.hours}
@@ -293,12 +334,49 @@ function SerbisyoContent() {
 
               {/* Interactive Document Requirements Checklist */}
               <div className="mt-5">
+                {(() => {
+                  const checkedCount = (completedChecklistIds[selectedGuide.slug] || []).length;
+                  const totalReqs = selectedGuide.requirementsChecklist.length;
+                  const pct = totalReqs > 0 ? Math.round((checkedCount / totalReqs) * 100) : 0;
+                  const allReqsText = selectedGuide.requirementsChecklist
+                    .map((r, i) => `${i + 1}. ${r.label}${r.isMandatory ? " [Required]" : ""} ${r.notes ? `(${r.notes})` : ""}`)
+                    .join("\n");
+
+                  return (
+                    <div className="mb-3 rounded-lg border border-slate-200 bg-slate-50 p-3">
+                      <div className="flex flex-wrap items-center justify-between gap-2 text-xs font-semibold">
+                        <span className="text-slate-800">Application Readiness Tracker</span>
+                        <span className={pct === 100 ? "font-bold text-emerald-700" : "text-[#17365D]"}>
+                          {checkedCount} of {totalReqs} prepared ({pct}%)
+                        </span>
+                      </div>
+                      <div className="mt-1.5 h-2 w-full overflow-hidden rounded-full bg-slate-200">
+                        <div
+                          className={`h-full transition-all duration-300 ${pct === 100 ? "bg-emerald-600" : "bg-[#17365D]"}`}
+                          style={{ width: `${pct}%` }}
+                        />
+                      </div>
+                      <div className="mt-2.5 flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-slate-200/60">
+                        <span className="text-[11px] text-slate-500">
+                          Click any item to mark as ready. Saved automatically on this device.
+                        </span>
+                        <CopyButton
+                          textToCopy={`Checklist for ${selectedGuide.title}:\n${allReqsText}`}
+                          label="Copy All Requirements"
+                          copiedLabel="Checklist Copied!"
+                          className="text-[11px]"
+                        />
+                      </div>
+                    </div>
+                  );
+                })()}
+
                 <div className="flex items-center justify-between">
                   <h3 className="text-sm font-bold text-slate-900">
-                    1. Document Requirements Checklist (Interactive)
+                    1. Required Documents
                   </h3>
                   <span className="text-xs text-slate-500">
-                    Click items to mark as prepared
+                    Tap to check off
                   </span>
                 </div>
 

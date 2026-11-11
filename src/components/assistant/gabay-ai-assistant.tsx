@@ -26,6 +26,7 @@ import {
 import { useCitizenState } from "@/components/providers/citizen-state-provider";
 import { useThemeAndToast } from "@/components/providers/theme-provider";
 import { StatusIndicator } from "@/components/ui/design-system";
+import { CopyButton } from "@/components/ui/copy-button";
 import type { ModuleType } from "@/types/database";
 
 export interface AssistantChatMessage {
@@ -569,6 +570,17 @@ export function GabayAiAssistantView() {
             <div className="whitespace-pre-line leading-relaxed text-slate-800">
               {msg.displayedContent ?? msg.content}
             </div>
+
+            {msg.role === "assistant" && (
+              <div className="mt-2.5 flex items-center justify-end">
+                <CopyButton
+                  textToCopy={msg.content}
+                  label="Copy Response"
+                  copiedLabel="Response Copied!"
+                  className="bg-white/80 py-0.5 text-[11px]"
+                />
+              </div>
+            )}
 
             {/* Source Citations Block */}
             {msg.role === "assistant" &&

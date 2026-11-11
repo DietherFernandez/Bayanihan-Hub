@@ -9,6 +9,8 @@ import {
   ShieldCheck,
   MailCheck,
   MapPin,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import { authRegisterSchema } from "@/lib/validations/schemas";
 import { registerCitizenAction } from "@/lib/auth/actions";
@@ -31,6 +33,7 @@ export default function RegisterPage() {
   const [barangay, setBarangay] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [saveSearchHistory, setSaveSearchHistory] = useState(false);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -316,15 +319,25 @@ export default function RegisterPage() {
               >
                 Password (8+ chars, 1 uppercase, 1 number) *
               </label>
-              <input
-                id="reg-pass"
-                type="password"
-                required
-                autoComplete="new-password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 min-h-[40px] w-full rounded border border-[var(--gabay-border)] bg-[var(--gabay-surface)] px-3 py-2 text-[var(--gabay-text)]"
-              />
+              <div className="relative mt-1">
+                <input
+                  id="reg-pass"
+                  type={showPassword ? "text" : "password"}
+                  required
+                  autoComplete="new-password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="min-h-[40px] w-full rounded border border-[var(--gabay-border)] bg-[var(--gabay-surface)] py-2 pl-3 pr-10 text-[var(--gabay-text)] focus:border-[#17365D] focus:outline-none"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700"
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
             </div>
 
             <div>
@@ -334,15 +347,25 @@ export default function RegisterPage() {
               >
                 Confirm Password *
               </label>
-              <input
-                id="reg-confirm"
-                type="password"
-                required
-                autoComplete="new-password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className="mt-1 min-h-[40px] w-full rounded border border-[var(--gabay-border)] bg-[var(--gabay-surface)] px-3 py-2 text-[var(--gabay-text)]"
-              />
+              <div className="relative mt-1">
+                <input
+                  id="reg-confirm"
+                  type={showPassword ? "text" : "password"}
+                  required
+                  autoComplete="new-password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="min-h-[40px] w-full rounded border border-[var(--gabay-border)] bg-[var(--gabay-surface)] py-2 pl-3 pr-10 text-[var(--gabay-text)] focus:border-[#17365D] focus:outline-none"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700"
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
             </div>
           </div>
 

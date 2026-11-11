@@ -18,6 +18,7 @@ import {
   VERIFIED_OPPORTUNITIES,
 } from "@/lib/constants/philippine-data";
 import { SourceCitationBar } from "@/components/trust/verification-badge";
+import { CopyButton } from "@/components/ui/copy-button";
 import { jobScamReportSchema } from "@/lib/validations/schemas";
 import { useCitizenState } from "@/components/providers/citizen-state-provider";
 
@@ -32,6 +33,52 @@ function TrabahoContent() {
   const [keyword, setKeyword] = useState<string>("");
 
   const { toggleBookmark, isBookmarked, submitPublicReport } = useCitizenState();
+
+  // Resume Template Presets
+  const applyResumeTemplate = (type: "admin" | "bpo" | "trade" | "graduate") => {
+    if (type === "admin") {
+      setResumeFullName("Maria L. Santos");
+      setResumeTitle("Administrative & Operations Assistant");
+      setResumeLocation("Manila, Philippines");
+      setResumePhone("0917-123-4567");
+      setResumeEmail("maria.santos@email.ph");
+      setResumeSummary("Proactive and detail-oriented Administrative Assistant with 2+ years of experience managing records, public inquiry desks, and office procurement. Proficient in MS Office, Google Workspace, and official document filing.");
+      setResumeExperience("Administrative Assistant — Barangay Operations (2023 – Present)\n• Handled official correspondence and daily resident inquiries with 98% positive satisfaction.\n• Managed records inventory and digitized 1,200+ municipal civil documents.");
+      setResumeEducation("Bachelor of Science in Office Administration\nPamantasan ng Lungsod ng Maynila (Graduated 2023)");
+      setResumeSkills("Office Administration, MS Word/Excel, Customer Relations, Fast 60 WPM Typing, Civil Service Sub-Professional Eligible");
+    } else if (type === "bpo") {
+      setResumeFullName("Mark Christian Reyes");
+      setResumeTitle("Customer Support Specialist (Inbound & Chat)");
+      setResumeLocation("Quezon City, Metro Manila");
+      setResumePhone("0918-987-6543");
+      setResumeEmail("mark.reyes@email.ph");
+      setResumeSummary("Customer Service Representative with 1.5+ years of voice and non-voice experience in e-commerce and technical support. Dedicated to achieving high CSAT scores, rapid first-call resolution, and empathetic customer communication.");
+      setResumeExperience("Customer Service Representative — Teleperformance (2023 – 2024)\n• Handled 50+ inbound customer interactions daily maintaining a 94% CSAT rating.\n• Resolved customer order and billing inquiries following strict SLA guidelines.");
+      setResumeEducation("Associate in Information Technology / Senior High School TVL Track\nSTI College (2022)");
+      setResumeSkills("Active Listening, CRM Tools (Zendesk, Salesforce), English & Filipino Fluency, Conflict Resolution, 55 WPM Typing");
+    } else if (type === "trade") {
+      setResumeFullName("Eduardo D. Garcia");
+      setResumeTitle("Electrical Technician / Installation & Maintenance");
+      setResumeLocation("Cebu City, Central Visayas");
+      setResumePhone("0920-555-0192");
+      setResumeEmail("eduardo.garcia@email.ph");
+      setResumeSummary("TESDA National Certificate (NC II) Certified Electrical Installation and Maintenance technician with 3 years of residential and commercial wiring experience. Strict adherence to Philippine Electrical Code and OSH safety standards.");
+      setResumeExperience("Electrician Assistant — Metro Builders & Contractors (2022 – Present)\n• Installed conduit piping, breaker panels, and lighting fixtures for 20+ commercial units.\n• Conducted routine preventive maintenance and circuit testing without workplace injury.");
+      setResumeEducation("TESDA NC II in Electrical Installation and Maintenance\nTESDA Regional Training Center (2022)");
+      setResumeSkills("Blueprint Reading, Conduit Bending, Panel Board Wiring, Safety Compliance (DOLE BOSH), Power Tools Operation");
+    } else {
+      setResumeFullName("Angela Rose Bautista");
+      setResumeTitle("Entry-Level Junior Associate");
+      setResumeLocation("Davao City, Davao del Sur");
+      setResumePhone("0929-333-8821");
+      setResumeEmail("angela.bautista@email.ph");
+      setResumeSummary("Motivated and adaptive recent graduate with strong leadership, communication, and digital research abilities. Eager to contribute disciplined work ethic, creative problem solving, and technical adaptability to a collaborative team.");
+      setResumeExperience("Student Council Public Relations Officer — University of Mindanao (2023 – 2024)\n• Coordinated event logistics and digital marketing for 4 campus-wide student seminars.\n• Created infographics and social media updates reaching 5,000+ student followers.");
+      setResumeEducation("Bachelor of Science in Business Management\nUniversity of Mindanao (Graduated Magna Cum Laude, 2024)");
+      setResumeSkills("Project Coordination, Canva & MS Office, Social Media Management, Public Speaking, Tagalog & English Fluency");
+    }
+  };
+
 
   // Resume Builder State
   const [resumeFullName, setResumeFullName] = useState("Juan M. Dela Cruz");
@@ -133,6 +180,31 @@ function TrabahoContent() {
         </p>
         <div className="mt-3 rounded border border-amber-200 bg-amber-50/80 px-3 py-2 text-[11px] text-amber-950">
           <strong>Employer & Recruitment Disclosure:</strong> GabayPH is an independent public directory and is <strong>not</strong> the employer or recruitment agency. We do not invent job vacancies, charge placement fees, or guarantee employment. All applications are submitted directly on the official employer or <code>.gov.ph</code> portal.
+        </div>
+
+        {/* Trabaho 3-Section Jump Bar */}
+        <div className="mt-4 flex flex-wrap gap-2">
+          <a
+            href="#jobs-directory"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-800 shadow-2xs hover:border-[#17365D] hover:text-[#17365D]"
+          >
+            <Briefcase className="h-3.5 w-3.5 text-[#17365D]" />
+            <span>1. Jobs & Scholarships ({jobsAndTraining.length})</span>
+          </a>
+          <a
+            href="#resume-builder"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-800 shadow-2xs hover:border-[#17365D] hover:text-[#17365D]"
+          >
+            <FileText className="h-3.5 w-3.5 text-[#17365D]" />
+            <span>2. Free Printable Resume Builder</span>
+          </a>
+          <a
+            href="#scam-report"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-800 shadow-2xs hover:border-[#17365D] hover:text-[#17365D]"
+          >
+            <ShieldAlert className="h-3.5 w-3.5 text-red-600" />
+            <span>3. Anti-Scam Reporting Center</span>
+          </a>
         </div>
       </div>
 
@@ -362,8 +434,39 @@ function TrabahoContent() {
                 2. Free Printable Resume Builder (Philippine Standard Format)
               </h2>
               <p className="text-xs text-slate-600">
-                Fill in your details on the left and click &quot;Print / Save as PDF&quot; to generate a clean, employer-ready resume.
+                Choose a pre-filled Philippine industry template below or fill in your details to print a clean, employer-ready resume.
               </p>
+              <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
+                <span className="text-[11px] font-semibold text-slate-500">Industry Templates:</span>
+                <button
+                  type="button"
+                  onClick={() => applyResumeTemplate("admin")}
+                  className="rounded border border-slate-200 bg-slate-50 px-2 py-0.5 text-[11px] font-medium text-slate-700 hover:bg-slate-100"
+                >
+                  Admin & Office
+                </button>
+                <button
+                  type="button"
+                  onClick={() => applyResumeTemplate("bpo")}
+                  className="rounded border border-slate-200 bg-slate-50 px-2 py-0.5 text-[11px] font-medium text-slate-700 hover:bg-slate-100"
+                >
+                  BPO & Support
+                </button>
+                <button
+                  type="button"
+                  onClick={() => applyResumeTemplate("trade")}
+                  className="rounded border border-slate-200 bg-slate-50 px-2 py-0.5 text-[11px] font-medium text-slate-700 hover:bg-slate-100"
+                >
+                  TESDA Skilled Trade
+                </button>
+                <button
+                  type="button"
+                  onClick={() => applyResumeTemplate("graduate")}
+                  className="rounded border border-slate-200 bg-slate-50 px-2 py-0.5 text-[11px] font-medium text-slate-700 hover:bg-slate-100"
+                >
+                  Fresh Graduate
+                </button>
+              </div>
             </div>
           </div>
 
