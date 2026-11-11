@@ -85,7 +85,7 @@ export function UniversalSearchHero({
         </label>
         <div className="relative">
           <Search
-            className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-500"
+            className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#64748B]"
             aria-hidden="true"
           />
           <input
@@ -96,14 +96,14 @@ export function UniversalSearchHero({
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search government services, IDs, hotlines, or benefits..."
-            className="min-h-[52px] w-full rounded-xl border border-slate-200 bg-white pl-12 pr-12 text-[15px] text-slate-900 shadow-sm placeholder:text-slate-500 focus:border-[#17365D] focus:outline-none focus:ring-2 focus:ring-[#17365D]/25 [&::-webkit-search-cancel-button]:hidden"
+            className="min-h-[46px] sm:min-h-[48px] w-full rounded-xl border border-[#E2E8F0] bg-white pl-10 pr-10 text-[13.5px] sm:text-[14px] text-[#172B45] placeholder:text-[#64748B] shadow-2xs focus:border-[#173B67] focus:outline-none focus:ring-2 focus:ring-[#173B67]/20 [&::-webkit-search-cancel-button]:hidden"
           />
           {query.length > 0 && (
             <button
               type="button"
               onClick={() => setQuery("")}
               aria-label="Clear search query"
-              className="absolute right-1 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-lg text-slate-500 hover:text-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#17365D]"
+              className="absolute right-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-lg text-[#64748B] hover:text-[#172B45] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#173B67]"
             >
               <X className="h-4 w-4" aria-hidden="true" />
             </button>
@@ -114,41 +114,41 @@ export function UniversalSearchHero({
       {query.trim().length >= 2 && (
         <div
           aria-live="polite"
-          className="mt-3 rounded-xl border border-slate-200 bg-white p-3 text-xs shadow-sm"
+          className="mt-2.5 rounded-xl border border-[#E2E8F0] bg-white p-3 text-[12px] shadow-2xs"
         >
-          <div className="flex items-center justify-between pb-2">
-            <span className="font-semibold text-slate-800">
+          <div className="flex items-center justify-between pb-2 border-b border-[#E2E8F0]">
+            <span className="font-semibold text-[#172B45]">
               Verified results for &ldquo;{query.trim()}&rdquo;
             </span>
             <Link
               href={`/search?q=${encodeURIComponent(query.trim())}`}
-              className="font-semibold text-[#17365D] hover:underline"
+              className="font-semibold text-[#173B67] hover:underline"
             >
               See all →
             </Link>
           </div>
 
           {liveSuggestions.length === 0 ? (
-            <p className="py-1 text-slate-600">
+            <p className="py-2 text-[#64748B]">
               No verified entry found for &ldquo;{query.trim()}&rdquo;. We only
               show verified records and never fabricate government
               requirements. Try an agency acronym (PSA, NBI, SSS, PhilHealth).
             </p>
           ) : (
-            <ul className="divide-y divide-slate-200">
+            <ul className="divide-y divide-[#E2E8F0]">
               {liveSuggestions.map((item) => (
                 <li
                   key={item.id}
-                  className="flex items-center justify-between gap-2 py-1"
+                  className="flex items-center justify-between gap-2 py-1.5"
                 >
                   <Link
                     href={item.href}
-                    className="flex min-h-[44px] min-w-0 flex-1 flex-col justify-center"
+                    className="flex min-h-[40px] min-w-0 flex-1 flex-col justify-center"
                   >
-                    <span className="truncate text-[13px] font-semibold text-[#17365D]">
+                    <span className="truncate text-[13px] font-semibold text-[#173B67] hover:underline">
                       {item.title}
                     </span>
-                    <span className="truncate text-[11px] text-slate-600">
+                    <span className="truncate text-[11px] text-[#64748B]">
                       {item.sourceName}
                     </span>
                   </Link>
@@ -159,7 +159,7 @@ export function UniversalSearchHero({
                       target="_blank"
                       rel="noopener noreferrer"
                       aria-label={`Official source for ${item.title}`}
-                      className="inline-flex h-11 w-8 items-center justify-center text-[#17365D]"
+                      className="inline-flex h-8 w-8 items-center justify-center text-[#173B67] hover:text-[#16866B]"
                     >
                       <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
                     </a>
@@ -174,14 +174,14 @@ export function UniversalSearchHero({
       {!compact && (
         <ul
           aria-label="Popular searches"
-          className="no-scrollbar -mx-3 mt-3 flex flex-nowrap gap-2 overflow-x-auto whitespace-nowrap px-3 pb-1 sm:mx-0 sm:px-0"
+          className="no-scrollbar -mx-3 mt-2.5 flex flex-nowrap gap-1.5 overflow-x-auto whitespace-nowrap px-3 pb-0.5 sm:mx-0 sm:px-0"
         >
           {POPULAR_SEARCH_EXAMPLES.map((item) => (
             <li key={item.label} className="shrink-0">
               <button
                 type="button"
                 onClick={() => handleSuggestionClick(item)}
-                className="inline-flex min-h-[44px] items-center rounded-full border border-slate-200 bg-white px-4 text-[13px] font-medium text-slate-700 shadow-sm hover:border-[#17365D] hover:text-[#17365D] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#17365D]"
+                className="inline-flex min-h-[34px] sm:min-h-[36px] items-center rounded-full border border-[#E2E8F0] bg-white px-3.5 text-[12px] font-medium text-[#172B45] hover:border-[#173B67] hover:text-[#173B67] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#173B67]"
               >
                 {item.label}
               </button>

@@ -76,13 +76,13 @@ export function DesktopNavigation({ pathname }: { pathname: string }) {
     >
       <Link
         href="/#explore-modules"
-        className={`gabay-interactive inline-flex min-h-[36px] items-center gap-1.5 rounded-md px-2.5 py-1 text-[13px] font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#087F8C] ${
+        className={`gabay-interactive inline-flex min-h-[34px] items-center gap-1.5 rounded-md px-2.5 py-1 text-[13px] font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#16866B] ${
           pathname === "/"
-            ? "bg-[#17365D]/10 text-[#17365D]"
-            : "text-slate-700 hover:bg-slate-100 hover:text-[#17365D]"
+            ? "bg-[#173B67]/10 text-[#173B67]"
+            : "text-[#172B45] hover:bg-slate-100 hover:text-[#173B67]"
         }`}
       >
-        <Compass className="h-3.5 w-3.5 text-[#087F8C]" aria-hidden="true" />
+        <Compass className="h-3.5 w-3.5 text-[#16866B]" aria-hidden="true" />
         <span>Explore</span>
       </Link>
 
@@ -94,10 +94,10 @@ export function DesktopNavigation({ pathname }: { pathname: string }) {
           <Link
             key={item.href}
             href={item.href}
-            className={`gabay-interactive inline-flex min-h-[36px] items-center gap-1.5 rounded-md px-2.5 py-1 text-[13px] font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#087F8C] ${
+            className={`gabay-interactive inline-flex min-h-[34px] items-center gap-1.5 rounded-md px-2.5 py-1 text-[13px] font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#16866B] ${
               isActive
-                ? "bg-[#17365D] text-white"
-                : "text-slate-700 hover:bg-slate-100 hover:text-[#17365D]"
+                ? "bg-[#173B67] text-white"
+                : "text-[#172B45] hover:bg-slate-100 hover:text-[#173B67]"
             }`}
           >
             <Icon className="h-3.5 w-3.5" aria-hidden="true" />
@@ -108,10 +108,10 @@ export function DesktopNavigation({ pathname }: { pathname: string }) {
 
       <Link
         href="/about"
-        className={`gabay-interactive inline-flex min-h-[36px] items-center gap-1.5 rounded-md px-2.5 py-1 text-[13px] font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#087F8C] ${
+        className={`gabay-interactive inline-flex min-h-[34px] items-center gap-1.5 rounded-md px-2.5 py-1 text-[13px] font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#16866B] ${
           pathname === "/about"
-            ? "bg-[#17365D] text-white"
-            : "text-slate-700 hover:bg-slate-100 hover:text-[#17365D]"
+            ? "bg-[#173B67] text-white"
+            : "text-[#172B45] hover:bg-slate-100 hover:text-[#173B67]"
         }`}
       >
         <Info className="h-3.5 w-3.5" aria-hidden="true" />
@@ -149,7 +149,7 @@ export function MobileBottomNavigation({ pathname }: { pathname: string }) {
   return (
     <nav
       aria-label="Quick Mobile Bottom Navigation"
-      className="no-print fixed bottom-0 left-0 right-0 z-40 border-t border-slate-200 bg-white pb-[env(safe-area-inset-bottom)] shadow-[0_-2px_8px_rgba(15,23,42,0.05)] md:hidden"
+      className="no-print fixed bottom-0 left-0 right-0 z-40 border-t border-[#E2E8F0] bg-white/95 backdrop-blur-md pb-[env(safe-area-inset-bottom)] shadow-[0_-1px_3px_rgba(15,23,42,0.04)] md:hidden"
     >
       <ul className="grid grid-cols-4">
         {tabs.map((tab) => {
@@ -157,20 +157,20 @@ export function MobileBottomNavigation({ pathname }: { pathname: string }) {
           const color = tab.active
             ? tab.danger
               ? "text-[#D94B4B]"
-              : "text-[#17365D]"
+              : "text-[#173B67]"
             : tab.danger
               ? "text-[#D94B4B]/80"
-              : "text-slate-600";
+              : "text-[#64748B]";
           return (
             <li key={tab.label}>
               <Link
                 href={tab.href}
                 aria-current={tab.active ? "page" : undefined}
-                className={`flex min-h-[56px] flex-col items-center justify-center gap-0.5 text-[11px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#17365D] ${color} ${
+                className={`flex min-h-[50px] flex-col items-center justify-center gap-0.5 text-[11px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#173B67] ${color} ${
                   tab.active ? "font-bold" : "font-medium"
                 }`}
               >
-                <Icon className="h-5 w-5" aria-hidden="true" />
+                <Icon className="h-4.5 w-4.5" aria-hidden="true" />
                 <span>{tab.label}</span>
               </Link>
             </li>
@@ -189,17 +189,17 @@ export function CivicHeader() {
   const isStaff = canAccessAdminDashboard(user?.role);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-slate-200 bg-white">
+    <header className="sticky top-0 z-40 border-b border-[#E2E8F0] bg-white">
       {/* Top Civic Trust & Emergency Strip (subtle utility strip) */}
-      <div className="border-b border-slate-200 bg-slate-50 px-3 text-[11.5px] text-slate-600">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-2">
-          <div className="flex min-w-0 items-center gap-1.5 py-1.5">
+      <div className="border-b border-[#E2E8F0] bg-[#F5F7FA] px-3 text-[11px] text-[#64748B]">
+        <div className="mx-auto flex max-w-5xl items-center justify-between gap-2">
+          <div className="flex min-w-0 items-center gap-1.5 py-1">
             <ShieldCheck
-              className="h-3.5 w-3.5 shrink-0 text-[#16A36A]"
+              className="h-3.5 w-3.5 shrink-0 text-[#16866B]"
               aria-hidden="true"
             />
             <span className="truncate">
-              <strong className="text-[#17365D]">GabayPH</strong>
+              <strong className="text-[#173B67]">GabayPH</strong>
               <span className="hidden sm:inline"> · Independent Public-Service &amp; Community Guide</span>
               <span className="sm:hidden"> · Independent public guide</span>
             </span>
@@ -207,7 +207,7 @@ export function CivicHeader() {
           <div className="flex shrink-0 items-center gap-2">
             <Link
               href="/kaligtasan#hotlines"
-              className="gabay-interactive inline-flex min-h-[28px] items-center gap-1 rounded-full border border-[#D94B4B]/30 bg-white px-2.5 text-[11px] font-semibold text-[#B83A3A] hover:bg-red-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D94B4B]"
+              className="gabay-interactive inline-flex min-h-[26px] items-center gap-1 rounded-full border border-[#D94B4B]/30 bg-white px-2 text-[11px] font-semibold text-[#B83A3A] hover:bg-red-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D94B4B]"
             >
               <PhoneCall className="h-3 w-3" aria-hidden="true" />
               <span>911 · 143</span>
@@ -226,20 +226,20 @@ export function CivicHeader() {
       </div>
 
       {/* Compact Main Navigation Row */}
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-2 px-3 py-2 sm:px-6">
+      <div className="mx-auto flex max-w-5xl items-center justify-between gap-2 px-3 py-2 sm:px-6">
         <div className="flex items-center gap-5">
           <Link
             href="/"
-            className="flex items-center gap-2 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#087F8C]"
+            className="flex items-center gap-2 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#16866B]"
           >
-            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-[#17365D] text-xs font-bold tracking-tight text-white">
+            <div className="flex h-7 w-7 items-center justify-center rounded-md bg-[#173B67] text-[11px] font-bold tracking-tight text-white">
               PH
             </div>
             <div>
-              <span className="block text-[15px] font-bold leading-none tracking-tight text-slate-900">
+              <span className="block text-[14.5px] font-bold leading-none tracking-tight text-[#172B45]">
                 GabayPH
               </span>
-              <span className="hidden text-[11px] text-[#64748B] sm:block">
+              <span className="hidden text-[10.5px] text-[#64748B] sm:block">
                 Your Everyday Guide to a Better Life.
               </span>
             </div>
@@ -253,23 +253,23 @@ export function CivicHeader() {
           <Link
             href="/assistant"
             aria-label="GabayAI Grounded Assistant"
-            className={`gabay-interactive hidden min-h-[36px] items-center gap-1.5 rounded-md border px-2.5 py-1 text-[12px] font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#087F8C] sm:inline-flex ${
+            className={`gabay-interactive hidden min-h-[34px] items-center gap-1.5 rounded-md border px-2.5 py-1 text-[12px] font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#16866B] sm:inline-flex ${
               pathname === "/assistant"
-                ? "border-[#087F8C] bg-[#087F8C]/10 text-[#087F8C]"
-                : "border-slate-300 bg-[#F7F9FC] text-[#17365D] hover:border-[#087F8C]"
+                ? "border-[#16866B] bg-[#16866B]/10 text-[#16866B]"
+                : "border-[#E2E8F0] bg-[#F5F7FA] text-[#173B67] hover:border-[#16866B]"
             }`}
           >
-            <Compass className="h-3.5 w-3.5 text-[#087F8C]" aria-hidden="true" />
+            <Compass className="h-3.5 w-3.5 text-[#16866B]" aria-hidden="true" />
             <span>GabayAI</span>
           </Link>
 
           <Link
             href="/search"
             aria-label="Universal Search"
-            className={`gabay-interactive hidden min-h-[36px] items-center gap-1.5 rounded-md border px-2.5 py-1 text-[12px] font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#087F8C] sm:inline-flex ${
+            className={`gabay-interactive hidden min-h-[34px] items-center gap-1.5 rounded-md border px-2.5 py-1 text-[12px] font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#16866B] sm:inline-flex ${
               pathname === "/search"
-                ? "border-[#087F8C] bg-[#087F8C]/10 text-[#087F8C]"
-                : "border-slate-300 bg-[#F7F9FC] text-slate-700 hover:border-[#087F8C]"
+                ? "border-[#16866B] bg-[#16866B]/10 text-[#16866B]"
+                : "border-[#E2E8F0] bg-[#F5F7FA] text-[#172B45] hover:border-[#16866B]"
             }`}
           >
             <Search className="h-3.5 w-3.5" aria-hidden="true" />
@@ -279,15 +279,15 @@ export function CivicHeader() {
           <Link
             href="/bookmarks"
             aria-label={`Saved Bookmarks (${bookmarks.length})`}
-            className={`gabay-interactive hidden min-h-[36px] items-center gap-1 rounded-md border px-2 py-1 text-[12px] font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#087F8C] sm:inline-flex ${
+            className={`gabay-interactive hidden min-h-[34px] items-center gap-1 rounded-md border px-2 py-1 text-[12px] font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#16866B] sm:inline-flex ${
               pathname === "/bookmarks"
-                ? "border-[#087F8C] bg-[#087F8C]/10 text-[#087F8C]"
-                : "border-slate-300 bg-white text-slate-700 hover:border-[#087F8C]"
+                ? "border-[#16866B] bg-[#16866B]/10 text-[#16866B]"
+                : "border-[#E2E8F0] bg-white text-[#172B45] hover:border-[#16866B]"
             }`}
           >
             <Bookmark className="h-3.5 w-3.5" aria-hidden="true" />
             {bookmarks.length > 0 && (
-              <span className="rounded-full bg-[#087F8C] px-1.5 py-0.2 text-[10px] font-bold text-white">
+              <span className="rounded-full bg-[#16866B] px-1.5 py-0.2 text-[10px] font-bold text-white">
                 {bookmarks.length}
               </span>
             )}
@@ -299,35 +299,35 @@ export function CivicHeader() {
             aria-label={
               theme === "dark" ? "Switch to light mode" : "Switch to dark mode"
             }
-            className="gabay-interactive hidden min-h-[36px] min-w-[36px] items-center justify-center rounded-md border border-slate-300 bg-white text-slate-700 hover:border-[#087F8C] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#087F8C] sm:inline-flex"
+            className="gabay-interactive hidden min-h-[34px] min-w-[34px] items-center justify-center rounded-md border border-[#E2E8F0] bg-white text-[#172B45] hover:border-[#16866B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#16866B] sm:inline-flex"
           >
             {theme === "dark" ? (
               <Sun className="h-4 w-4 text-[#D99A28]" aria-hidden="true" />
             ) : (
-              <Moon className="h-4 w-4 text-[#17365D]" aria-hidden="true" />
+              <Moon className="h-4 w-4 text-[#173B67]" aria-hidden="true" />
             )}
           </button>
 
           {user ? (
             <Link
               href="/profile"
-              className="gabay-interactive hidden min-h-[36px] items-center gap-1.5 rounded-md border border-slate-300 bg-white px-2.5 py-1 text-[12px] font-semibold text-slate-800 hover:border-[#087F8C] sm:inline-flex focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#087F8C]"
+              className="gabay-interactive hidden min-h-[34px] items-center gap-1.5 rounded-md border border-[#E2E8F0] bg-white px-2.5 py-1 text-[12px] font-semibold text-[#172B45] hover:border-[#16866B] sm:inline-flex focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#16866B]"
             >
-              <User className="h-3.5 w-3.5 text-[#087F8C]" aria-hidden="true" />
+              <User className="h-3.5 w-3.5 text-[#16866B]" aria-hidden="true" />
               <span className="max-w-[90px] truncate">{user.fullName}</span>
             </Link>
           ) : (
             <div className="flex items-center gap-1.5">
               <Link
                 href="/login"
-                className="gabay-interactive hidden min-h-[36px] items-center gap-1 rounded-md border border-slate-300 bg-white px-2.5 py-1 text-[12px] font-semibold text-slate-800 hover:border-[#087F8C] sm:inline-flex focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#087F8C]"
+                className="gabay-interactive hidden min-h-[34px] items-center gap-1 rounded-md border border-[#E2E8F0] bg-white px-2.5 py-1 text-[12px] font-semibold text-[#172B45] hover:border-[#16866B] sm:inline-flex focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#16866B]"
               >
-                <User className="h-3.5 w-3.5 text-[#17365D]" aria-hidden="true" />
+                <User className="h-3.5 w-3.5 text-[#173B67]" aria-hidden="true" />
                 <span>Login</span>
               </Link>
               <Link
                 href="/register"
-                className="gabay-interactive hidden min-h-[36px] items-center gap-1 rounded-md bg-[#17365D] px-2.5 py-1 text-[12px] font-semibold text-white hover:bg-[#102847] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#087F8C] sm:inline-flex"
+                className="gabay-interactive hidden min-h-[34px] items-center gap-1 rounded-md bg-[#173B67] px-2.5 py-1 text-[12px] font-semibold text-white hover:bg-[#102B4C] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#16866B] sm:inline-flex"
               >
                 <UserPlus className="h-3.5 w-3.5" aria-hidden="true" />
                 <span>Register</span>
@@ -339,7 +339,7 @@ export function CivicHeader() {
             type="button"
             onClick={() => setDrawerOpen(true)}
             aria-label="Open navigation menu"
-            className="gabay-interactive inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg border border-slate-200 bg-white text-[#17365D] hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#17365D] lg:hidden"
+            className="gabay-interactive inline-flex min-h-[38px] min-w-[38px] items-center justify-center rounded-lg border border-[#E2E8F0] bg-white text-[#173B67] hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#173B67] lg:hidden"
           >
             <Menu className="h-5 w-5" aria-hidden="true" />
           </button>
@@ -513,36 +513,36 @@ export function CivicHeader() {
 export function CivicFooter() {
   const pathname = usePathname();
   return (
-    <footer className="mt-12 border-t border-slate-200 bg-white pb-[calc(5rem+env(safe-area-inset-bottom))] text-[12.5px] text-[#64748B] md:pb-8">
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
-        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
+    <footer className="mt-12 border-t border-[#E2E8F0] bg-white pb-[calc(5rem+env(safe-area-inset-bottom))] text-[12.5px] text-[#64748B] md:pb-8">
+      <div className="mx-auto max-w-5xl px-4 py-7 sm:px-6 sm:py-8">
+        <div className="grid grid-cols-1 gap-7 sm:grid-cols-2 lg:grid-cols-4">
           <div>
-            <div className="flex items-center gap-2 font-bold text-slate-900">
-              <span className="inline-flex h-6 w-6 items-center justify-center rounded bg-[#17365D] text-xs text-white">
+            <div className="flex items-center gap-2 font-bold text-[#172B45]">
+              <span className="inline-flex h-6 w-6 items-center justify-center rounded bg-[#173B67] text-xs text-white">
                 PH
               </span>
-              <span>GabayPH</span>
+              <span className="text-[14px]">GabayPH</span>
             </div>
-            <p className="mt-1 text-[12px] font-semibold text-slate-700">
+            <p className="mt-1 text-[11.5px] font-semibold text-[#172B45]">
               Your Everyday Guide to a Better Life.
             </p>
-            <p className="mt-2 leading-relaxed">
-              Free, mobile-first public service directory, employment guide, financial calculators, and emergency resource platform for every Filipino.
+            <p className="mt-2 text-[12px] leading-relaxed text-[#64748B]">
+              Independent, mobile-first public service directory, employment guide, financial calculators, and emergency resource platform for every Filipino.
             </p>
-            <p className="mt-2 text-[11px]">
-              Independent Platform Notice: GabayPH is not a government agency. We link directly to official <code>.gov.ph</code> portals and never charge fees or approve applications.
+            <p className="mt-2 text-[11px] text-[#64748B]">
+              Independent Notice: GabayPH is not a government agency. We link directly to official <code>.gov.ph</code> portals and never charge fees.
             </p>
           </div>
 
           <div>
-            <h3 className="gabay-label uppercase tracking-wider text-slate-900">
+            <h3 className="text-[12px] font-bold uppercase tracking-wider text-[#172B45]">
               Explore Categories
             </h3>
-            <ul className="mt-2.5 space-y-1.5">
+            <ul className="mt-2 space-y-1.5 text-[12.5px]">
               <li>
                 <Link
                   href="/trabaho"
-                  className="hover:text-[#087F8C] hover:underline"
+                  className="hover:text-[#173B67] hover:underline"
                 >
                   Trabaho (Jobs, Resume &amp; Training)
                 </Link>
@@ -550,15 +550,15 @@ export function CivicFooter() {
               <li>
                 <Link
                   href="/serbisyo"
-                  className="hover:text-[#087F8C] hover:underline"
+                  className="hover:text-[#173B67] hover:underline"
                 >
-                  Serbisyo (Government Guides &amp; Checklists)
+                  Serbisyo (Gov Guides &amp; Checklists)
                 </Link>
               </li>
               <li>
                 <Link
                   href="/pera"
-                  className="hover:text-[#087F8C] hover:underline"
+                  className="hover:text-[#173B67] hover:underline"
                 >
                   Pera (Financial Aid &amp; Calculators)
                 </Link>
@@ -566,15 +566,15 @@ export function CivicFooter() {
               <li>
                 <Link
                   href="/bayanihan"
-                  className="hover:text-[#087F8C] hover:underline"
+                  className="hover:text-[#173B67] hover:underline"
                 >
-                  Bayanihan (Donations &amp; Volunteering)
+                  Bayanihan (Mutual Aid &amp; Volunteers)
                 </Link>
               </li>
               <li>
                 <Link
                   href="/aral"
-                  className="hover:text-[#087F8C] hover:underline"
+                  className="hover:text-[#173B67] hover:underline"
                 >
                   Aral (Free Courses &amp; Scholarships)
                 </Link>
@@ -582,23 +582,23 @@ export function CivicFooter() {
               <li>
                 <Link
                   href="/kaligtasan"
-                  className="hover:text-[#087F8C] hover:underline"
+                  className="hover:text-[#173B67] hover:underline"
                 >
-                  Kaligtasan (Hotlines &amp; Evacuation Directory)
+                  Kaligtasan (Hotlines &amp; Evacuation)
                 </Link>
               </li>
             </ul>
           </div>
 
           <div>
-            <h3 className="gabay-label uppercase tracking-wider text-slate-900">
+            <h3 className="text-[12px] font-bold uppercase tracking-wider text-[#172B45]">
               Information &amp; Governance
             </h3>
-            <ul className="mt-2.5 space-y-1.5">
+            <ul className="mt-2 space-y-1.5 text-[12.5px]">
               <li>
                 <Link
                   href="/about"
-                  className="hover:text-[#087F8C] hover:underline"
+                  className="hover:text-[#173B67] hover:underline"
                 >
                   About GabayPH
                 </Link>
@@ -606,7 +606,7 @@ export function CivicFooter() {
               <li>
                 <Link
                   href="/privacy"
-                  className="hover:text-[#087F8C] hover:underline"
+                  className="hover:text-[#173B67] hover:underline"
                 >
                   Privacy Policy
                 </Link>
@@ -614,7 +614,7 @@ export function CivicFooter() {
               <li>
                 <Link
                   href="/terms"
-                  className="hover:text-[#087F8C] hover:underline"
+                  className="hover:text-[#173B67] hover:underline"
                 >
                   Terms of Service
                 </Link>
@@ -622,7 +622,7 @@ export function CivicFooter() {
               <li>
                 <Link
                   href="/contact"
-                  className="hover:text-[#087F8C] hover:underline"
+                  className="hover:text-[#173B67] hover:underline"
                 >
                   Contact
                 </Link>
@@ -630,7 +630,7 @@ export function CivicFooter() {
               <li>
                 <Link
                   href="/reports"
-                  className="hover:text-[#087F8C] hover:underline"
+                  className="hover:text-[#173B67] hover:underline"
                 >
                   Report Incorrect Information
                 </Link>
@@ -639,35 +639,55 @@ export function CivicFooter() {
           </div>
 
           <div>
-            <h3 className="gabay-label uppercase tracking-wider text-slate-900">
+            <h3 className="text-[12px] font-bold uppercase tracking-wider text-[#172B45]">
               National Emergency Hotlines
             </h3>
-            <dl className="mt-2.5 space-y-1.5 font-mono text-xs">
-              <div className="flex justify-between border-b border-slate-100 pb-1">
-                <dt className="font-sans">National Emergency:</dt>
-                <dd className="font-bold text-[#D94B4B]">911</dd>
+            <dl className="mt-2 space-y-1.5 font-mono text-[12px]">
+              <div className="flex justify-between border-b border-[#E2E8F0] pb-1">
+                <dt className="font-sans text-[#64748B]">National Emergency:</dt>
+                <dd>
+                  <a href="tel:911" className="font-bold text-[#D94B4B] hover:underline">
+                    911
+                  </a>
+                </dd>
               </div>
-              <div className="flex justify-between border-b border-slate-100 pb-1">
-                <dt className="font-sans">Philippine Red Cross:</dt>
-                <dd className="font-bold text-[#D94B4B]">143</dd>
+              <div className="flex justify-between border-b border-[#E2E8F0] pb-1">
+                <dt className="font-sans text-[#64748B]">Philippine Red Cross:</dt>
+                <dd>
+                  <a href="tel:143" className="font-bold text-[#D94B4B] hover:underline">
+                    143
+                  </a>
+                </dd>
               </div>
-              <div className="flex justify-between border-b border-slate-100 pb-1">
-                <dt className="font-sans">Citizens&apos; Complaint:</dt>
-                <dd className="font-semibold text-slate-900">8888</dd>
+              <div className="flex justify-between border-b border-[#E2E8F0] pb-1">
+                <dt className="font-sans text-[#64748B]">Citizens&apos; Complaint:</dt>
+                <dd>
+                  <a href="tel:8888" className="font-semibold text-[#172B45] hover:underline">
+                    8888
+                  </a>
+                </dd>
               </div>
-              <div className="flex justify-between border-b border-slate-100 pb-1">
-                <dt className="font-sans">CICC Anti-Scam:</dt>
-                <dd className="font-semibold text-slate-900">1326</dd>
+              <div className="flex justify-between border-b border-[#E2E8F0] pb-1">
+                <dt className="font-sans text-[#64748B]">CICC Anti-Scam:</dt>
+                <dd>
+                  <a href="tel:1326" className="font-semibold text-[#172B45] hover:underline">
+                    1326
+                  </a>
+                </dd>
               </div>
               <div className="flex justify-between">
-                <dt className="font-sans">NCMH Crisis Line:</dt>
-                <dd className="font-semibold text-slate-900">1553</dd>
+                <dt className="font-sans text-[#64748B]">NCMH Crisis Line:</dt>
+                <dd>
+                  <a href="tel:1553" className="font-semibold text-[#172B45] hover:underline">
+                    1553
+                  </a>
+                </dd>
               </div>
             </dl>
           </div>
         </div>
 
-        <div className="mt-8 flex flex-wrap items-center justify-between gap-2 border-t border-slate-200 pt-4 text-[11.5px]">
+        <div className="mt-7 flex flex-wrap items-center justify-between gap-2 border-t border-[#E2E8F0] pt-4 text-[11px] text-[#64748B]">
           <span>
             © {new Date().getFullYear()} GabayPH — Your Everyday Guide to a Better Life. All rights reserved.
           </span>

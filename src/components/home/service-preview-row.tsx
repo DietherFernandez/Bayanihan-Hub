@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, ShieldCheck } from "lucide-react";
 import type { ResourceRecord } from "@/types/database";
 import { formatVerifiedDate } from "@/lib/utils";
 
@@ -49,29 +49,31 @@ export function ServicePreviewRow({ resource }: { resource: ResourceRecord }) {
   return (
     <Link
       href={`/${resource.module}/${resource.slug}`}
-      className="group -mx-2 flex min-h-[56px] items-center justify-between gap-3 rounded-lg px-2 py-3 transition hover:bg-slate-50/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#17365D]"
+      title={resource.title}
+      className="group -mx-2 flex min-h-[50px] items-center justify-between gap-3 rounded-lg px-2.5 py-2.5 transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#173B67]"
     >
-      <div className="min-w-0">
+      <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
-          <span className="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wide text-slate-700">
+          <span className="shrink-0 rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider text-slate-700">
             {resource.organizationAcronym}
           </span>
-          <span className="truncate text-xs font-semibold text-slate-900 group-hover:text-[#17365D] sm:text-sm">
+          <span className="truncate text-[13px] font-semibold text-[#172B45] group-hover:text-[#173B67] sm:text-[14px]">
             {resource.title}
           </span>
         </div>
-        <div className="mt-1 flex flex-wrap items-center gap-2 text-[11px] text-slate-500">
-          {fee && <span className="font-semibold text-emerald-700">{fee}</span>}
-          {fee && time && <span>·</span>}
+        <div className="mt-0.5 flex flex-wrap items-center gap-2 text-[11px] text-[#64748B] sm:text-[12px]">
+          {fee && <span className="font-semibold text-[#16866B]">{fee}</span>}
+          {fee && time && <span className="text-slate-300">·</span>}
           {time && <span>{time}</span>}
-          <span>·</span>
-          <span className="text-slate-400">
-            Verified {formatVerifiedDate(resource.lastVerifiedAt)}
+          <span className="text-slate-300">·</span>
+          <span className="inline-flex items-center gap-1 text-slate-400">
+            <ShieldCheck className="h-3 w-3 text-[#16866B]" aria-hidden="true" />
+            <span>Verified {formatVerifiedDate(resource.lastVerifiedAt)}</span>
           </span>
         </div>
       </div>
       <ChevronRight
-        className="h-4 w-4 shrink-0 text-slate-400 transition group-hover:translate-x-0.5 group-hover:text-slate-700"
+        className="h-4 w-4 shrink-0 text-slate-400 transition-transform group-hover:translate-x-0.5 group-hover:text-[#173B67]"
         aria-hidden="true"
       />
     </Link>

@@ -10,22 +10,22 @@
 
 :root {
   /* Core Brand Identity */
-  --brand-navy: #17365d;
-  --brand-navy-hover: #102847;
-  --brand-navy-subtle: #eaf0f8;
+  --brand-navy: #173b67;
+  --brand-navy-hover: #102b4c;
+  --brand-navy-subtle: #ebf1f8;
 
-  --brand-teal: #087f8c;
-  --brand-teal-hover: #06636d;
-  --brand-teal-subtle: #e6f5f7;
+  --brand-teal: #16866b;
+  --brand-teal-hover: #126d57;
+  --brand-teal-subtle: #e8f5f1;
 
   /* Surfaces & Backgrounds */
-  --bg-canvas: #f7f9fc;
+  --bg-canvas: #f5f7fa;
   --bg-surface: #ffffff;
-  --bg-surface-muted: #f1f5f9;
+  --bg-surface-muted: #edf2f7;
   --bg-surface-elevated: #ffffff;
 
   /* Typography & Neutral Ink */
-  --text-primary: #0f172a;
+  --text-primary: #172b45;
   --text-secondary: #334155;
   --text-muted: #64748b;
   --text-on-brand: #ffffff;
@@ -33,7 +33,7 @@
   /* Borders & Dividers */
   --border-subtle: #e2e8f0;
   --border-strong: #cbd5e1;
-  --focus-ring: #087f8c;
+  --focus-ring: #16866b;
 
   /* Semantic Status Colors */
   --status-success: #16a36a;
