@@ -1,18 +1,21 @@
 "use client";
 
 import React, { Suspense, useState } from "react";
+import Link from "next/link";
 import {
   HeartHandshake,
   MapPin,
   CheckCircle2,
   AlertCircle,
   PlusCircle,
+  ExternalLink,
+  Info,
+  ShieldCheck,
+  Search,
 } from "lucide-react";
 import {
-  ACTIVE_ANNOUNCEMENTS,
   PH_LOCATIONS,
   VERIFIED_BAYANIHAN_POSTS,
-  VERIFIED_ORGANIZATIONS,
 } from "@/lib/constants/philippine-data";
 import type { BayanihanPostRecord } from "@/types/database";
 import { SourceCitationBar } from "@/components/trust/verification-badge";
@@ -27,6 +30,7 @@ function BayanihanContent() {
   );
   const [typeFilter, setTypeFilter] = useState<string>("all");
   const [regionFilter, setRegionFilter] = useState<string>("ALL");
+  const [activeTab, setActiveTab] = useState<"list" | "submit">("list");
 
   // Submission Form State
   const [postType, setPostType] = useState<
@@ -88,7 +92,7 @@ function BayanihanContent() {
     if (piiGuard.flagged) {
       setFormError(
         piiGuard.reason ||
-          "Do not include sensitive personal identifiers or residential house numbers."
+          "Do not include sensitive personal identifiers or residential street addresses."
       );
       return;
     }
@@ -122,455 +126,393 @@ function BayanihanContent() {
     setTitle("");
     setSummary("");
     setItemsNeeded("");
+    setMeetingPoint("");
+    setContactChannel("");
   };
 
   return (
-    <div className="mx-auto max-w-7xl px-3 py-6 sm:px-6">
-      {/* Header */}
-      <div className="mb-6 border-b border-slate-200 pb-4">
-        <div className="inline-flex items-center gap-1.5 rounded bg-blue-50 px-2.5 py-0.5 text-xs font-bold uppercase text-[#17365D]">
-          <HeartHandshake className="h-3.5 w-3.5" aria-hidden="true" />
-          <span>Module D · Bayanihan</span>
+    <div className="mx-auto max-w-5xl px-4 py-8 sm:py-10 space-y-8 sm:space-y-10">
+      {/* Header & Page Title (Cardless Editorial Style) */}
+      <div className="space-y-2 border-b border-slate-200 pb-5">
+        <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase text-rose-800">
+          <HeartHandshake className="h-4 w-4 text-rose-700" aria-hidden="true" />
+          <span>Module D · Bayanihan at Komunidad</span>
         </div>
-        <h1 className="mt-1.5 text-xl font-bold tracking-tight text-slate-900 sm:text-2xl">
-          Community Relief, Volunteer Opportunities & Verified Local Initiatives
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+          Community Relief, Volunteer Operations &amp; Mutual Aid Hub
         </h1>
-        <p className="mt-1 text-xs text-slate-600">
-          Connect with verified DSWD NROC, Philippine Red Cross 143, LGU relief operations, and community assistance drives. All community submissions undergo verification labeling.
+        <p className="text-xs sm:text-sm text-slate-500 max-w-3xl leading-relaxed">
+          Connect with verified DSWD NROC family food pack repacking shifts, Philippine Red Cross 143 community volunteer drives, and LGU calamity relief hubs.
         </p>
-        <div className="mt-3 rounded border border-amber-200 bg-amber-50/80 px-3 py-2 text-[11px] text-amber-950">
-          <strong>Safety, Privacy & Donation Policy:</strong> GabayPH does <strong>not</strong> collect monetary donations or process payments. Coordinate in-kind relief and volunteering only at official LGU/Barangay halls, DSWD NROC, or Philippine Red Cross chapters. Never expose private residential street addresses or government ID numbers of individuals requesting help.
+
+        {/* Section Navigation Tabs (Civic Underline Tabs) */}
+        <div className="no-scrollbar flex gap-4 overflow-x-auto whitespace-nowrap pt-3 text-xs font-semibold text-slate-500">
+          <button
+            type="button"
+            onClick={() => {
+              setActiveTab("list");
+              setTypeFilter("all");
+            }}
+            className={`pb-2.5 transition ${
+              activeTab === "list" && typeFilter === "all"
+                ? "border-b-2 border-[#17365D] font-bold text-[#17365D]"
+                : "hover:text-slate-800"
+            }`}
+          >
+            All Initiatives ({posts.length})
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setActiveTab("list");
+              setTypeFilter("volunteer_call");
+            }}
+            className={`pb-2.5 transition ${
+              activeTab === "list" && typeFilter === "volunteer_call"
+                ? "border-b-2 border-[#17365D] font-bold text-[#17365D]"
+                : "hover:text-slate-800"
+            }`}
+          >
+            Volunteer Calls
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setActiveTab("list");
+              setTypeFilter("donation_offer");
+            }}
+            className={`pb-2.5 transition ${
+              activeTab === "list" && typeFilter === "donation_offer"
+                ? "border-b-2 border-[#17365D] font-bold text-[#17365D]"
+                : "hover:text-slate-800"
+            }`}
+          >
+            Food Repacking &amp; In-Kind Hubs
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab("submit")}
+            className={`pb-2.5 transition ${
+              activeTab === "submit"
+                ? "border-b-2 border-rose-700 font-bold text-rose-700"
+                : "hover:text-rose-700"
+            }`}
+          >
+            + Submit Community Drive
+          </button>
         </div>
       </div>
 
-      {/* Filters */}
-      <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-        <div className="flex flex-wrap gap-1.5 text-xs">
-          {[
-            { id: "all", label: "All Bayanihan Listings" },
-            { id: "volunteer_call", label: "Volunteer Calls" },
-            { id: "donation_offer", label: "Donation & Repacking Hubs" },
-            { id: "assistance_request", label: "Community Assistance Requests" },
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              type="button"
-              onClick={() => setTypeFilter(tab.id)}
-              className={`rounded border px-3 py-1.5 font-medium ${
-                typeFilter === tab.id
-                  ? "border-[#17365D] bg-[#17365D] text-white"
-                  : "border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
-
-        <select
-          value={regionFilter}
-          onChange={(e) => setRegionFilter(e.target.value)}
-          aria-label="Filter Bayanihan listings by region"
-          className="rounded border border-slate-300 bg-white px-2.5 py-1.5 text-xs"
-        >
-          <option value="ALL">All Regions</option>
-          {PH_LOCATIONS.map((l) => (
-            <option key={l.id} value={l.regionCode}>
-              {l.regionCode}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      {/* Directory Grid */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
-        <div className="space-y-4 lg:col-span-7">
-          {filteredPosts.map((post) => (
-            <article
-              key={post.id}
-              className="rounded-md border border-slate-200 bg-white p-4 sm:p-5"
-            >
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <div className="flex items-center gap-2">
-                  <span className="rounded bg-blue-50 px-2 py-0.5 font-mono text-[11px] font-bold uppercase text-[#17365D]">
-                    {post.postType.replace("_", " ")}
-                  </span>
-                  {post.urgencyLevel === "critical" && (
-                    <span className="rounded bg-red-100 px-2 py-0.5 text-[11px] font-bold uppercase text-red-900">
-                      Urgent / Critical
-                    </span>
-                  )}
-                </div>
-                <span className="inline-flex items-center gap-1 text-xs text-slate-600">
-                  <MapPin className="h-3.5 w-3.5 text-[#17365D]" />
-                  <span>
-                    {post.cityMunicipality} ({post.regionCode})
-                  </span>
-                </span>
-              </div>
-
-              <div className="mt-2 flex items-start justify-between gap-2">
-                <h2 className="text-base font-bold text-slate-900">
-                  <a
-                    href={`/bayanihan/${post.slug}`}
-                    className="hover:text-[#17365D] hover:underline"
-                  >
-                    {post.title}
-                  </a>
-                </h2>
-                <a
-                  href={`/bayanihan/${post.slug}`}
-                  className="shrink-0 rounded border border-slate-300 bg-white px-2.5 py-1 text-[11px] font-semibold text-[#17365D] hover:bg-slate-50"
-                >
-                  Details →
-                </a>
-              </div>
-              <p className="mt-0.5 text-xs font-medium text-slate-600">
-                Lead Organization: {post.organizationName}
-              </p>
-              <p className="mt-2 text-xs leading-relaxed text-slate-700">
-                {post.summary}
-              </p>
-
-              <div className="mt-3 rounded border border-slate-200 bg-slate-50 p-3 text-xs">
-                <div className="font-semibold text-slate-900">
-                  Items / Volunteer Roles Needed:
-                </div>
-                <div className="mt-1.5 flex flex-wrap gap-1.5">
-                  {post.itemsOrSkillsNeeded.map((skill, idx) => (
-                    <span
-                      key={idx}
-                      className="rounded border border-slate-200 bg-white px-2 py-0.5 text-[11px] text-slate-800"
-                    >
-                      {skill}
-                    </span>
-                  ))}
-                </div>
-                <div className="mt-2.5 text-slate-700">
-                  <strong>Coordination / Drop-off Point:</strong>{" "}
-                  {post.dropOffOrMeetingPoint}
-                </div>
-                <div className="mt-1 text-slate-700">
-                  <strong>Official Contact Channel:</strong> {post.contactChannel}
-                </div>
-              </div>
-
-              <SourceCitationBar
-                sourceName={post.sourceName}
-                sourceUrl={post.sourceUrl}
-                regionName={post.regionName}
-                lastVerifiedAt={post.lastVerifiedAt}
-                verificationStatus={post.verificationStatus}
-                targetId={post.id}
-                targetTitle={post.title}
-                targetType="bayanihan_post"
-                shareHref={`/bayanihan/${post.slug}`}
-              />
-            </article>
-          ))}
-        </div>
-
-        {/* Right Column: Submit Community Initiative for Moderation */}
-        <aside className="lg:col-span-5">
-          <div className="rounded-md border border-slate-200 bg-white p-4 sm:p-5">
-            <div className="flex items-center gap-2 border-b border-slate-200 pb-3">
-              <PlusCircle className="h-4 w-4 text-[#17365D]" />
-              <div>
-                <h2 className="text-sm font-bold text-slate-900">
-                  Submit a Community Drive or Assistance Request
-                </h2>
-                <p className="text-[11px] text-slate-500">
-                  New submissions are labeled &quot;Verification pending&quot; until vetted by a Regional Moderator.
-                </p>
-              </div>
+      {/* SECTION 1: Community Initiatives Directory (Cardless) */}
+      {activeTab === "list" && (
+        <section aria-labelledby="bayanihan-list-heading" className="space-y-4">
+          <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
+            <div className="text-xs">
+              <span className="font-bold text-slate-900">
+                Verified Community Initiatives ({filteredPosts.length})
+              </span>
+              <span className="text-slate-400 block text-[11px]">
+                Physical volunteering &amp; in-kind goods only. No cash solicitations permitted.
+              </span>
             </div>
 
-            {submittedSuccess && (
-              <div className="mt-3 flex items-start gap-2 rounded border border-emerald-300 bg-emerald-50 p-3 text-xs text-emerald-950">
-                <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-700" />
-                <span>
-                  Your Bayanihan listing has been added with status{" "}
-                  <strong>Source available, verification pending</strong> and queued for moderator review.
-                </span>
-              </div>
-            )}
-
-            {formError && (
-              <div
-                role="alert"
-                className="mt-3 flex items-center gap-2 rounded border border-red-300 bg-red-50 p-2.5 text-xs text-red-900"
+            <div className="flex items-center gap-2 text-xs shrink-0">
+              <label htmlFor="bay-region" className="font-semibold text-slate-600">Region:</label>
+              <select
+                id="bay-region"
+                value={regionFilter}
+                onChange={(e) => setRegionFilter(e.target.value)}
+                aria-label="Filter Bayanihan listings by region"
+                className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#17365D]"
               >
-                <AlertCircle className="h-4 w-4 shrink-0 text-red-700" />
-                <span>{formError}</span>
-              </div>
-            )}
+                <option value="ALL">All Regions (Nationwide)</option>
+                {PH_LOCATIONS.map((l) => (
+                  <option key={l.id} value={l.regionCode}>
+                    {l.regionCode} — {l.regionName}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
 
-            <form onSubmit={handleCreatePost} className="mt-4 space-y-3 text-xs">
-              <div className="grid grid-cols-2 gap-2.5">
-                <div>
-                  <label htmlFor="bay-type" className="block font-semibold text-slate-800">
-                    Listing Type
-                  </label>
-                  <select
-                    id="bay-type"
-                    value={postType}
-                    onChange={(e) =>
-                      setPostType(e.target.value as typeof postType)
-                    }
-                    className="mt-1 w-full rounded border border-slate-300 bg-white px-2.5 py-1.5"
-                  >
-                    <option value="volunteer_call">Volunteer Opportunity</option>
-                    <option value="donation_offer">Donation / Relief Hub</option>
-                    <option value="assistance_request">Assistance Request</option>
-                  </select>
+          {filteredPosts.length === 0 ? (
+            <div className="py-8 text-center text-xs text-slate-500">
+              No community initiatives found matching your selected region filter.
+            </div>
+          ) : (
+            <div className="divide-y divide-slate-100 border-y border-slate-200 text-xs">
+              {filteredPosts.map((post) => (
+                <div
+                  key={post.id}
+                  className="py-4 space-y-2 group hover:bg-slate-50/60 -mx-2 px-2 rounded-lg transition"
+                >
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div className="space-y-0.5">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="rounded bg-rose-50 px-1.5 py-0.5 font-mono text-[10px] font-bold uppercase text-rose-800">
+                          {post.postType.replace(/_/g, " ")}
+                        </span>
+                        {post.urgencyLevel === "critical" && (
+                          <span className="rounded bg-red-100 px-1.5 py-0.5 font-mono text-[10px] font-bold uppercase text-red-900">
+                            Urgent Relief
+                          </span>
+                        )}
+                        <span className="text-[11px] text-slate-400">
+                          {post.cityMunicipality} ({post.regionCode})
+                        </span>
+                      </div>
+                      <h3 className="font-bold text-slate-900 group-hover:text-[#17365D] text-sm sm:text-base transition">
+                        <Link href={`/bayanihan/${post.slug}`}>
+                          {post.title}
+                        </Link>
+                      </h3>
+                      <p className="text-[11px] text-slate-500">
+                        Organizing Group: <strong className="text-slate-700">{post.organizationName}</strong>
+                      </p>
+                    </div>
+
+                    <Link
+                      href={`/bayanihan/${post.slug}`}
+                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#17365D] text-white text-xs font-semibold hover:bg-[#102847] shadow-2xs transition shrink-0 self-start sm:self-auto"
+                    >
+                      <span>View Coordination Details</span>
+                      <ExternalLink className="h-3.5 w-3.5" />
+                    </Link>
+                  </div>
+
+                  <p className="text-slate-600 leading-relaxed text-[11.5px]">
+                    {post.summary}
+                  </p>
+
+                  <div className="text-[11px] text-slate-500 space-y-1 pt-1 border-t border-slate-50">
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      <span className="font-semibold text-slate-700">Needed Roles / Goods:</span>
+                      {post.itemsOrSkillsNeeded.map((skill, idx) => (
+                        <span
+                          key={idx}
+                          className="rounded bg-slate-100 px-1.5 py-0.2 text-[10px] text-slate-700 font-medium"
+                        >
+                          {skill}
+                        </span>
+                      ))}
+                    </div>
+                    <div className="flex flex-wrap items-center gap-3 text-slate-600">
+                      <span>Drop-off / Assembly: <strong>{post.dropOffOrMeetingPoint}</strong></span>
+                      <span>·</span>
+                      <span>Desk: <strong>{post.contactChannel}</strong></span>
+                    </div>
+                  </div>
+
+                  <SourceCitationBar
+                    sourceName={post.sourceName}
+                    sourceUrl={post.sourceUrl}
+                    regionName={post.regionName}
+                    lastVerifiedAt={post.lastVerifiedAt}
+                    verificationStatus={post.verificationStatus}
+                    targetId={post.id}
+                    targetTitle={post.title}
+                    targetType="bayanihan_post"
+                    shareHref={`/bayanihan/${post.slug}`}
+                  />
                 </div>
+              ))}
+            </div>
+          )}
+        </section>
+      )}
 
-                <div>
-                  <label htmlFor="bay-urgency" className="block font-semibold text-slate-800">
-                    Urgency Level
-                  </label>
-                  <select
-                    id="bay-urgency"
-                    value={urgencyLevel}
-                    onChange={(e) =>
-                      setUrgencyLevel(e.target.value as typeof urgencyLevel)
-                    }
-                    className="mt-1 w-full rounded border border-slate-300 bg-white px-2.5 py-1.5"
-                  >
-                    <option value="normal">Normal</option>
-                    <option value="high">High Priority</option>
-                    <option value="critical">Critical / Calamity</option>
-                  </select>
-                </div>
-              </div>
+      {/* SECTION 2: Submit Community Initiative (Cardless Form) */}
+      {activeTab === "submit" && (
+        <section aria-labelledby="submit-heading" className="space-y-4">
+          <div className="border-b border-slate-200 pb-3">
+            <h2 id="submit-heading" className="text-sm sm:text-base font-bold text-slate-900">
+              Submit a Community Relief Drive or Volunteer Call
+            </h2>
+            <p className="text-xs text-slate-500 mt-0.5">
+              New submissions are reviewed by regional moderators. Only accredited in-kind drop-off points (Barangay Hall, DSWD NROC, or Red Cross) are accepted.
+            </p>
+          </div>
 
+          {submittedSuccess && (
+            <div className="p-4 rounded-xl bg-emerald-50 text-emerald-950 border border-emerald-200 text-xs flex items-start gap-2.5">
+              <CheckCircle2 className="h-5 w-5 text-emerald-700 shrink-0 mt-0.5" />
               <div>
-                <label htmlFor="bay-title" className="block font-semibold text-slate-800">
-                  Initiative Title
-                </label>
+                <strong className="block font-bold">Initiative Queued for Moderation</strong>
+                <span>Your listing has been submitted for verification. It will appear on the public feed once confirmed.</span>
+              </div>
+            </div>
+          )}
+
+          {formError && (
+            <div className="p-3 rounded-lg bg-red-50 text-red-900 border border-red-200 text-xs flex items-center gap-2">
+              <AlertCircle className="h-4 w-4 shrink-0 text-red-700" />
+              <span>{formError}</span>
+            </div>
+          )}
+
+          <form onSubmit={handleCreatePost} className="space-y-4 text-xs">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <label className="font-semibold text-slate-700">Type of Initiative</label>
+                <select
+                  value={postType}
+                  onChange={(e) => setPostType(e.target.value as any)}
+                  className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-xs focus:outline-none focus:border-[#17365D]"
+                >
+                  <option value="volunteer_call">Volunteer Call (Repacking / Logistics)</option>
+                  <option value="donation_offer">In-Kind Donation &amp; Relief Hub</option>
+                  <option value="assistance_request">Community In-Kind Request</option>
+                </select>
+              </div>
+
+              <div className="space-y-1">
+                <label className="font-semibold text-slate-700">Urgency Level</label>
+                <select
+                  value={urgencyLevel}
+                  onChange={(e) => setUrgencyLevel(e.target.value as any)}
+                  className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-xs focus:outline-none focus:border-[#17365D]"
+                >
+                  <option value="normal">Normal / Scheduled Operation</option>
+                  <option value="high">High Priority</option>
+                  <option value="critical">Critical / Disaster Emergency</option>
+                </select>
+              </div>
+
+              <div className="space-y-1">
+                <label className="font-semibold text-slate-700">Initiative Title</label>
                 <input
-                  id="bay-title"
                   type="text"
                   required
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  placeholder="e.g., Barangay San Roque Weekend Reading & Feeding Drive"
-                  className="mt-1 w-full rounded border border-slate-300 px-3 py-1.5"
+                  placeholder="e.g. Typhoon Relief Food Repacking Volunteers"
+                  className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-xs focus:outline-none focus:border-[#17365D]"
                 />
               </div>
 
-              <div>
-                <label htmlFor="bay-org" className="block font-semibold text-slate-800">
-                  Lead Organization / LGU / Barangay Council
-                </label>
+              <div className="space-y-1">
+                <label className="font-semibold text-slate-700">Organizing Group / LGU Agency</label>
                 <input
-                  id="bay-org"
                   type="text"
                   required
                   value={organizationName}
                   onChange={(e) => setOrganizationName(e.target.value)}
-                  placeholder="e.g., Sangguniang Kabataan / Accredited NGO"
-                  className="mt-1 w-full rounded border border-slate-300 px-3 py-1.5"
+                  placeholder="e.g. Barangay San Isidro DRRM / Red Cross Chapter"
+                  className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-xs focus:outline-none focus:border-[#17365D]"
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-2.5">
-                <div>
-                  <label htmlFor="bay-reg" className="block font-semibold text-slate-800">
-                    Region
-                  </label>
-                  <select
-                    id="bay-reg"
-                    value={regionCode}
-                    onChange={(e) => setRegionCode(e.target.value)}
-                    className="mt-1 w-full rounded border border-slate-300 bg-white px-2.5 py-1.5"
-                  >
-                    {PH_LOCATIONS.map((l) => (
-                      <option key={l.id} value={l.regionCode}>
-                        {l.regionCode}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label htmlFor="bay-city" className="block font-semibold text-slate-800">
-                    City / Municipality
-                  </label>
-                  <input
-                    id="bay-city"
-                    type="text"
-                    required
-                    value={cityMunicipality}
-                    onChange={(e) => setCityMunicipality(e.target.value)}
-                    placeholder="e.g., Pasig City"
-                    className="mt-1 w-full rounded border border-slate-300 px-2.5 py-1.5"
-                  />
-                </div>
+              <div className="space-y-1">
+                <label className="font-semibold text-slate-700">Region</label>
+                <select
+                  value={regionCode}
+                  onChange={(e) => setRegionCode(e.target.value)}
+                  className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-xs focus:outline-none focus:border-[#17365D]"
+                >
+                  {PH_LOCATIONS.map((l) => (
+                    <option key={l.id} value={l.regionCode}>
+                      {l.regionCode} — {l.regionName}
+                    </option>
+                  ))}
+                </select>
               </div>
 
-              <div>
-                <label htmlFor="bay-sum" className="block font-semibold text-slate-800">
-                  Summary & Verification Details (Min 25 chars)
-                </label>
-                <textarea
-                  id="bay-sum"
-                  rows={2}
-                  required
-                  value={summary}
-                  onChange={(e) => setSummary(e.target.value)}
-                  placeholder="Describe the objective, dates, and beneficiaries..."
-                  className="mt-1 w-full rounded border border-slate-300 px-3 py-1.5"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="bay-items" className="block font-semibold text-slate-800">
-                  Specific Items or Volunteer Skills Needed (Comma-separated)
-                </label>
+              <div className="space-y-1">
+                <label className="font-semibold text-slate-700">City / Municipality</label>
                 <input
-                  id="bay-items"
+                  type="text"
+                  required
+                  value={cityMunicipality}
+                  onChange={(e) => setCityMunicipality(e.target.value)}
+                  placeholder="e.g. Pasay City"
+                  className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-xs focus:outline-none focus:border-[#17365D]"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-1">
+              <label className="font-semibold text-slate-700">Operational Summary &amp; Shifts</label>
+              <textarea
+                rows={3}
+                required
+                value={summary}
+                onChange={(e) => setSummary(e.target.value)}
+                placeholder="Describe the volunteer shift schedules, nature of work, or in-kind relief needs..."
+                className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-xs focus:outline-none focus:border-[#17365D]"
+              />
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <label className="font-semibold text-slate-700">Items or Skills Needed (comma-separated)</label>
+                <input
                   type="text"
                   required
                   value={itemsNeeded}
                   onChange={(e) => setItemsNeeded(e.target.value)}
-                  placeholder="e.g., Bottled water, Hygiene kits, Volunteer packers"
-                  className="mt-1 w-full rounded border border-slate-300 px-3 py-1.5"
+                  placeholder="e.g. Canned goods, Bottled water, Pallet loading, Triage"
+                  className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-xs focus:outline-none focus:border-[#17365D]"
                 />
               </div>
 
-              <div>
-                <label htmlFor="bay-point" className="block font-semibold text-slate-800">
-                  Verified Drop-Off or Meeting Point
-                </label>
+              <div className="space-y-1">
+                <label className="font-semibold text-slate-700">Official Drop-off or Assembly Point</label>
                 <input
-                  id="bay-point"
                   type="text"
                   required
                   value={meetingPoint}
                   onChange={(e) => setMeetingPoint(e.target.value)}
-                  placeholder="e.g., Barangay Covered Court / CSWDO Desk"
-                  className="mt-1 w-full rounded border border-slate-300 px-3 py-1.5"
+                  placeholder="e.g. Barangay Hall Gymnasium / Multi-purpose center"
+                  className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-xs focus:outline-none focus:border-[#17365D]"
                 />
               </div>
 
-              <div>
-                <label htmlFor="bay-contact" className="block font-semibold text-slate-800">
-                  Official Contact Number or Desk
-                </label>
+              <div className="space-y-1">
+                <label className="font-semibold text-slate-700">Official Contact Channel</label>
                 <input
-                  id="bay-contact"
                   type="text"
                   required
                   value={contactChannel}
                   onChange={(e) => setContactChannel(e.target.value)}
-                  placeholder="e.g., (02) 8000-0000 / Official LGU Page"
-                  className="mt-1 w-full rounded border border-slate-300 px-3 py-1.5"
+                  placeholder="e.g. Barangay Landline / Official Facebook Page"
+                  className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-xs focus:outline-none focus:border-[#17365D]"
                 />
               </div>
 
-              <div>
-                <label htmlFor="bay-url" className="block font-semibold text-slate-800">
-                  Official Reference Link (Optional)
-                </label>
+              <div className="space-y-1">
+                <label className="font-semibold text-slate-700">Official Source or Verification Link (Optional)</label>
                 <input
-                  id="bay-url"
                   type="url"
                   value={sourceUrl}
                   onChange={(e) => setSourceUrl(e.target.value)}
                   placeholder="https://..."
-                  className="mt-1 w-full rounded border border-slate-300 px-3 py-1.5"
+                  className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-xs focus:outline-none focus:border-[#17365D]"
                 />
               </div>
+            </div>
 
+            <div className="flex justify-end pt-2">
               <button
                 type="submit"
-                className="w-full rounded bg-[#17365D] px-4 py-2 text-xs font-semibold text-white hover:bg-[#102847]"
+                className="px-4 py-2 rounded-lg bg-[#17365D] text-white font-bold text-xs hover:bg-[#102847] shadow-2xs transition"
               >
-                Submit for Community Moderation
+                Submit for Regional Verification
               </button>
-            </form>
-          </div>
-        </aside>
+            </div>
+          </form>
+        </section>
+      )}
+
+      {/* Community Privacy & Anti-Money Laundering Notice (Open Civic Text) */}
+      <div className="pt-4 text-xs text-slate-500 space-y-1.5 border-t border-slate-200/80">
+        <div className="flex items-center gap-1.5 font-bold text-slate-700">
+          <Info className="h-4 w-4 text-[#17365D]" aria-hidden="true" />
+          <span>Community Privacy &amp; Anti-Money Laundering Notice</span>
+        </div>
+        <p className="leading-relaxed">
+          GabayPH does not handle money or private crowdfunding accounts. All relief initiatives must route physical goods through accredited public institutions, LGU barangay disaster desks, DSWD NROC, or the Philippine Red Cross. Never post personal banking or private residential street addresses.
+        </p>
       </div>
-
-      {/* Section 2: Verified Humanitarian & Local Government Organizations */}
-      <section aria-labelledby="bayanihan-orgs-heading" className="mt-10">
-        <h2
-          id="bayanihan-orgs-heading"
-          className="mb-3 text-base font-bold text-slate-900"
-        >
-          2. Verified Humanitarian, Relief & Public Service Organizations
-        </h2>
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {VERIFIED_ORGANIZATIONS.slice(0, 6).map((org) => (
-            <div
-              key={org.id}
-              className="rounded-md border border-slate-200 bg-white p-3.5 text-xs"
-            >
-              <div className="flex items-center justify-between gap-2">
-                <span className="rounded bg-[#17365D] px-2 py-0.5 font-mono text-[10px] font-bold uppercase text-white">
-                  {org.acronym}
-                </span>
-                <span className="text-[11px] text-slate-500">
-                  Verified {org.lastVerifiedAt}
-                </span>
-              </div>
-              <h3 className="mt-1.5 font-bold text-slate-900">{org.name}</h3>
-              <p className="mt-1 line-clamp-2 text-[11px] text-slate-600">
-                {org.description}
-              </p>
-              <div className="mt-2.5 flex items-center justify-between border-t border-slate-100 pt-2 text-[11px]">
-                <span className="font-mono text-slate-600">
-                  Hotline: {org.hotline || "See portal"}
-                </span>
-                <a
-                  href={org.officialWebsite}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="font-semibold text-[#087F8C] hover:underline"
-                >
-                  Official Portal ↗
-                </a>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Section 3: Active Community Announcements & Public Advisories */}
-      <section aria-labelledby="bayanihan-announcements-heading" className="mt-8">
-        <h2
-          id="bayanihan-announcements-heading"
-          className="mb-3 text-base font-bold text-slate-900"
-        >
-          3. Active Community & Public Advisories
-        </h2>
-        <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
-          {ACTIVE_ANNOUNCEMENTS.map((ann) => (
-            <div
-              key={ann.id}
-              className="rounded-md border border-slate-200 bg-white p-3.5 text-xs"
-            >
-              <span className="rounded bg-amber-100 px-2 py-0.5 font-mono text-[10px] font-bold uppercase text-amber-900">
-                {ann.severity} · {ann.regionCode}
-              </span>
-              <h3 className="mt-1.5 font-bold text-slate-900">{ann.title}</h3>
-              <p className="mt-1 text-[11px] text-slate-600">{ann.summary}</p>
-              <div className="mt-2.5 flex items-center justify-between border-t border-slate-100 pt-2 text-[11px]">
-                <span className="text-slate-500">Source: {ann.sourceName}</span>
-                <a
-                  href={ann.sourceUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="font-semibold text-[#087F8C] hover:underline"
-                >
-                  Verify ↗
-                </a>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
     </div>
   );
 }
@@ -579,8 +521,8 @@ export default function BayanihanPage() {
   return (
     <Suspense
       fallback={
-        <div className="mx-auto max-w-7xl px-4 py-8 text-xs text-slate-600">
-          Loading Bayanihan Community Hub...
+        <div className="mx-auto max-w-5xl px-4 py-8 text-xs text-slate-600">
+          Loading Bayanihan Community Relief Hub...
         </div>
       }
     >

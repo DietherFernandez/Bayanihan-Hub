@@ -16,6 +16,7 @@ import {
   Laptop,
   TrendingUp,
   HeartPulse,
+  Info,
 } from "lucide-react";
 import {
   PH_LOCATIONS,
@@ -165,162 +166,102 @@ function AralContent() {
   );
 
   return (
-    <div className="mx-auto max-w-7xl px-3 py-6 sm:px-6">
-      {/* Header */}
-      <div className="mb-6 border-b border-slate-200 pb-4">
-        <div className="inline-flex items-center gap-1.5 rounded bg-blue-50 px-2.5 py-0.5 text-xs font-bold uppercase text-[#17365D]">
-          <GraduationCap className="h-3.5 w-3.5" aria-hidden="true" />
-          <span>Module E · Aral</span>
+    <div className="mx-auto max-w-5xl px-4 py-8 sm:py-10 space-y-8 sm:space-y-10">
+      {/* Header & Page Title (Cardless Editorial Style) */}
+      <div className="space-y-2 border-b border-slate-200 pb-5">
+        <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase text-indigo-800">
+          <GraduationCap className="h-4 w-4 text-indigo-700" aria-hidden="true" />
+          <span>Module E · Aral at Edukasyon</span>
         </div>
-        <h1 className="mt-1.5 text-xl font-bold tracking-tight text-slate-900 sm:text-2xl">
-          Free Online Learning, Scholarships & Personal Progress Tracker
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+          Free Online Learning, Scholarships &amp; Skills Progress Tracker
         </h1>
-        <p className="mt-1 text-xs text-slate-600">
-          Verified DOST-SEI & CHED college scholarships, TESDA free technical-vocational grants, and interactive self-paced learning tracks.
+        <p className="text-xs sm:text-sm text-slate-500 max-w-3xl leading-relaxed">
+          Verified CHED merit scholarships, DOST-SEI undergraduate grants, free TESDA technical-vocational NC-II training, and self-paced courseware.
         </p>
       </div>
 
-      {/* Quick Topic Chips (SVG Icons Only) */}
-      <div className="no-scrollbar mb-4 flex gap-2 overflow-x-auto whitespace-nowrap pb-1">
-        {[
-          { id: "all", label: "All Learning", icon: null },
-          { id: "ICT & Digital", label: "ICT & Web Development", icon: Laptop },
-          { id: "STEM & College", label: "DOST College Scholarships", icon: GraduationCap },
-          { id: "Business & Entrepreneurship", label: "Negosyo & MSME", icon: TrendingUp },
-          { id: "Healthcare & Caregiving", label: "Caregiving & Health", icon: HeartPulse },
-        ].map((chip) => {
-          const Icon = chip.icon;
-          return (
-            <button
-              key={chip.id}
-              type="button"
-              onClick={() => setTopicFilter(chip.id)}
-              className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold shadow-2xs transition ${
-                topicFilter === chip.id
-                  ? "border-[#17365D] bg-[#17365D] text-white"
-                  : "border-slate-200 bg-white text-slate-700 hover:border-slate-300"
-              }`}
-            >
-              {Icon && <Icon className="h-3.5 w-3.5" aria-hidden="true" />}
-              <span>{chip.label}</span>
-            </button>
-          );
-        })}
-      </div>
+      {/* Quick Topic Chips (Lucide SVG Icons, Zero Emojis) */}
+      <div className="space-y-3">
+        <div className="no-scrollbar flex gap-2 overflow-x-auto whitespace-nowrap pb-1">
+          {[
+            { id: "all", label: "All Learning Grants", icon: null },
+            { id: "ICT & Digital", label: "ICT & Web Development", icon: Laptop },
+            { id: "STEM & College", label: "College Scholarships", icon: GraduationCap },
+            { id: "Business & Entrepreneurship", label: "Negosyo & MSME", icon: TrendingUp },
+            { id: "Healthcare & Caregiving", label: "Caregiving & Health", icon: HeartPulse },
+          ].map((chip) => {
+            const Icon = chip.icon;
+            const isSelected = topicFilter === chip.id;
+            return (
+              <button
+                key={chip.id}
+                type="button"
+                onClick={() => setTopicFilter(chip.id)}
+                className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold shadow-2xs transition ${
+                  isSelected
+                    ? "border-[#17365D] bg-[#17365D] text-white"
+                    : "border-slate-200 bg-white text-slate-700 hover:border-slate-300"
+                }`}
+              >
+                {Icon && <Icon className="h-3.5 w-3.5" aria-hidden="true" />}
+                <span>{chip.label}</span>
+              </button>
+            );
+          })}
+        </div>
 
-      {/* Multi-Faceted Filter Bar: Topic, Learning Type, Provider, Location & Keyword */}
-      <section
-        aria-label="Filter learning resources and scholarships"
-        className="mb-6 rounded-xl border border-slate-200 bg-white p-3.5 shadow-2xs"
-      >
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
-          <div>
-            <label
-              htmlFor="aral-search"
-              className="block text-[11px] font-semibold uppercase text-slate-600"
-            >
-              Keyword Search
-            </label>
-            <div className="relative mt-1">
-              <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
-              <input
-                id="aral-search"
-                type="search"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="TESDA, DOST, Web Dev..."
-                className="w-full rounded border border-slate-300 py-1.5 pl-8 pr-2.5 text-xs text-slate-900"
-              />
-            </div>
+        {/* Search & Multi-Faceted Filters (Clean Editorial, No Box Card) */}
+        <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
+          <div className="relative flex-1">
+            <Search className="pointer-events-none absolute left-3.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
+            <input
+              type="search"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search TESDA courses, DOST scholarships, web development..."
+              aria-label="Filter learning resources and scholarships"
+              className="w-full rounded-lg border border-slate-200 bg-white py-2 pl-9 pr-3 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[#17365D] focus:ring-1 focus:ring-[#17365D] transition"
+            />
           </div>
 
-          <div>
-            <label
-              htmlFor="aral-topic"
-              className="block text-[11px] font-semibold uppercase text-slate-600"
-            >
-              Topic
-            </label>
+          <div className="flex flex-wrap items-center gap-2 text-xs shrink-0">
             <select
-              id="aral-topic"
-              value={topicFilter}
-              onChange={(e) => setTopicFilter(e.target.value)}
-              className="mt-1 w-full rounded border border-slate-300 bg-white px-2.5 py-1.5 text-xs text-slate-900"
-            >
-              <option value="all">All Topics</option>
-              <option value="ICT & Digital">ICT & Digital Literacy</option>
-              <option value="STEM & College">STEM & College Degrees</option>
-              <option value="Business & Entrepreneurship">
-                Business & Entrepreneurship
-              </option>
-              <option value="Healthcare & Caregiving">
-                Healthcare & Caregiving
-              </option>
-            </select>
-          </div>
-
-          <div>
-            <label
-              htmlFor="aral-type"
-              className="block text-[11px] font-semibold uppercase text-slate-600"
-            >
-              Learning Type
-            </label>
-            <select
-              id="aral-type"
               value={learningTypeFilter}
               onChange={(e) =>
                 setLearningTypeFilter(
-                  e.target.value as
-                    | "all"
-                    | "scholarship"
-                    | "training"
-                    | "online_course"
+                  e.target.value as "all" | "scholarship" | "training" | "online_course"
                 )
               }
-              className="mt-1 w-full rounded border border-slate-300 bg-white px-2.5 py-1.5 text-xs text-slate-900"
+              aria-label="Filter by learning type"
+              className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#17365D]"
             >
-              <option value="all">All Learning Types</option>
-              <option value="scholarship">College Scholarships</option>
-              <option value="training">Free Skills Training / NC II</option>
-              <option value="online_course">Self-Paced Online Courses</option>
+              <option value="all">All Types</option>
+              <option value="scholarship">Degree Scholarships</option>
+              <option value="training">Free Skills Training (NC-II)</option>
+              <option value="online_course">Self-Paced e-TESDA</option>
             </select>
-          </div>
 
-          <div>
-            <label
-              htmlFor="aral-provider"
-              className="block text-[11px] font-semibold uppercase text-slate-600"
-            >
-              Provider / Agency
-            </label>
             <select
-              id="aral-provider"
               value={providerFilter}
               onChange={(e) => setProviderFilter(e.target.value)}
-              className="mt-1 w-full rounded border border-slate-300 bg-white px-2.5 py-1.5 text-xs text-slate-900"
+              aria-label="Filter by provider"
+              className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#17365D]"
             >
-              <option value="all">All Verified Providers</option>
+              <option value="all">All Providers</option>
               <option value="TESDA">TESDA / e-TESDA</option>
               <option value="DOST">DOST-SEI</option>
+              <option value="CHED">CHED</option>
               <option value="DICT">DICT</option>
             </select>
-          </div>
 
-          <div>
-            <label
-              htmlFor="aral-region"
-              className="block text-[11px] font-semibold uppercase text-slate-600"
-            >
-              Location / Region
-            </label>
             <select
-              id="aral-region"
               value={regionFilter}
               onChange={(e) => setRegionFilter(e.target.value)}
-              className="mt-1 w-full rounded border border-slate-300 bg-white px-2.5 py-1.5 text-xs text-slate-900"
+              aria-label="Filter by region"
+              className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#17365D]"
             >
-              <option value="ALL">Nationwide & All Regions</option>
+              <option value="ALL">Nationwide (All Regions)</option>
               {PH_LOCATIONS.filter((l) => !l.isNational).map((loc) => (
                 <option key={loc.id} value={loc.regionCode}>
                   {loc.regionCode} — {loc.regionName}
@@ -329,20 +270,20 @@ function AralContent() {
             </select>
           </div>
         </div>
-      </section>
+      </div>
 
-      {/* Section 1: Scholarship & Free Training Grants Directory */}
-      <section aria-labelledby="scholarships-heading" className="mb-10">
-        <h2
-          id="scholarships-heading"
-          className="mb-3 text-base font-bold text-slate-900"
-        >
-          1. Verified Government Scholarships & Free Skills Grants ({scholarshipsAndTraining.length})
-        </h2>
+      {/* SECTION 1: Scholarship & Free Training Grants Directory (Cardless) */}
+      <section aria-labelledby="scholarships-heading" className="space-y-4">
+        <div className="flex items-center justify-between text-xs border-b border-slate-200 pb-2">
+          <h2 id="scholarships-heading" className="font-bold text-slate-900 text-sm sm:text-base">
+            1. Verified Government Scholarships &amp; Skills Grants ({scholarshipsAndTraining.length})
+          </h2>
+          <span className="text-slate-400">Direct Agency Guidelines</span>
+        </div>
 
         {scholarshipsAndTraining.length === 0 ? (
-          <div className="rounded-md border border-slate-200 bg-white p-6 text-center text-xs text-slate-600">
-            No scholarships or training grants matched your current filter combination.{" "}
+          <div className="py-8 text-center text-xs text-slate-500">
+            No scholarships or training grants matched your filter criteria.{" "}
             <button
               type="button"
               onClick={() => {
@@ -354,84 +295,84 @@ function AralContent() {
               }}
               className="font-semibold text-[#17365D] underline"
             >
-              Reset all Aral filters
+              Reset all filters
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div className="divide-y divide-slate-100 border-y border-slate-200 text-xs">
             {scholarshipsAndTraining.map((item) => {
-              const isHighlighted = initialSlug === item.slug;
               return (
-                <article
+                <div
                   key={item.id}
-                  className={`flex flex-col justify-between rounded-md border bg-white p-4 sm:p-5 ${
-                    isHighlighted
-                      ? "border-[#17365D] ring-2 ring-[#17365D]/20"
-                      : "border-slate-200"
-                  }`}
+                  className="py-4 space-y-2 group hover:bg-slate-50/60 -mx-2 px-2 rounded-lg transition"
                 >
-                  <div>
-                    <div className="flex flex-wrap items-center justify-between gap-2">
-                      <span className="rounded bg-blue-50 px-2 py-0.5 font-mono text-[11px] font-bold uppercase text-[#17365D]">
-                        {item.type}
-                      </span>
-                      <div className="flex items-center gap-2">
-                        <Link
-                          href={`/aral/${item.slug}`}
-                          className="rounded border border-slate-300 bg-slate-50 px-2.5 py-1 text-xs font-semibold text-[#17365D] hover:bg-blue-50"
-                        >
-                          Full Grant Details
-                        </Link>
-                        <button
-                          type="button"
-                          onClick={() =>
-                            toggleBookmark({
-                              targetType: "opportunity",
-                              targetId: item.id,
-                              targetSlug: item.slug,
-                              targetTitle: item.title,
-                              targetModule: "aral",
-                              href: `/aral/${item.slug}`,
-                            })
-                          }
-                          className="inline-flex items-center gap-1 rounded border border-slate-300 bg-white px-2.5 py-1 text-xs font-medium text-slate-700 hover:bg-slate-50"
-                        >
-                          {isBookmarked(item.id) ? (
-                            <>
-                              <BookmarkCheck className="h-3.5 w-3.5 text-emerald-700" />
-                              <span>Saved</span>
-                            </>
-                          ) : (
-                            <>
-                              <Bookmark className="h-3.5 w-3.5" />
-                              <span>Save</span>
-                            </>
-                          )}
-                        </button>
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div className="space-y-0.5">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="rounded bg-indigo-50 px-1.5 py-0.5 font-mono text-[10px] font-bold uppercase text-indigo-800">
+                          {item.organizationName.split(" ")[0]} · {item.type}
+                        </span>
+                        <span className="text-[11px] text-slate-400">
+                          {item.regionName}
+                        </span>
+                        {item.deadlineAt && (
+                          <>
+                            <span className="text-slate-300">·</span>
+                            <span className="text-[11px] text-amber-700 font-medium">
+                              Deadline: {item.deadlineAt}
+                            </span>
+                          </>
+                        )}
                       </div>
+                      <h3 className="font-bold text-slate-900 group-hover:text-[#17365D] text-sm sm:text-base transition">
+                        <Link href={`/aral/${item.slug}`}>
+                          {item.title}
+                        </Link>
+                      </h3>
                     </div>
 
-                    <h3 className="mt-2 text-base font-bold text-slate-900">
-                      <Link href={`/aral/${item.slug}`} className="hover:text-[#17365D] hover:underline">
-                        {item.title}
+                    <div className="flex items-center gap-2 shrink-0 self-start sm:self-auto">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          toggleBookmark({
+                            targetType: "opportunity",
+                            targetId: item.id,
+                            targetSlug: item.slug,
+                            targetTitle: item.title,
+                            targetModule: "aral",
+                            href: `/aral/${item.slug}`,
+                          })
+                        }
+                        className="p-1.5 rounded-lg border border-slate-200 text-slate-400 hover:text-[#17365D] transition"
+                        title="Save grant"
+                      >
+                        {isBookmarked(item.id) ? (
+                          <BookmarkCheck className="h-4 w-4 text-emerald-700" />
+                        ) : (
+                          <Bookmark className="h-4 w-4" />
+                        )}
+                      </button>
+                      <Link
+                        href={`/aral/${item.slug}`}
+                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#17365D] text-white text-xs font-semibold hover:bg-[#102847] shadow-2xs transition"
+                      >
+                        <span>Full Details</span>
+                        <ExternalLink className="h-3.5 w-3.5" />
                       </Link>
-                    </h3>
-                    <p className="mt-1 text-xs text-slate-600">
-                      {item.description}
-                    </p>
-
-                    <div className="mt-3 rounded border border-emerald-200 bg-emerald-50/70 p-2.5 text-xs text-emerald-950">
-                      <strong>Grant Benefit:</strong> {item.compensationOrBenefit}
                     </div>
+                  </div>
 
-                    <div className="mt-3 text-xs">
-                      <strong className="text-slate-800">Key Requirements:</strong>
-                      <ul className="mt-1 list-disc space-y-1 pl-4 text-slate-600">
-                        {item.requirements.map((r, i) => (
-                          <li key={i}>{r}</li>
-                        ))}
-                      </ul>
-                    </div>
+                  <p className="text-slate-600 leading-relaxed text-[11.5px]">
+                    {item.description}
+                  </p>
+
+                  <div className="text-[11px] text-slate-500 flex flex-wrap items-center gap-2 pt-1 border-t border-slate-50">
+                    <span className="font-semibold text-emerald-800">
+                      Benefit: {item.compensationOrBenefit}
+                    </span>
+                    <span>·</span>
+                    <span>{item.requirements.slice(0, 2).join(" · ")}</span>
                   </div>
 
                   <SourceCitationBar
@@ -444,107 +385,97 @@ function AralContent() {
                     targetTitle={item.title}
                     targetType="opportunity"
                   />
-                </article>
+                </div>
               );
             })}
           </div>
         )}
       </section>
 
-      {/* Section 2: Interactive Learning Progress Tracker */}
-      <section aria-labelledby="learning-progress-heading" className="mb-10">
-        <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
-            <Award className="h-4 w-4 text-[#17365D]" aria-hidden="true" />
-            <h2
-              id="learning-progress-heading"
-              className="text-base font-bold text-slate-900"
-            >
-              2. Free Self-Paced Learning Tracks & Progress Tracker ({filteredTracks.length})
+      {/* SECTION 2: Interactive Self-Paced Learning Progress Tracker (Cardless) */}
+      <section aria-labelledby="learning-progress-heading" className="space-y-4 pt-2">
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-2">
+          <div>
+            <h2 id="learning-progress-heading" className="text-sm sm:text-base font-bold text-slate-900">
+              2. Interactive Self-Paced Learning Tracks ({filteredTracks.length})
             </h2>
+            <p className="text-xs text-slate-500">
+              Check off modules as you complete them online at e-TESDA.
+            </p>
           </div>
-          <span className="text-xs text-slate-500">
-            Check off modules as you complete them on e-TESDA
-          </span>
+          <span className="text-[11px] font-mono text-emerald-700 font-bold">Free Certifications</span>
         </div>
 
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+        <div className="divide-y divide-slate-100 border-y border-slate-200 text-xs">
           {filteredTracks.map((track) => {
             const completed = completedChecklistIds[track.id] || [];
             const pct = Math.round(
               (completed.length / track.modules.length) * 100
             );
             return (
-              <div
-                key={track.id}
-                className="flex flex-col justify-between rounded-md border border-slate-200 bg-white p-4"
-              >
-                <div>
-                  <div className="flex items-center justify-between gap-2 text-xs">
-                    <span className="font-semibold text-[#17365D]">
-                      {track.provider}
+              <div key={track.id} className="py-4 space-y-2.5">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div className="space-y-0.5">
+                    <div className="flex items-center gap-2">
+                      <span className="rounded bg-indigo-50 px-1.5 py-0.5 font-mono text-[10px] font-bold uppercase text-indigo-800">
+                        {track.providerTag}
+                      </span>
+                      <span className="font-bold text-slate-900 text-sm">
+                        {track.title}
+                      </span>
+                    </div>
+                    <span className="block text-[11px] text-slate-500">
+                      {track.provider} · {track.duration} · Topic: {track.topic}
                     </span>
-                    <span className="rounded bg-slate-100 px-2 py-0.5 font-mono text-[11px] font-bold text-slate-800">
+                  </div>
+
+                  <div className="flex items-center gap-2 shrink-0 self-start sm:self-auto">
+                    <span className="font-mono text-xs font-bold text-emerald-700">
                       {pct}% Complete
                     </span>
-                  </div>
-
-                  <h3 className="mt-1.5 text-sm font-bold text-slate-900">
-                    {track.title}
-                  </h3>
-                  <p className="mt-0.5 text-[11px] text-slate-500">
-                    {track.duration} · Topic: {track.topic}
-                  </p>
-
-                  {/* Progress bar */}
-                  <div className="mt-2.5 h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
-                    <div
-                      className="h-full bg-emerald-600 transition-all"
-                      style={{ width: `${pct}%` }}
-                    />
-                  </div>
-
-                  <div className="mt-3 divide-y divide-slate-100 border-t border-slate-100 pt-2 text-xs">
-                    {track.modules.map((modName, idx) => {
-                      const stepId = `${track.id}-m${idx}`;
-                      const isDone = completed.includes(stepId);
-                      return (
-                        <button
-                          key={stepId}
-                          type="button"
-                          onClick={() => toggleChecklistStep(track.id, stepId)}
-                          className="flex w-full items-start gap-2 py-2 text-left hover:bg-slate-50"
-                        >
-                          {isDone ? (
-                            <CheckSquare className="mt-0.5 h-4 w-4 shrink-0 text-emerald-700" />
-                          ) : (
-                            <Square className="mt-0.5 h-4 w-4 shrink-0 text-slate-400" />
-                          )}
-                          <span
-                            className={
-                              isDone
-                                ? "line-through text-slate-400"
-                                : "text-slate-800"
-                            }
-                          >
-                            {modName}
-                          </span>
-                        </button>
-                      );
-                    })}
+                    <a
+                      href={track.portalUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#17365D] text-white text-xs font-semibold hover:bg-[#102847] shadow-2xs transition"
+                    >
+                      <span>Open e-TESDA Course</span>
+                      <ExternalLink className="h-3.5 w-3.5" />
+                    </a>
                   </div>
                 </div>
 
-                <div className="mt-3 border-t border-slate-100 pt-3">
-                  <a
-                    href={track.portalUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex w-full items-center justify-center gap-1.5 rounded bg-[#17365D] px-3 py-2 text-xs font-semibold text-white hover:bg-[#102847]"
-                  >
-                    <span>Open Official e-TESDA Courseware</span>
-                    <ExternalLink className="h-3.5 w-3.5" />
-                  </a>
+                {/* Progress bar */}
+                <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                  <div
+                    className="h-full bg-emerald-600 transition-all duration-300"
+                    style={{ width: `${pct}%` }}
+                  />
+                </div>
+
+                {/* Modules Checklist */}
+                <div className="space-y-1.5 pt-1">
+                  {track.modules.map((modName, idx) => {
+                    const stepId = `${track.id}-m${idx}`;
+                    const isDone = completed.includes(stepId);
+                    return (
+                      <button
+                        key={stepId}
+                        type="button"
+                        onClick={() => toggleChecklistStep(track.id, stepId)}
+                        className="flex w-full items-start gap-2.5 py-1 text-left text-slate-700 hover:text-slate-900 group transition"
+                      >
+                        {isDone ? (
+                          <CheckSquare className="mt-0.5 h-4 w-4 shrink-0 text-emerald-700" />
+                        ) : (
+                          <Square className="mt-0.5 h-4 w-4 shrink-0 text-slate-400 group-hover:text-slate-600" />
+                        )}
+                        <span className={isDone ? "line-through text-slate-400" : "text-slate-800"}>
+                          {modName}
+                        </span>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             );
@@ -552,101 +483,101 @@ function AralContent() {
         </div>
       </section>
 
-      {/* Section 3: Detailed e-TESDA Enrollment Guide */}
-      <section aria-labelledby="aral-guides-heading" className="mb-10">
-        <h2
-          id="aral-guides-heading"
-          className="mb-3 text-base font-bold text-slate-900"
-        >
-          3. Official Enrollment Guide
+      {/* SECTION 3: Official Enrollment Guides (Cardless) */}
+      <section aria-labelledby="aral-guides-heading" className="space-y-4 pt-2">
+        <h2 id="aral-guides-heading" className="text-sm sm:text-base font-bold text-slate-900 border-b border-slate-200 pb-2">
+          3. Official Enrollment Guides
         </h2>
-        {aralResources.map((res) => (
-          <div
-            key={res.id}
-            className="rounded-md border border-slate-200 bg-white p-4 sm:p-5"
-          >
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <h3 className="text-sm font-bold text-slate-900">
-                <Link href={`/aral/${res.slug}`} className="hover:text-[#17365D] hover:underline">
-                  {res.title}
+        <div className="divide-y divide-slate-100 border-y border-slate-200 text-xs">
+          {aralResources.map((res) => (
+            <div key={res.id} className="py-4 space-y-2">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <h3 className="font-bold text-slate-900 text-sm">
+                  <Link href={`/aral/${res.slug}`} className="hover:text-[#17365D] hover:underline">
+                    {res.title}
+                  </Link>
+                </h3>
+                <Link
+                  href={`/aral/${res.slug}`}
+                  className="inline-flex items-center gap-1 text-[#17365D] font-semibold hover:underline"
+                >
+                  <span>Open Dedicated Enrollment Guide</span>
+                  <ExternalLink className="h-3 w-3" />
                 </Link>
-              </h3>
-              <Link
-                href={`/aral/${res.slug}`}
-                className="rounded border border-slate-300 bg-slate-50 px-2.5 py-1 text-xs font-semibold text-[#17365D] hover:bg-blue-50"
-              >
-                Open Dedicated Enrollment Page
-              </Link>
+              </div>
+              <p className="text-slate-600 leading-relaxed text-[11.5px]">{res.summary}</p>
+              <ol className="list-decimal space-y-1 pl-4 text-slate-700 pt-1">
+                {res.steps.map((s) => (
+                  <li key={s.stepNumber}>
+                    <strong>{s.title}:</strong> {s.description}
+                  </li>
+                ))}
+              </ol>
+              <SourceCitationBar
+                sourceName={res.sourceName}
+                sourceUrl={res.sourceUrl}
+                regionName={res.regionName}
+                lastVerifiedAt={res.lastVerifiedAt}
+                verificationStatus={res.verificationStatus}
+                targetId={res.id}
+                targetTitle={res.title}
+                targetType="resource"
+              />
             </div>
-            <p className="mt-1 text-xs text-slate-600">{res.summary}</p>
-            <ol className="mt-3 list-decimal space-y-1.5 pl-4 text-xs text-slate-700">
-              {res.steps.map((s) => (
-                <li key={s.stepNumber}>
-                  <strong>{s.title}:</strong> {s.description}
-                </li>
-              ))}
-            </ol>
-            <SourceCitationBar
-              sourceName={res.sourceName}
-              sourceUrl={res.sourceUrl}
-              regionName={res.regionName}
-              lastVerifiedAt={res.lastVerifiedAt}
-              verificationStatus={res.verificationStatus}
-              targetId={res.id}
-              targetTitle={res.title}
-              targetType="resource"
-            />
-          </div>
-        ))}
+          ))}
+        </div>
       </section>
 
-      {/* Section 4: Verified Educational & Training Institutions */}
-      <section aria-labelledby="aral-orgs-heading">
-        <div className="mb-3 flex items-center gap-2">
+      {/* SECTION 4: Verified Educational Agencies (Cardless) */}
+      <section aria-labelledby="aral-orgs-heading" className="space-y-3 pt-2">
+        <div className="flex items-center gap-2 border-b border-slate-200 pb-2">
           <Building2 className="h-4 w-4 text-[#17365D]" aria-hidden="true" />
-          <h2
-            id="aral-orgs-heading"
-            className="text-base font-bold text-slate-900"
-          >
-            4. Verified Educational & Training Agencies
+          <h2 id="aral-orgs-heading" className="text-sm sm:text-base font-bold text-slate-900">
+            4. Verified Educational &amp; Scholarship Agencies
           </h2>
         </div>
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <div className="divide-y divide-slate-100 border-y border-slate-200 text-xs">
           {educationalOrgs.map((org) => (
-            <div
-              key={org.id}
-              className="flex flex-col justify-between rounded-md border border-slate-200 bg-white p-3.5 text-xs"
-            >
-              <div>
-                <div className="flex items-center justify-between gap-2">
-                  <span className="rounded bg-blue-50 px-2 py-0.5 font-mono text-[10px] font-bold text-[#17365D]">
+            <div key={org.id} className="py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div className="space-y-0.5">
+                <div className="flex items-center gap-2">
+                  <span className="rounded bg-indigo-50 px-1.5 py-0.5 font-mono text-[10px] font-bold text-[#17365D]">
                     {org.acronym}
                   </span>
+                  <span className="font-bold text-slate-900">{org.name}</span>
                   <VerificationBadge
                     status={org.verificationStatus}
                     lastVerifiedAt={org.lastVerifiedAt}
                   />
                 </div>
-                <h3 className="mt-2 font-bold text-slate-900">{org.name}</h3>
-                <p className="mt-1 text-[11px] text-slate-500">
-                  Hotline: {org.hotline}
-                </p>
+                <span className="block text-[11px] text-slate-500">
+                  Hotline: {org.hotline} · Verified Agency
+                </span>
               </div>
-              <div className="mt-3 border-t border-slate-100 pt-2">
-                <a
-                  href={org.officialWebsite}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 font-semibold text-[#17365D] hover:underline"
-                >
-                  <span>Official Agency Portal</span>
-                  <ExternalLink className="h-3 w-3" />
-                </a>
-              </div>
+              <a
+                href={org.officialWebsite}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 font-semibold text-[#17365D] hover:underline shrink-0"
+              >
+                <span>Official Agency Portal</span>
+                <ExternalLink className="h-3 w-3" />
+              </a>
             </div>
           ))}
         </div>
       </section>
+
+      {/* Statutory Disclosure (Open Civic Text, No Box Card) */}
+      <div className="pt-4 text-xs text-slate-500 space-y-1.5 border-t border-slate-200/80">
+        <div className="flex items-center gap-1.5 font-bold text-slate-700">
+          <Info className="h-4 w-4 text-[#17365D]" aria-hidden="true" />
+          <span>Scholarship Eligibility &amp; Testing Notice</span>
+        </div>
+        <p className="leading-relaxed">
+          GabayPH provides verified statutory information for free public education and skills training. We do not evaluate exam results or award scholarships. Official application processing and qualifying examinations are administered directly by CHED, DOST-SEI, and accredited TESDA centers.
+        </p>
+      </div>
     </div>
   );
 }
@@ -655,8 +586,8 @@ export default function AralPage() {
   return (
     <Suspense
       fallback={
-        <div className="mx-auto max-w-7xl px-4 py-8 text-xs text-slate-600">
-          Loading Aral Scholarships & Free Courses...
+        <div className="mx-auto max-w-5xl px-4 py-8 text-xs text-slate-600">
+          Loading Aral Scholarships &amp; Free Courses...
         </div>
       }
     >
